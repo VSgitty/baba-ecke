@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meine Filmliste</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: 120px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .sort-controls {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .sort-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sort-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sort-label {
+            font-weight: bold;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .sort-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: #f0f0f0;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            min-width: 120px;
+        }
+
+        .sort-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .sort-btn.active {
+            background: #2196f3;
+            color: white;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            background: white;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .filter-btn:hover {
+            border-color: #2196f3;
+            color: #2196f3;
+        }
+
+        .filter-btn.active {
+            background: #2196f3;
+            color: white;
+            border-color: #2196f3;
+        }
+
+        /* Franchise Overview Styles */
+        .franchise-overview {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .franchise-overview h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-shadow: none;
+        }
+
+        .franchise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .franchise-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .franchise-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .franchise-card.final-destination {
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+        }
+
+        .franchise-card.saw {
+            background: linear-gradient(135deg, #FF4500 0%, #FF6347 100%);
+        }
+
+        .franchise-card.scream {
+            background: linear-gradient(135deg, #000000 0%, #434343 100%);
+        }
+
+        .franchise-card.halloween {
+            background: linear-gradient(135deg, #FF8C00 0%, #FFA500 100%);
+        }
+
+        .franchise-card.friday-13th {
+            background: linear-gradient(135deg, #8B0000 0%, #B22222 100%);
+        }
+
+        .franchise-card.nightmare {
+            background: linear-gradient(135deg, #8B008B 0%, #9932CC 100%);
+        }
+
+        .franchise-card.conjuring {
+            background: linear-gradient(135deg, #2F4F4F 0%, #708090 100%);
+        }
+
+        .franchise-card.insidious {
+            background: linear-gradient(135deg, #191970 0%, #4169E1 100%);
+        }
+
+        .franchise-card.paranormal {
+            background: linear-gradient(135deg, #000080 0%, #4682B4 100%);
+        }
+
+        .franchise-card.purge {
+            background: linear-gradient(135deg, #8B0000 0%, #CD5C5C 100%);
+        }
+
+        .franchise-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .franchise-icon {
+            font-size: 2rem;
+            margin-right: 10px;
+        }
+
+        .franchise-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .franchise-count {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .franchise-movies {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .franchise-movie {
+            background: rgba(255,255,255,0.1);
+            padding: 6px 8px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            text-align: center;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+
+        .franchise-movie:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .franchise-movie.completed {
+            background: rgba(76, 175, 80, 0.3);
+        }
+
+        .franchise-movie.watching {
+            background: rgba(255, 152, 0, 0.3);
+        }
+
+        .franchise-movie.planned {
+            background: rgba(33, 150, 243, 0.3);
+        }
+
+        .franchise-movie.paused {
+            background: rgba(244, 67, 54, 0.3);
+        }
+
+        .franchise-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .franchise-progress {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .franchise-progress-bar {
+            width: 60px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .franchise-progress-fill {
+            height: 100%;
+            background: rgba(76, 175, 80, 0.8);
+            transition: width 0.3s;
+        }
+
+        .movie-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .movie-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transition: all 0.5s ease;
+            position: relative;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .movie-card.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-bottom: 3px solid #f0f0f0;
+        }
+
+        .movie-info {
+            padding: 15px;
+        }
+
+        .movie-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .movie-details {
+            color: #666;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+
+        .movie-genre {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-right: 4px;
+            margin-bottom: 8px;
+        }
+
+        .progress-section {
+            margin-top: 12px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .status-watching { background: #ff9800; }
+        .status-completed { background: #4caf50; }
+        .status-planned { background: #2196f3; }
+        .status-paused { background: #f44336; }
+
+        .movie-rating {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .stars {
+            color: #ffc107;
+            margin-right: 5px;
+            font-size: 0.9rem;
+        }
+
+        .rating-text {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .results-info {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .added-time {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 3px 6px;
+            border-radius: 8px;
+            font-size: 0.6rem;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(30, 60, 114, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header .logo {
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        header nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        header nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+
+        header nav a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        header nav a[href="mylist.html"] {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .back-button {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(255,255,255,1);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .sort-section {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .movie-list {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            body {
+                padding-top: 140px;
+            }
+
+            .franchise-grid {
+                grid-template-columns: 1fr;
+            }
+
+                        
+            .franchise-movies {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+                /* Franchise Overview Styles */
+                .franchise-overview {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .franchise-overview h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-shadow: none;
+        }
+
+        .franchise-grid {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 10px 0;
+            scroll-behavior: smooth;
+        }
+
+        .franchise-grid::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .franchise-grid::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .franchise-grid::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .franchise-grid::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .franchise-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            max-width: 300px;
+            max-height: 150px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .sort-section {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .movie-list {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            body {
+                padding-top: 140px;
+            }
+
+            .franchise-card {
+                min-width: 250px;
+            }
+                        
+            .franchise-movies {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header>
+        <div class="logo">Baba Marcos Baba Ecke</div>
+        <nav>
+            <a href="https://skullbonk.netlify.app">Page mage</a>
+            <a href="index.html">Streams</a>
+            <a href="#">Series</a>
+            <a href="mylist.html">My List & Progress</a>
+        </nav>
+    </header>
+
+    <!-- Zurück Button -->
+    <button class="back-button" onclick="goBack()">← Zurück zur Übersicht</button>
+
+    <div class="container">
+        <h1>🎬 Meine Filmliste</h1>
+        
+        <!-- Sortier- und Filter-Controls -->
+        <div class="sort-controls">
+            <div class="sort-section">
+                <!-- Sortierung -->
+                <div class="sort-group">
+                    <span class="sort-label">Sortieren nach:</span>
+                    <div class="filter-group">
+                        <button class="sort-btn active" data-sort="added">Zuletzt hinzugefügt</button>
+                        <button class="sort-btn" data-sort="title">Titel A-Z</button>
+                        <button class="sort-btn" data-sort="year">Jahr</button>
+                        <button class="sort-btn" data-sort="rating">Bewertung</button>
+                        <button class="sort-btn" data-sort="progress">Fortschritt</button>
+                        <button class="sort-btn" data-sort="status">Status</button>
+                    </div>
+                </div>
+
+                <!-- Status Filter -->
+                <div class="sort-group">
+                    <span class="sort-label">Status:</span>
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-filter="all">Alle</button>
+                        <button class="filter-btn" data-filter="watching">Schaue ich</button>
+                        <button class="filter-btn" data-filter="completed">Abgeschlossen</button>
+                        <button class="filter-btn" data-filter="planned">Geplant</button>
+                        <button class="filter-btn" data-filter="paused">Pausiert</button>
+                    </div>
+                </div>
+
+                <!-- Genre Filter -->
+                <div class="sort-group">
+                    <span class="sort-label">Genre:</span>
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-genre="all">Alle</button>
+                        <button class="filter-btn" data-genre="horror">Horror</button>
+                        <button class="filter-btn" data-genre="sci-fi">Sci-Fi</button>
+                        <button class="filter-btn" data-genre="thriller">Thriller</button>
+                        <button class="filter-btn" data-genre="action">Action</button>
+                        <button class="filter-btn" data-genre="drama">Drama</button>
+                        <button class="filter-btn" data-genre="crime">Crime</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Franchise Overview -->
+        <div class="franchise-overview">
+            <h2>🎬 Filmreihen Übersicht</h2>
+            <div class="franchise-grid" id="franchiseGrid">
+                <!-- Wird dynamisch gefüllt -->
+            </div>
+        </div>
+
+        <div class="results-info" id="resultsInfo">
+            Zeige alle 0 Filme
+        </div>
+        
+        <div class="movie-list" id="movieList">
+            <!-- Filme werden hier dynamisch hinzugefügt -->
+        </div>
+    </div>
+
+    <script src="movie_collections.js"></script>
+    <script>
+        class MovieSorter {
+            constructor() {
+                this.movieList = document.getElementById('movieList');
+                this.resultsInfo = document.getElementById('resultsInfo');
+                this.movies = Array.from(document.querySelectorAll('.movie-card'));
+                this.currentSort = 'added';
+                this.currentFilter = 'all';
+                this.currentGenre = 'all';
+                
+                this.initEventListeners();
+                this.updateResults();
+            }
+
+            initEventListeners() {
+                // Sortier-Buttons
+                document.querySelectorAll('[data-sort]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.setActiveButton(e.target, '[data-sort]');
+                        this.currentSort = e.target.dataset.sort;
+                        this.sortAndFilter();
+                    });
+                });
+
+                // Status-Filter
+                document.querySelectorAll('[data-filter]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.setActiveButton(e.target, '[data-filter]');
+                        this.currentFilter = e.target.dataset.filter;
+                        this.sortAndFilter();
+                    });
+                });
+
+                // Genre-Filter
+                document.querySelectorAll('[data-genre]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.setActiveButton(e.target, '[data-genre]');
+                        this.currentGenre = e.target.dataset.genre;
+                        this.sortAndFilter();
+                    });
+                });
+            }
+
+            setActiveButton(clickedBtn, selector) {
+                document.querySelectorAll(selector).forEach(btn => btn.classList.remove('active'));
+                clickedBtn.classList.add('active');
+            }
+
+            sortMovies(movies) {
+                return movies.sort((a, b) => {
+                    switch (this.currentSort) {
+                        case 'added':
+                            return parseInt(a.dataset.added) - parseInt(b.dataset.added);
+                        
+                        case 'title':
+                            return a.dataset.title.localeCompare(b.dataset.title);
+                        
+                        case 'year':
+                            return parseInt(b.dataset.year) - parseInt(a.dataset.year);
+                        
+                        case 'rating':
+                            return parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating);
+                        
+                        case 'progress':
+                            return parseInt(b.dataset.progress) - parseInt(a.dataset.progress);
+                        
+                        case 'status':
+                            const statusOrder = { 'watching': 1, 'paused': 2, 'planned': 3, 'completed': 4 };
+                            return statusOrder[a.dataset.status] - statusOrder[b.dataset.status];
+                        
+                        default:
+                            return 0;
+                    }
+                });
+            }
+
+            filterMovies(movies) {
+                return movies.filter(movie => {
+                    // Status Filter
+                    const statusMatch = this.currentFilter === 'all' || movie.dataset.status === this.currentFilter;
+                    
+                    // Genre Filter
+                    const genreMatch = this.currentGenre === 'all' || 
+                                     movie.dataset.genres.includes(this.currentGenre);
+                    
+                    return statusMatch && genreMatch;
+                });
+            }
+
+            sortAndFilter() {
+                // Alle Filme verstecken
+                this.movies.forEach(movie => {
+                    movie.classList.add('hidden');
+                });
+
+                // Filme filtern und sortieren
+                let filteredMovies = this.filterMovies([...this.movies]);
+                let sortedMovies = this.sortMovies(filteredMovies);
+
+                // Sortierte Filme anzeigen
+                setTimeout(() => {
+                    // Alle Filme aus dem DOM entfernen
+                    this.movies.forEach(movie => {
+                        if (movie.parentNode) {
+                            movie.parentNode.removeChild(movie);
+                        }
+                    });
+
+                    // Sortierte und gefilterte Filme wieder hinzufügen
+                    sortedMovies.forEach(movie => {
+                        movie.classList.remove('hidden');
+                        this.movieList.appendChild(movie);
+                    });
+
+                    // Versteckte Filme hinzufügen (für spätere Filter)
+                    this.movies.forEach(movie => {
+                        if (!sortedMovies.includes(movie)) {
+                            movie.classList.add('hidden');
+                            this.movieList.appendChild(movie);
+                        }
+                    });
+
+                    this.updateResults(sortedMovies.length);
+                }, 300);
+            }
+
+            updateResults(count = null) {
+                const visibleCount = count !== null ? count : this.movies.length;
+                const totalCount = this.movies.length;
+                
+                let text = `Zeige ${visibleCount} von ${totalCount} Filmen`;
+                
+                if (this.currentFilter !== 'all') {
+                    const filterText = {
+                        'watching': 'Schaue ich',
+                        'completed': 'Abgeschlossen',
+                        'planned': 'Geplant',
+                        'paused': 'Pausiert'
+                    };
+                    text += ` • Status: ${filterText[this.currentFilter]}`;
+                }
+                
+                if (this.currentGenre !== 'all') {
+                    text += ` • Genre: ${this.currentGenre.charAt(0).toUpperCase() + this.currentGenre.slice(1)}`;
+                }
+                
+                const sortText = {
+                    'added': 'Zuletzt hinzugefügt',
+                    'title': 'Titel A-Z',
+                    'year': 'Jahr (neueste zuerst)',
+                    'rating': 'Bewertung (höchste zuerst)',
+                    'progress': 'Fortschritt (höchster zuerst)',
+                    'status': 'Status'
+                };
+                text += ` • Sortiert nach: ${sortText[this.currentSort]}`;
+                
+                this.resultsInfo.textContent = text;
+            }
+
+            // Neue Methode um Movies Array zu aktualisieren
+            refreshMovies() {
+                this.movies = Array.from(document.querySelectorAll('.movie-card'));
+                this.updateResults();
+            }
+        }
+
+        // Global MovieSorter Variable
+        let movieSorter;
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', function() {
+            // Zuerst Collection-Filme laden
+            loadCollectionMovies();
+            
+            // Dann MovieSorter initialisieren
+            setTimeout(() => {
+                movieSorter = new MovieSorter();
+                
+                // Hover-Effekte für Movie Cards
+                document.addEventListener('mouseenter', function(e) {
+                    if (e.target.closest('.movie-card')) {
+                        const card = e.target.closest('.movie-card');
+                        if (!card.classList.contains('hidden')) {
+                            card.style.transform = 'translateY(-8px) scale(1.02)';
+                        }
+                    }
+                }, true);
+
+                document.addEventListener('mouseleave', function(e) {
+                    if (e.target.closest('.movie-card')) {
+                        const card = e.target.closest('.movie-card');
+                        card.style.transform = 'translateY(0) scale(1)';
+                    }
+                }, true);
+
+                // Klick-Event für Movie Cards
+                document.addEventListener('click', function(e) {
+                    const card = e.target.closest('.movie-card');
+                    if (card && !card.classList.contains('hidden')) {
+                        const title = card.querySelector('.movie-title').textContent;
+                        const progress = card.dataset.progress;
+                        const status = card.dataset.status;
+                        
+                        alert(`Film: "${title}"\nFortschritt: ${progress}%\nStatus: ${status}`);
+                    }
+                });
+            }, 100);
+        });
+
+        function loadCollectionMovies() {
+            const collections = new MovieCollections();
+            const allMovies = collections.getAllMovies();
+            const movieList = document.getElementById('movieList');
+            
+            // Bestehende Beispielfilme löschen
+            movieList.innerHTML = '';
+            
+            // Franchise-Übersicht erstellen
+            createFranchiseOverview(collections);
+            
+            // Collection-Filme hinzufügen mit korrekten data-added Attributen
+            allMovies.forEach((movie, index) => {
+                const statusText = {
+                    'watching': 'Schaue ich',
+                    'completed': 'Abgeschlossen', 
+                    'planned': 'Geplant',
+                    'paused': 'Pausiert'
+                };
+
+                const stars = '★'.repeat(Math.floor(movie.rating / 2)) + '☆'.repeat(5 - Math.floor(movie.rating / 2));
+
+                // Zeitstempel für "Hinzugefügt" berechnen
+                function getTimeAgo(timestamp) {
+                    const now = Date.now();
+                    const diff = now - timestamp;
+                    const minutes = Math.floor(diff / (1000 * 60));
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const weeks = Math.floor(days / 7);
+                    const months = Math.floor(days / 30);
+
+                    if (minutes < 60) return `${minutes} Min`;
+                    if (hours < 24) return `${hours} Std`;
+                    if (days < 7) return `${days} Tage`;
+                    if (weeks < 4) return `${weeks} Wochen`;
+                    if (months < 12) return `${months} Monate`;
+                    return 'Letztes Jahr';
+                }
+
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.setAttribute('data-title', movie.title);
+                card.setAttribute('data-year', movie.year);
+                card.setAttribute('data-rating', movie.rating);
+                card.setAttribute('data-progress', movie.progress);
+                card.setAttribute('data-duration', movie.duration);
+                card.setAttribute('data-status', movie.status);
+                card.setAttribute('data-genres', movie.genres);
+                card.setAttribute('data-added', index + 1); // Für Sortierung
+
+                card.innerHTML = `
+                    <div class="added-time">${getTimeAgo(movie.added)}</div>
+                    <div class="status-badge status-${movie.status}">${statusText[movie.status]}</div>
+                    <img src="${movie.poster}" alt="${movie.title}" class="movie-poster">
+                    <div class="movie-info">
+                        <h3 class="movie-title">${movie.title}</h3>
+                        <div class="movie-details">${movie.year} • ${movie.duration} Min • ${movie.director}</div>
+                        ${movie.genres.split(',').map(genre => `<span class="movie-genre">${genre.charAt(0).toUpperCase() + genre.slice(1)}</span>`).join('')}
+                        
+                        <div class="movie-rating">
+                            <span class="stars">${stars}</span>
+                            <span class="rating-text">${movie.rating}/10</span>
+                        </div>
+                        
+                        <div class="progress-section">
+                                                        <div class="progress-label">
+                                <span>Fortschritt</span>
+                                <span>${movie.progress}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${movie.progress}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                movieList.appendChild(card);
+            });
+
+            // Ergebnis-Info aktualisieren
+            document.getElementById('resultsInfo').textContent = `Zeige alle ${allMovies.length} Filme`;
+        }
+
+        function createFranchiseOverview(collections) {
+            const franchiseGrid = document.getElementById('franchiseGrid');
+            
+            const franchiseData = [
+                {
+                    key: 'finalDestination',
+                    title: 'Final Destination',
+                    icon: '💀',
+                    className: 'final-destination',
+                    movies: collections.getCollection('finalDestination')
+                },
+                {
+                    key: 'saw',
+                    title: 'Saw',
+                    icon: '🪚',
+                    className: 'saw',
+                    movies: collections.getCollection('saw')
+                },
+                {
+                    key: 'scream',
+                    title: 'Scream',
+                    icon: '😱',
+                    className: 'scream',
+                    movies: collections.getCollection('scream')
+                },
+                {
+                    key: 'halloween',
+                    title: 'Halloween',
+                    icon: '🎃',
+                    className: 'halloween',
+                    movies: collections.getCollection('halloween')
+                },
+                {
+                    key: 'fridayThe13th',
+                    title: 'Friday the 13th',
+                    icon: '🔪',
+                    className: 'friday-13th',
+                    movies: collections.getCollection('fridayThe13th')
+                },
+                {
+                    key: 'nightmareOnElmStreet',
+                    title: 'Nightmare on Elm Street',
+                    icon: '😈',
+                    className: 'nightmare',
+                    movies: collections.getCollection('nightmareOnElmStreet')
+                },
+                {
+                    key: 'conjuring',
+                    title: 'Conjuring Universe',
+                    icon: '👻',
+                    className: 'conjuring',
+                    movies: collections.getCollection('conjuring')
+                },
+                {
+                    key: 'insidious',
+                    title: 'Insidious',
+                    icon: '🌙',
+                    className: 'insidious',
+                    movies: collections.getCollection('insidious')
+                },
+                {
+                    key: 'paranormalActivity',
+                    title: 'Paranormal Activity',
+                    icon: '📹',
+                    className: 'paranormal',
+                    movies: collections.getCollection('paranormalActivity')
+                },
+                {
+                    key: 'purge',
+                    title: 'The Purge',
+                    icon: '🎭',
+                    className: 'purge',
+                    movies: collections.getCollection('purge')
+                }
+            ];
+
+            franchiseData.forEach(franchise => {
+                const card = createFranchiseCard(franchise);
+                franchiseGrid.appendChild(card);
+            });
+        }
+
+        function createFranchiseCard(franchise) {
+            const card = document.createElement('div');
+            card.className = `franchise-card ${franchise.className}`;
+            
+            const completedCount = franchise.movies.filter(m => m.status === 'completed').length;
+            const totalCount = franchise.movies.length;
+            const progressPercent = Math.round((completedCount / totalCount) * 100);
+
+            const moviesHtml = franchise.movies.map((movie, index) => {
+                const shortTitle = movie.title.length > 20 ? 
+                    movie.title.substring(0, 17) + '...' : movie.title;
+                return `<div class="franchise-movie ${movie.status}" 
+                             onclick="scrollToMovie('${movie.title}')" 
+                             title="${movie.title} (${movie.year})">
+                            ${shortTitle}
+                        </div>`;
+            }).join('');
+
+            card.innerHTML = `
+                <div class="franchise-header">
+                    <div style="display: flex; align-items: center;">
+                        <span class="franchise-icon">${franchise.icon}</span>
+                        <span class="franchise-title">${franchise.title}</span>
+                    </div>
+                    <span class="franchise-count">${totalCount} Filme</span>
+                </div>
+                
+                <div class="franchise-movies">
+                    ${moviesHtml}
+                </div>
+                
+                <div class="franchise-stats">
+                    <span>Abgeschlossen: ${completedCount}/${totalCount}</span>
+                    <div class="franchise-progress">
+                        <span>${progressPercent}%</span>
+                        <div class="franchise-progress-bar">
+                            <div class="franchise-progress-fill" style="width: ${progressPercent}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Klick-Event für die ganze Karte
+            card.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('franchise-movie')) {
+                    filterByFranchise(franchise.key);
+                }
+            });
+
+            return card;
+        }
+
+        function scrollToMovie(movieTitle) {
+            const movieCards = document.querySelectorAll('.movie-card');
+            movieCards.forEach(card => {
+                if (card.dataset.title === movieTitle) {
+                    card.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                    
+                    // Highlight-Effekt
+                    card.style.transform = 'scale(1.05)';
+                    card.style.boxShadow = '0 0 20px rgba(33, 150, 243, 0.6)';
+                    
+                    setTimeout(() => {
+                        card.style.transform = '';
+                        card.style.boxShadow = '';
+                    }, 2000);
+                }
+            });
+        }
+
+        function filterByFranchise(franchiseKey) {
+            // Alle Filter zurücksetzen
+            document.querySelectorAll('[data-filter]').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('[data-filter="all"]').classList.add('active');
+            
+            document.querySelectorAll('[data-genre]').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('[data-genre="all"]').classList.add('active');
+
+            // Franchise-spezifische Filme anzeigen
+            const collections = new MovieCollections();
+            const franchiseMovies = collections.getCollection(franchiseKey);
+            const franchiseTitles = franchiseMovies.map(m => m.title);
+
+            const allMovieCards = document.querySelectorAll('.movie-card');
+            let visibleCount = 0;
+
+            allMovieCards.forEach(card => {
+                if (franchiseTitles.includes(card.dataset.title)) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Ergebnis-Info aktualisieren
+            const franchiseNames = {
+                'finalDestination': 'Final Destination',
+                'saw': 'Saw',
+                'scream': 'Scream',
+                'halloween': 'Halloween',
+                'fridayThe13th': 'Friday the 13th',
+                'nightmareOnElmStreet': 'Nightmare on Elm Street',
+                'conjuring': 'Conjuring Universe',
+                'insidious': 'Insidious',
+                'paranormalActivity': 'Paranormal Activity',
+                'purge': 'The Purge'
+            };
+
+            document.getElementById('resultsInfo').textContent = 
+                `Zeige ${visibleCount} Filme aus ${franchiseNames[franchiseKey]}`;
+
+            // Zur Filmliste scrollen
+            document.getElementById('movieList').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        // Zurück-Button Funktion
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
+

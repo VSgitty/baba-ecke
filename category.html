@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kategorie - Film Streaming</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .category-hero {
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .category-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+        }
+
+        .category-hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .category-hero h1 {
+            font-size: 3.5rem;
+            margin: 0 0 20px 0;
+            color: #f4c10f;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+        }
+
+        .category-hero p {
+            font-size: 1.2rem;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #f4c10f;
+            color: #121212;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(244, 193, 15, 0.3);
+        }
+
+        .back-button:hover {
+            background: #e0b509;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 193, 15, 0.4);
+        }
+
+        .category-movies {
+            padding: 40px 0;
+            background-color: #121212;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .movie-card-category {
+            background-color: #1f1f1f;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .movie-card-category:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(244, 193, 15, 0.2);
+        }
+
+        .movie-card-category img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .movie-card-category .content {
+            padding: 20px;
+        }
+
+        .movie-card-category .content h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+            color: #f4c10f;
+        }
+
+        .movie-card-category .content p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #cccccc;
+        }
+
+        .movie-rating {
+            display: inline-block;
+            background: #f4c10f;
+            color: #121212;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .category-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .category-hero p {
+                font-size: 1rem;
+            }
+
+            .movies-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .back-button {
+                position: relative;
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="goBack()">← Zurück zur Übersicht</button>
+    
+    <div class="category-hero" id="categoryHero">
+        <div class="category-hero-content">
+            <h1 id="categoryTitle">Kategorie wird geladen...</h1>
+            <p id="categoryDescription">Beschreibung wird geladen...</p>
+        </div>
+    </div>
+
+    <div class="category-movies">
+        <div class="movies-grid" id="moviesGrid">
+            <!-- Movies will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        // Category database with movies
+        const categoryDatabase = {
+            'horror': {
+                title: 'Horror',
+                description: 'Erleben Sie die besten Horrorfilme - von klassischen Thrillern bis zu modernen Schreckensfilmen',
+                background: 'https://images.unsplash.com/photo-1520637736862-4d197d17c90a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                movies: [
+                    {
+                        id: 'scream1',
+                        title: 'Scream',
+                        cover: 'https://i.ebayimg.com/00/s/MTYwMFgxMDI1/z/CBIAAOSwBLlVIuJ8/$_57.JPG?set_id=880000500F',
+                        year: '1996',
+                        rating: '7.3/10',
+                        description: 'Ein maskierter Killer terrorisiert Sidney Prescott und ihre Freunde in diesem Horror-Klassiker.'
+                    },
+                    {
+                        id: 'scream2',
+                        title: 'Scream 2',
+                        cover: 'https://paramount-media.de/image/get/id/1043/q/85/w/367/h/0/name/cover.jpg',
+                        year: '1997',
+                        rating: '6.3/10',
+                        description: 'Die Fortsetzung des Horror-Hits mit neuen Morden am Windsor College.'
+                    },
+                    {
+                        id: 'scream3',
+                        title: 'Scream 3',
+                        cover: 'https://m.media-amazon.com/images/I/71Iv91gOENL._AC_UF894,1000_QL80_.jpg',
+                        year: '2000',
+                        rating: '5.6/10',
+                        description: 'Der Ghostface-Killer kehrt zurück und terrorisiert das Hollywood-Set von STAB 3.'
+                    },
+                    {
+                        id: 'scream4',
+                        title: 'Scream 4',
+                        cover: 'https://m.media-amazon.com/images/I/61nQR9fZltL.jpg',
+                        year: '2011',
+                        rating: '6.2/10',
+                        description: 'Zehn Jahre später kehrt Sidney nach Woodsboro zurück und der Ghostface-Killer schlägt erneut zu.'
+                    },
+                    {
+                        id: 'scream5',
+                        title: 'Scream (2022)',
+                        cover: 'https://m.media-amazon.com/images/I/81WzNuj6BGL._AC_UF894,1000_QL80_.jpg',
+                        year: '2022',
+                        rating: '6.3/10',
+                        description: 'Eine neue Generation wird von einem neuen Ghostface-Killer ins Visier genommen.'
+                    },
+                    {
+                        id: 'scream6',
+                        title: 'Scream VI',
+                        cover: 'https://m.media-amazon.com/images/I/71NtLPdYYPL.jpg',
+                        year: '2023',
+                        rating: '6.5/10',
+                        description: 'Die Überlebenden ziehen nach New York, aber die Vergangenheit holt sie ein.'
+                    }
+                ]
+            },
+            'action': {
+                title: 'Action',
+                description: 'Adrenalingeladene Action-Filme mit spektakulären Stunts und packenden Kämpfen',
+                background: 'https://images.unsplash.com/photo-1489599735734-79b4169c2a78?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                movies: [
+                    {
+                        id: 'john-wick',
+                        title: 'John Wick',
+                        cover: 'https://media1.jpc.de/image/w1155/front/0/4006680072067.jpg',
+                        year: '2014',
+                        rating: '7.4/10',
+                        description: 'Ein pensionierter Auftragskiller kehrt zurück, um Rache für seinen getöteten Hund zu nehmen.'
+                    },
+                    {
+                        id: 'mad-max',
+                        title: 'Mad Max: Fury Road',
+                        cover: 'https://de.web.img3.acsta.net/r_1280_720/img/75/fc/75fc90eee42e23be1857be88082dd3db.jpg',
+                        year: '2015',
+                        rating: '8.1/10',
+                        description: 'In einer post-apokalyptischen Welt kämpft Max ums Überleben in der Wüste.'
+                    }
+                ]
+            },
+            'comedy': {
+                title: 'Comedy',
+                description: 'Die besten Komödien für garantierte Lacher und gute Unterhaltung',
+                background: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                movies: [
+                    {
+                        id: 'scott-tenorman',
+                        title: 'Scott Tenorman Must Die',
+                        cover: 'https://img.diverto.tv/sites/default/files/new/image/cover/9/1/b/img-811539225?sgnpyh',
+                        year: '2001',
+                        rating: '9.5/10',
+                        description: 'Cartmans diabolischer Racheplan in dieser legendären South Park-Episode.'
+                    },
+                    {
+                        id: 'cartmanland',
+                        title: 'Cartmanland',
+                        cover: 'https://cdn.moviepilot.de/files/4ac4e2e1bd9952dc65a34e1633043b2cf8aefcf29ca94af1b259e2fdbc1e/copyright/FGlKDFsXIAQ3KN5.jpeg',
+                        year: '2001',
+                        rating: '9.2/10',
+                        description: 'Cartman kauft seinen eigenen Vergnügungspark in dieser klassischen South Park-Episode.'
+                    }
+                ]
+            },
+            'scifi': {
+                title: 'Science Fiction',
+                description: 'Faszinierende Sci-Fi Welten mit futuristischen Technologien und außergewöhnlichen Geschichten',
+                background: 'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                movies: [
+                    {
+                        id: 'alice-in-borderland',
+                        title: 'Alice in Borderland',
+                        cover: 'https://images.justwatch.com/poster/302278365/s718/Alice-in-Borderland.jpg',
+                        year: '2020',
+                        rating: '7.8/10',
+                        description: 'Arisu und seine Freunde müssen in einem verlassenen Tokio gefährliche Spiele überleben.'
+                    },
+                    {
+                        id: 'blade-runner',
+                        title: 'Blade Runner 2049',
+                        cover: 'https://m.media-amazon.com/images/I/71qKQlFhpOL._AC_UF894,1000_QL80_.jpg',
+                        year: '2017',
+                        rating: '8.0/10',
+                        description: 'Ein junger Blade Runner entdeckt ein Geheimnis, das die Gesellschaft ins Chaos stürzen könnte.'
+                    }
+                ]
+            },
+            'drama': {
+                title: 'Drama',
+                description: 'Emotionale und tiefgreifende Dramen, die das menschliche Leben in all seinen Facetten zeigen',
+                background: 'https://images.unsplash.com/photo-1489599735734-79b4169c2a78?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                movies: [
+                    {
+                        id: 'shawshank',
+                        title: 'The Shawshank Redemption',
+                        cover: 'https://m.media-amazon.com/images/I/71715eBi1sL._AC_UF894,1000_QL80_.jpg',
+                        year: '1994',
+                        rating: '9.3/10',
+                        description: 'Die Geschichte einer ungewöhnlichen Freundschaft zwischen zwei Gefangenen.'
+                    }
+                ]
+            },
+            'thriller': {
+                title: 'Thriller',
+                description: 'Spannungsgeladene Thriller, die Sie bis zur letzten Minute in Atem halten',
+                background: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                movies: [
+                    {
+                        id: 'gone-girl',
+                        title: 'Gone Girl',
+                        cover: 'https://m.media-amazon.com/images/I/81P4WrY7NFL._AC_UF894,1000_QL80_.jpg',
+                        year: '2014',
+                        rating: '8.1/10',
+                        description: 'Ein Mann wird zum Hauptverdächtigen im Verschwinden seiner Frau.'
+                    },
+                    {
+                        id: 'zodiac',
+                        title: 'Zodiac',
+                        cover: 'https://m.media-amazon.com/images/I/71VKtmC5SQL._AC_UF894,1000_QL80_.jpg',
+                        year: '2007',
+                        rating: '7.7/10',
+                        description: 'Die obsessive Jagd nach dem berüchtigten Zodiac-Killer in San Francisco.'
+                    }
+                ]
+            }
+        };
+
+        // Function to get URL parameters
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Function to load category data
+        function loadCategoryData() {
+            const categoryId = getUrlParameter('category');
+            
+            if (!categoryId || !categoryDatabase[categoryId]) {
+                document.getElementById('categoryTitle').textContent = 'Kategorie nicht gefunden';
+                document.getElementById('categoryDescription').textContent = 'Die angeforderte Kategorie existiert nicht.';
+                return;
+            }
+
+            const category = categoryDatabase[categoryId];
+            
+            // Set page title
+            document.title = category.title + ' - Film Streaming';
+            
+            // Set hero section
+            document.getElementById('categoryTitle').textContent = category.title;
+            document.getElementById('categoryDescription').textContent = category.description;
+            document.getElementById('categoryHero').style.backgroundImage = `url('${category.background}')`;
+            
+            // Load movies
+            loadMovies(category.movies);
+        }
+
+        // Function to load movies
+        function loadMovies(movies) {
+            const moviesGrid = document.getElementById('moviesGrid');
+            moviesGrid.innerHTML = '';
+
+            movies.forEach((movie, index) => {
+                const movieCard = document.createElement('div');
+                movieCard.className = 'movie-card-category';
+                movieCard.style.animationDelay = `${index * 0.1}s`;
+                
+                movieCard.innerHTML = `
+                    <img src="${movie.cover}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x400/1f1f1f/f4c10f?text=No+Image'">
+                    <div class="content">
+                        <h3>${movie.title}</h3>
+                        <p><strong>Jahr:</strong> ${movie.year}</p>
+                        <p>${movie.description}</p>
+                        <span class="movie-rating">${movie.rating}</span>
+                    </div>
+                `;
+                
+                movieCard.addEventListener('click', () => {
+                    window.location.href = `stream.html?id=${movie.id}`;
+                });
+                
+                moviesGrid.appendChild(movieCard);
+            });
+        }
+
+        // Function to go back
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        // Load category data when page loads
+        window.onload = function() {
+            loadCategoryData();
+        };
+    </script>
+</body>
+</html>

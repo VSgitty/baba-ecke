@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Film Review Page</title>
+
+    <!-- Pop-up Blocker laden -->
+    <script src="popup-blocker.js"></script>
+    
+    <style>
+        /* Ihre bestehenden Styles hier */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            background-color: #f4f4f4;
+            padding: 20px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        /* Iframe Schutz Styles */
+        .iframe-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .iframe-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .iframe-container:hover .iframe-overlay {
+            pointer-events: auto;
+        }
+
+        /* Ihre anderen bestehenden Styles... */
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            background-color: #f4f4f4;
+            padding: 20px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .container {
+            display: grid;
+            grid-template-areas:
+                "cover name"
+                "cover infos"
+                "cover beschreibung"
+                "player player"
+                "kritik kommentare";
+            grid-template-columns: 1fr 2fr;
+            grid-template-rows: auto auto auto auto auto;
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            animation: slideIn 1.2s ease-out;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 1000;
+            transition: background 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #0056b3;
+        }
+
+        .film-cover {
+            grid-area: cover;
+            background-color: #d8d8d8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            min-height: 300px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+        .film-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .film-cover:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .film-name {
+            grid-area: name;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-align: left;
+            animation: fadeInText 1.5s ease-in-out;
+            color: #333;
+        }
+
+        .video-player {
+            grid-area: player;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .video-player iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .no-stream {
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .film-infos, .film-beschreibung, .film-kritik, .film-kommentare {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .film-infos:hover, .film-beschreibung:hover, .film-kritik:hover, .film-kommentare:hover {
+            background-color: #e9ecef;
+            transform: translateY(-5px);
+        }
+
+        .film-infos {
+            grid-area: infos;
+            font-size: 0.9rem;
+        }
+
+        .film-beschreibung {
+            grid-area: beschreibung;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .film-kritik {
+            grid-area: kritik;
+            font-size: 0.9rem;
+            min-height: 200px;
+        }
+
+        .film-kommentare {
+            grid-area: kommentare;
+            font-size: 0.9rem;
+            min-height: 200px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #007bff;
+            font-size: 1.1rem;
+        }
+
+        .info-item {
+            margin-bottom: 5px;
+        }
+
+        .rating {
+            color: #ff6b35;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInText {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-areas:
+                    "cover"
+                    "name"
+                    "infos"
+                    "beschreibung"
+                    "player"
+                    "kritik"
+                    "kommentare";
+                grid-template-columns: 1fr;
+            }
+
+            .back-button {
+                position: relative;
+                margin-bottom: 20px;
+            }
+
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="goBack()">← Zurück zur Übersicht</button>
+    
+    <div class="container">
+        <div class="film-cover" id="filmCover">
+            <img id="coverImage" src="" alt="Film Cover" style="display: none;">
+            <div id="placeholderText">Film Cover</div>
+        </div>
+        
+        <div class="film-name" id="filmName">Film wird geladen...</div>
+        
+        <div class="film-infos" id="filmInfos">
+            <div class="section-title">Film Informationen</div>
+            <div id="infoContent">Informationen werden geladen...</div>
+        </div>
+        
+        <div class="film-beschreibung" id="filmDescription">
+            <div class="section-title">Beschreibung</div>
+            <div id="descriptionContent">Beschreibung wird geladen...</div>
+        </div>
+        
+        <div class="video-player" id="videoPlayer">
+            <iframe id="streamFrame" src="" allowfullscreen style="display: none;"></iframe>
+            <div id="noStreamMessage" class="no-stream">Stream wird geladen...</div>
+        </div>
+        
+        <div class="film-kritik">
+            <div class="section-title">Kritik & Bewertung</div>
+            <p>Hier finden Sie professionelle Kritiken und Bewertungen zum Film. Die Analyse umfasst Aspekte wie Regie, Schauspiel, Cinematografie und Gesamteindruck.</p>
+            <div id="criticContent"></div>
+        </div>
+        
+        <div class="film-kommentare">
+            <div class="section-title">Zuschauer Kommentare</div>
+            <p>Teilen Sie Ihre Meinung mit anderen Zuschauern und lesen Sie, was andere über diesen Film denken.</p>
+            <div id="commentsContent">
+                <div style="margin-top: 15px; padding: 10px; background: #fff; border-left: 4px solid #007bff;">
+                    <strong>Benutzer123:</strong> "Großartiger Film! Sehr empfehlenswert."
+                </div>
+                <div style="margin-top: 10px; padding: 10px; background: #fff; border-left: 4px solid #28a745;">
+                    <strong>FilmFan:</strong> "Spannend von Anfang bis Ende!"
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Movie database - gleiche Datenbank wie in index2.html
+        const movieDatabase = {
+            'alice-in-borderland': {
+                title: 'Alice in Borderland',
+                cover: 'https://images.justwatch.com/poster/302278365/s718/Alice-in-Borderland.jpg',
+                streamUrl: 'https://example.com/stream/alice-borderland',
+                genre: 'Thriller, Sci-Fi',
+                releaseDate: '2020',
+                duration: '8 Episodes',
+                rating: '7.8/10',
+                description: 'Alice in Borderland ist eine japanische Science-Fiction-Thriller-Serie. Die Geschichte folgt Arisu, einem ziellosen, arbeitslosen und videospielbesessenen jungen Mann, dessen Leben nirgendwo hinführt, und seinen zwei Freunden, die sich in einem verlassenen Tokio wiederfinden, wo sie gezwungen sind, an gefährlichen Spielen teilzunehmen.'
+            },
+            'scott-tenorman': {
+                title: 'Scott Tenorman Must Die',
+                cover: 'https://img.diverto.tv/sites/default/files/new/image/cover/9/1/b/img-811539225?sgnpyh',
+                streamUrl: 'https://jennifercertaindevelopment.com/e/dhxgavfs1otn',
+                genre: 'Animation, Comedy',
+                releaseDate: '2001',
+                duration: '22 min',
+                rating: '9.5/10',
+                description: 'Scott Tenorman muss sterben! In dieser legendären South Park-Episode sucht Cartman Rache an Scott Tenorman, der ihn dazu gebracht hat, Schamhaare zu kaufen. Was folgt, ist einer der diabolischsten Rachepläne in der Fernsehgeschichte.'
+            },
+            'cartmanland': {
+                title: 'Cartmanland',
+                cover: 'https://cdn.moviepilot.de/files/4ac4e2e1bd9952dc65a34e1633043b2cf8aefcf29ca94af1b259e2fdbc1e/copyright/FGlKDFsXIAQ3KN5.jpeg',
+                streamUrl: 'https://jennifercertaindevelopment.com/e/0jxaobp5opzp',
+                genre: 'Animation, Comedy',
+                releaseDate: '2001',
+                duration: '22 min',
+                rating: '9.2/10',
+                description: 'In dieser klassischen South Park-Episode erbt Cartman eine Million Dollar von seiner Großmutter und beschließt, seinen eigenen Vergnügungspark namens Cartmanland zu kaufen, wo er alleine spielen kann, ohne in Schlangen warten oder mit anderen Menschen zu tun haben zu müssen.'
+            },
+            'scream1': {
+                title: 'Scream',
+                cover: 'https://i.ebayimg.com/00/s/MTYwMFgxMDI1/z/CBIAAOSwBLlVIuJ8/$_57.JPG?set_id=880000500F',
+                streamUrl: 'https://vinovo.to/e/ggj504jnc2gjpr?02',
+                genre: 'Horror, Mystery',
+                releaseDate: '1996',
+                duration: '111 min',
+                rating: '7.3/10',
+                description: 'Ein Jahr nach dem Mord an ihrer Mutter wird Sidney Prescott von einem maskierten Killer terrorisiert, der sie und ihre Freunde ins Visier nimmt, indem er Horrorfilme als Teil eines tödlichen Spiels verwendet.'
+            },
+            'scream2': {
+                title: 'Scream 2',
+                cover: 'https://paramount-media.de/image/get/id/1043/q/85/w/367/h/0/name/cover.jpg',
+                streamUrl: 'https://vinovo.to/e/0p7r5e2rcd2gnn?02',
+                genre: 'Horror, Mystery',
+                releaseDate: '1997',
+                duration: '120 min',
+                rating: '6.3/10',
+                description: 'Zwei Jahre nach der ersten Mordserie besuchen Sidney Prescott und Randy das Windsor College, als ein Nachahmer-Killer eine neue Serie von Morden beginnt.'
+            },
+            'scream3': {
+                title: 'Scream 3',
+                cover: 'https://m.media-amazon.com/images/I/71Iv91gOENL._AC_UF894,1000_QL80_.jpg',
+                streamUrl: 'https://example.com/stream/scream3',
+                genre: 'Horror, Mystery',
+                releaseDate: '2000',
+                duration: '116 min',
+                rating: '5.6/10',
+                description: 'Während Sidney Prescott in sicher bewachter Abgeschiedenheit lebt, beginnen Leichen um das Hollywood-Set von STAB 3 zu fallen, dem neuesten Film basierend auf den grausamen Woodsboro-Morden.'
+            },
+            'scream4': {
+                title: 'Scream 4',
+                cover: 'https://m.media-amazon.com/images/I/61nQR9fZltL.jpg',
+                streamUrl: 'https://example.com/stream/scream4',
+                genre: 'Horror, Mystery',
+                releaseDate: '2011',
+                duration: '111 min',
+                rating: '6.2/10',
+                description: 'Zehn Jahre sind vergangen, und Sidney Prescott, die sich teilweise durch ihr Schreiben wieder zusammengerauft hat, wird vom Ghostface-Killer besucht.'
+            },
+            'scream5': {
+                title: 'Scream (2022)',
+                cover: 'https://m.media-amazon.com/images/I/81WzNuj6BGL._AC_UF894,1000_QL80_.jpg',
+                streamUrl: 'https://example.com/stream/scream5',
+                genre: 'Horror, Mystery',
+                releaseDate: '2022',
+                duration: '114 min',
+                rating: '6.3/10',
+                description: 'Fünfundzwanzig Jahre nachdem eine Serie brutaler Morde die ruhige Stadt Woodsboro erschütterte, hat ein neuer Killer die Ghostface-Maske aufgesetzt und beginnt, eine Gruppe von Teenagern ins Visier zu nehmen.'
+            },
+            'scream6': {
+                title: 'Scream VI',
+                cover: 'https://m.media-amazon.com/images/I/71NtLPdYYPL.jpg',
+                streamUrl: 'https://example.com/stream/scream6',
+                genre: 'Horror, Mystery',
+                releaseDate: '2023',
+                duration: '123 min',
+                rating: '6.5/10',
+                description: 'Die Überlebenden der Ghostface-Morde lassen Woodsboro hinter sich und beginnen ein neues Kapitel in New York City, aber die Vergangenheit weigert sich, begraben zu bleiben.'
+            }
+        };
+
+        // Function to get URL parameters
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Function to load movie data
+        function loadMovieData() {
+            const movieId = getUrlParameter('id');
+            
+            if (!movieId) {
+                // Fallback wenn keine ID übergeben wurde
+                document.getElementById('filmName').textContent = 'Kein Film ausgewählt';
+                document.getElementById('infoContent').textContent = 'Bitte wählen Sie einen Film aus der Übersicht.';
+                document.getElementById('descriptionContent').textContent = 'Keine Beschreibung verfügbar.';
+                document.getElementById('noStreamMessage').textContent = 'Kein Stream verfügbar.';
+                return;
+            }
+
+            const movie = movieDatabase[movieId];
+            
+            if (!movie) {
+                // Fallback wenn Film nicht gefunden wurde
+                document.getElementById('filmName').textContent = 'Film nicht gefunden';
+                document.getElementById('infoContent').textContent = 'Der angeforderte Film wurde nicht in der Datenbank gefunden.';
+                document.getElementById('descriptionContent').textContent = 'Keine Beschreibung verfügbar.';
+                document.getElementById('noStreamMessage').textContent = 'Kein Stream verfügbar.';
+                return;
+            }
+
+            // Film Titel setzen
+            document.getElementById('filmName').textContent = movie.title;
+            document.title = movie.title + ' - Film Review';
+
+            // Film Cover setzen
+            if (movie.cover) {
+                const coverImg = document.getElementById('coverImage');
+                const placeholder = document.getElementById('placeholderText');
+                
+                coverImg.src = movie.cover;
+                coverImg.style.display = 'block';
+                placeholder.style.display = 'none';
+                
+                coverImg.onerror = function() {
+                    coverImg.style.display = 'none';
+                    placeholder.style.display = 'block';
+                    placeholder.textContent = 'Cover nicht verfügbar';
+                };
+            }
+
+            // Film Informationen setzen
+            const infoContent = `
+                <div class="info-item"><strong>Genre:</strong> ${movie.genre}</div>
+                <div class="info-item"><strong>Erscheinungsjahr:</strong> ${movie.releaseDate}</div>
+                <div class="info-item"><strong>Laufzeit:</strong> ${movie.duration}</div>
+                <div class="info-item"><strong>Bewertung:</strong> <span class="rating">${movie.rating}</span></div>
+            `;
+            document.getElementById('infoContent').innerHTML = infoContent;
+
+            // Film Beschreibung setzen
+            document.getElementById('descriptionContent').textContent = movie.description;
+
+            // Video Stream setzen
+            if (movie.streamUrl && movie.streamUrl !== 'https://example.com/stream/' + movieId) {
+                const streamFrame = document.getElementById('streamFrame');
+                const noStreamMessage = document.getElementById('noStreamMessage');
+                
+                streamFrame.src = movie.streamUrl;
+                streamFrame.style.display = 'block';
+                noStreamMessage.style.display = 'none';
+                
+                // Fallback wenn Stream nicht lädt
+                streamFrame.onerror = function() {
+                    streamFrame.style.display = 'none';
+                    noStreamMessage.style.display = 'block';
+                    noStreamMessage.textContent = 'Stream konnte nicht geladen werden.';
+                };
+            } else {
+                document.getElementById('noStreamMessage').textContent = 'Für diesen Film ist derzeit kein Stream verfügbar.';
+            }
+
+            // Spezifische Kritiken für verschiedene Filme
+            setCriticContent(movieId, movie);
+        }
+
+        // Function to set specific critic content
+        function setCriticContent(movieId, movie) {
+            const criticContent = document.getElementById('criticContent');
+            
+            const criticReviews = {
+                'alice-in-borderland': `
+                    <div style="margin-top: 15px; padding: 10px; background: #fff; border-left: 4px solid #007bff;">
+                        <strong>Kritiker Bewertung:</strong> "Eine fesselnde Adaption des Mangas mit beeindruckenden visuellen Effekten und psychologischer Tiefe."
+                    </div>
+                `,
+                'scott-tenorman': `
+                    <div style="margin-top: 15px; padding: 10px; background: #fff; border-left: 4px solid #007bff;">
+                        <strong>Kritiker Bewertung:</strong> "Eine der besten South Park Episoden aller Zeiten. Cartmans Rache ist sowohl schockierend als auch brillant geschrieben."
+                    </div>
+                `,
+                'cartmanland': `
+                    <div style="margin-top: 15px; padding: 10px; background: #fff; border-left: 4px solid #007bff;">
+                        <strong>Kritiker Bewertung:</strong> "Ein perfektes Beispiel für South Parks satirischen Humor und gesellschaftskritische Betrachtungen."
+                    </div>
+                `,
+                'scream1': `
+                    <div style="margin-top: 15px; padding: 10px; background: #fff; border-left: 4px solid #007bff;">
+                        <strong>Kritiker Bewertung:</strong> "Wes Craven revolutionierte das Horror-Genre mit diesem selbstreflexiven Meisterwerk."
+                    </div>
+                `
+            };
+
+            if (criticReviews[movieId]) {
+                criticContent.innerHTML = criticReviews[movieId];
+            } else {
+                criticContent.innerHTML = `
+                    <div style="margin-top: 15px; padding: 10px; background: #fff; border-left: 4px solid #007bff;">
+                        <strong>Kritiker Bewertung:</strong> "Ein ${movie.genre.toLowerCase()} Film mit einer Bewertung von ${movie.rating}. Weitere Kritiken folgen in Kürze."
+                    </div>
+                `;
+            }
+        }
+
+        // Function to go back to movie listing
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        // Load movie data when page loads
+        window.onload = function() {
+            loadMovieData();
+        };
+
+        // Add some interactive features
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click event to cover image for fullscreen view
+            const coverImage = document.getElementById('coverImage');
+            coverImage.addEventListener('click', function() {
+                if (this.requestFullscreen) {
+                    this.requestFullscreen();
+                } else if (this.webkitRequestFullscreen) {
+                    this.webkitRequestFullscreen();
+                } else if (this.msRequestFullscreen) {
+                    this.msRequestFullscreen();
+                }
+            });
+
+            // Add tooltip to cover image
+            coverImage.title = 'Klicken für Vollbild';
+        });
+        
+    </script>
+</body>
+</html>
+

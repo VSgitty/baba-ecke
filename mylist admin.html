@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filmliste - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: 120px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Admin Panel Styles */
+        .admin-panel {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .admin-toggle {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .admin-toggle:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .admin-form {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .admin-form.active {
+            display: grid;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2196f3;
+        }
+
+        .genre-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .genre-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .add-movie-btn {
+            grid-column: 1 / -1;
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .add-movie-btn:hover {
+            background: #1976d2;
+        }
+
+        .export-import {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn, .import-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .export-btn:hover, .import-btn:hover {
+            background: #f57c00;
+        }
+
+        .import-input {
+            display: none;
+        }
+
+        /* Existing styles from original file */
+        .sort-controls {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .sort-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sort-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sort-label {
+            font-weight: bold;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .sort-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: #f0f0f0;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            min-width: 120px;
+        }
+
+        .sort-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .sort-btn.active {
+            background: #2196f3;
+            color: white;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            background: white;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .filter-btn:hover {
+            border-color: #2196f3;
+            color: #2196f3;
+        }
+
+        .filter-btn.active {
+            background: #2196f3;
+            color: white;
+            border-color: #2196f3;
+        }
+
+        .movie-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .movie-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transition: all 0.5s ease;
+            position: relative;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .movie-card.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 3px solid #f0f0f0;
+        }
+
+        .movie-info {
+            padding: 15px;
+        }
+
+        .movie-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .movie-details {
+            color: #666;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+
+        .movie-genre {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-right: 4px;
+            margin-bottom: 8px;
+        }
+
+        .progress-section {
+            margin-top: 12px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .status-watching { background: #ff9800; }
+        .status-completed { background: #4caf50; }
+        .status-planned { background: #2196f3; }
+        .status-paused { background: #f44336; }
+
+        .movie-rating {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .stars {
+            color: #ffc107;
+            margin-right: 5px;
+            font-size: 0.9rem;
+        }
+
+        .rating-text {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .results-info {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .added-time {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 3px 6px;
+            border-radius: 8px;
+            font-size: 0.6rem;
+        }
+
+        .delete-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .movie-card:hover .delete-btn {
+            opacity: 1;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(30, 60, 114, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header .logo {
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        header nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        header nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+
+        header nav a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .back-button {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(255,255,255,1);
+            transform: translateY(-2px);
+        }
+
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #4caf50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        .notification.error {
+            background: #f44336;
+        }
+
+        @media (max-width: 768px) {
+            .admin-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .sort-section {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .movie-list {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            body {
+                padding-top: 140px;
+            }
+
+            .admin-toggle {
+                top: 140px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header>
+        <div class="logo">Baba Marcos Baba Ecke</div>
+        <nav>
+            <a href="https://skullbonk.netlify.app">Page mage</a>
+            <a href="index.html">Streams</a>
+            <a href="#">Series</a>
+            <a href="mylist_admin.html">My List & Progress</a>
+        </nav>
+    </header>
+
+    <!-- Zurück Button -->
+    <button class="back-button" onclick="goBack()">← Zurück zur Übersicht</button>
+
+    <!-- Admin Toggle Button -->
+    <button class="admin-toggle" onclick="toggleAdmin()">🎬 Film hinzufügen</button>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <div class="container">
+        <h1>🎬 Meine Filmliste - Admin Panel</h1>
+        
+        <!-- Admin Panel -->
+        <div class="admin-panel">
+            <form class="admin-form" id="adminForm">
+                <div class="form-group">
+                    <label for="movieTitle">Filmtitel *</label>
+                    <input type="text" id="movieTitle" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="movieYear">Jahr *</label>
+                    <input type="number" id="movieYear" min="1900" max="2030" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="movieDirector">Regisseur</label>
+                    <input type="text" id="movieDirector">
+                </div>
+
+                <div class="form-group">
+                    <label for="movieDuration">Länge (Min) *</label>
+                    <input type="number" id="movieDuration" min="1" max="500" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="movieRating">Bewertung (1-10)</label>
+                    <input type="number" id="movieRating" min="1" max="10" step="0.1">
+                </div>
+
+                <div class="form-group">
+                    <label for="movieProgress">Fortschritt (%)</label>
+                    <input type="number" id="movieProgress" min="0" max="100" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="movieStatus">Status *</label>
+                    <select id="movieStatus" required>
+                        <option value="planned">Geplant</option>
+                        <option value="watching">Schaue ich</option>
+                        <option value="paused">Pausiert</option>
+                        <option value="completed">Abgeschlossen</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="moviePoster">Poster URL</label>
+                    <input type="url" id="moviePoster" placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label>Genres *</label>
+                    <div class="genre-checkboxes">
+                        <div class="genre-checkbox">
+                            <input type="checkbox" id="genre-action" value="action">
+                            <label for="genre-action">Action</label>
+                        </div>
+                        <div class="genre-checkbox">
+                            <input type="checkbox" id="genre-sci-fi" value="sci-fi">
+                            <label for="genre-sci-fi">Sci-Fi</label>
+                        </div>
+                        <div class="genre-checkbox">
+                            <input type="checkbox" id="genre-horror" value="horror">
+                            <label for="genre-horror">Horror</label>
+                        </div>
+                        <div class="genre-checkbox">
+                            <input type="checkbox" id="genre-thriller" value="thriller">
+                            <label for="genre-thriller">Thriller</label>
+                        </div>
+                        <div class="genre-checkbox">
+                            <input type="checkbox" id="genre-drama" value="drama">
+                            <label for="genre-drama">Drama</label>
+                        </div>
+                        <div class="genre-checkbox">
+                            <input type="checkbox" id="genre-crime" value="crime">
+                            <label for="genre-crime">Crime</label>
+                        </div>
+                        <div class="genre-checkbox">
+                            <input type="checkbox" id="genre-comedy" value="comedy">
+                            <label for="genre-comedy">Comedy</label>
+                        </div>
+                        <div class="genre-checkbox">
+                            <input type="checkbox" id="genre-animation" value="animation">
+                            <label for="genre-animation">Animation</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="add-movie-btn">🎬 Film hinzufügen</button>
+            </form>
+
+            <div class="export-import">
+                <button class="export-btn" onclick="exportMovies()">📥 Liste exportieren</button>
+                <button class="import-btn" onclick="document.getElementById('importFile').click()">📤 Liste importieren</button>
+                <input type="file" id="importFile" class="import-input" accept=".json" onchange="importMovies(event)">
+                <button class="export-btn" onclick="clearAllMovies()">🗑️ Alle löschen</button>
+            </div>
+        </div>
+
+        <!-- Sortier- und Filter-Controls -->
+        <div class="sort-controls">
+            <div class="sort-section">
+                <!-- Sortierung -->
+                <div class="sort-group">
+                    <span class="sort-label">Sortieren nach:</span>
+                    <div class="filter-group">
+                        <button class="sort-btn active" data-sort="added">Zuletzt hinzugefügt</button>
+                        <button class="sort-btn" data-sort="title">Titel A-Z</button>
+                        <button class="sort-btn" data-sort="year">Jahr</button>
+                        <button class="sort-btn" data-sort="rating">Bewertung</button>
+                        <button class="sort-btn" data-sort="progress">Fortschritt</button>
+                        <button class="sort-btn" data-sort="status">Status</button>
+                    </div>
+                </div>
+
+                <!-- Status Filter -->
+                <div class="sort-group">
+                    <span class="sort-label">Status:</span>
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-filter="all">Alle</button>
+                        <button class="filter-btn" data-filter="watching">Schaue ich</button>
+                        <button class="filter-btn" data-filter="completed">Abgeschlossen</button>
+                        <button class="filter-btn" data-filter="planned">Geplant</button>
+                        <button class="filter-btn" data-filter="paused">Pausiert</button>
+                    </div>
+                </div>
+
+                <!-- Genre Filter -->
+                <div class="sort-group">
+                    <span class="sort-label">Genre:</span>
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-genre="all">Alle</button>
+                        <button class="filter-btn" data-genre="horror">Horror</button>
+                        <button class="filter-btn" data-genre="sci-fi">Sci-Fi</button>
+                        <button class="filter-btn" data-genre="thriller">Thriller</button>
+                        <button class="filter-btn" data-genre="action">Action</button>
+                        <button class="filter-btn" data-genre="drama">Drama</button>
+                        <button class="filter-btn" data-genre="crime">Crime</button>
+                        <button class="filter-btn" data-genre="comedy">Comedy</button>
+                        <button class="filter-btn" data-genre="animation">Animation</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-info" id="resultsInfo">
+            Zeige alle 0 Filme
+        </div>
+        
+        <div class="movie-list" id="movieList">
+            <!-- Filme werden hier dynamisch hinzugefügt -->
+        </div>
+    </div>
+
+    <script>
+        class MovieManager {
+            constructor() {
+                this.movieList = document.getElementById('movieList');
+                this.resultsInfo = document.getElementById('resultsInfo');
+                this.movies = [];
+                this.currentSort = 'added';
+                this.currentFilter = 'all';
+                this.currentGenre = 'all';
+                this.nextId = 1;
+                
+                this.loadMovies();
+                this.initEventListeners();
+                this.renderMovies();
+            }
+
+            initEventListeners() {
+                // Admin Form
+                document.getElementById('adminForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addMovie();
+                });
+
+                // Sortier-Buttons
+                document.querySelectorAll('[data-sort]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.setActiveButton(e.target, '[data-sort]');
+                        this.currentSort = e.target.dataset.sort;
+                        this.renderMovies();
+                    });
+                });
+
+                // Status-Filter
+                document.querySelectorAll('[data-filter]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.setActiveButton(e.target, '[data-filter]');
+                        this.currentFilter = e.target.dataset.filter;
+                        this.renderMovies();
+                    });
+                });
+
+                // Genre-Filter
+                document.querySelectorAll('[data-genre]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.setActiveButton(e.target, '[data-genre]');
+                        this.currentGenre = e.target.dataset.genre;
+                        this.renderMovies();
+                    });
+                });
+            }
+
+            addMovie() {
+                const title = document.getElementById('movieTitle').value.trim();
+                const year = parseInt(document.getElementById('movieYear').value);
+                const director = document.getElementById('movieDirector').value.trim() || 'Unbekannt';
+                const duration = parseInt(document.getElementById('movieDuration').value);
+                const rating = parseFloat(document.getElementById('movieRating').value) || 0;
+                const progress = parseInt(document.getElementById('movieProgress').value) || 0;
+                const status = document.getElementById('movieStatus').value;
+                const poster = document.getElementById('moviePoster').value.trim();
+
+                // Genres sammeln
+                const genres = [];
+                document.querySelectorAll('.genre-checkbox input:checked').forEach(checkbox => {
+                    genres.push(checkbox.value);
+                });
+
+                if (genres.length === 0) {
+                    this.showNotification('Bitte mindestens ein Genre auswählen!', 'error');
+                    return;
+                }
+
+                const movie = {
+                    id: this.nextId++,
+                    title,
+                    year,
+                    director,
+                    duration,
+                    rating,
+                    progress,
+                    status,
+                    genres: genres.join(','),
+                    poster: poster || this.generatePlaceholderImage(title),
+                    added: Date.now()
+                };
+
+                this.movies.push(movie);
+                this.saveMovies();
+                this.renderMovies();
+                this.clearForm();
+                this.showNotification(`Film "${title}" wurde hinzugefügt!`);
+            }
+
+            generatePlaceholderImage(title) {
+                const colors = ['4a90e2', 'e74c3c', '2ecc71', '9b59b6', 'f39c12', '1abc9c', '34495e', 'e67e22'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const encodedTitle = encodeURIComponent(title.substring(0, 20));
+                return `https://via.placeholder.com/280x180/${color}/ffffff?text=${encodedTitle}`;
+            }
+
+            deleteMovie(id) {
+                if (confirm('Film wirklich löschen?')) {
+                    this.movies = this.movies.filter(movie => movie.id !== id);
+                    this.saveMovies();
+                    this.renderMovies();
+                    this.showNotification('Film wurde gelöscht!');
+                }
+            }
+
+            updateMovieProgress(id, newProgress) {
+                const movie = this.movies.find(m => m.id === id);
+                if (movie) {
+                    movie.progress = newProgress;
+                    if (newProgress === 100 && movie.status !== 'completed') {
+                        movie.status = 'completed';
+                    }
+                    this.saveMovies();
+                    this.renderMovies();
+                }
+            }
+
+            renderMovies() {
+                let filteredMovies = this.filterMovies([...this.movies]);
+                let sortedMovies = this.sortMovies(filteredMovies);
+
+                this.movieList.innerHTML = '';
+
+                sortedMovies.forEach(movie => {
+                    const movieCard = this.createMovieCard(movie);
+                    this.movieList.appendChild(movieCard);
+                });
+
+                this.updateResults(sortedMovies.length);
+            }
+
+            createMovieCard(movie) {
+                const div = document.createElement('div');
+                div.className = 'movie-card';
+                div.dataset.id = movie.id;
+
+                const stars = this.generateStars(movie.rating);
+                const statusClass = `status-${movie.status}`;
+                const statusText = {
+                    'watching': 'Schaue ich',
+                    'completed': 'Abgeschlossen',
+                    'planned': 'Geplant',
+                    'paused': 'Pausiert'
+                }[movie.status];
+
+                const genres = movie.genres.split(',').map(genre => 
+                    `<span class="movie-genre">${this.capitalizeFirst(genre)}</span>`
+                ).join('');
+
+                const timeAgo = this.getTimeAgo(movie.added);
+
+                div.innerHTML = `
+                    <div class="added-time">${timeAgo}</div>
+                    <div class="status-badge ${statusClass}">${statusText}</div>
+                    <img src="${movie.poster}" alt="${movie.title}" class="movie-poster" onerror="this.src='https://via.placeholder.com/280x180/666666/ffffff?text=Kein+Bild'">
+                    <div class="movie-info">
+                        <h3 class="movie-title">${movie.title}</h3>
+                        <div class="movie-details">${movie.year} • ${movie.duration} Min • ${movie.director}</div>
+                        ${genres}
+                        
+                        <div class="movie-rating">
+                            <span class="stars">${stars}</span>
+                            <span class="rating-text">${movie.rating}/10</span>
+                        </div>
+                        
+                        <div class="progress-section">
+                            <div class="progress-label">
+                                <span>Fortschritt</span>
+                                <span>${movie.progress}%</span>
+                            </div>
+                            <div class="progress-bar" onclick="movieManager.updateProgressFromClick(event, ${movie.id})">
+                                <div class="progress-fill" style="width: ${movie.progress}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="delete-btn" onclick="movieManager.deleteMovie(${movie.id})">🗑️</button>
+                `;
+
+                return div;
+            }
+
+            updateProgressFromClick(event, movieId) {
+                const progressBar = event.currentTarget;
+                const rect = progressBar.getBoundingClientRect();
+                const clickX = event.clientX - rect.left;
+                const newProgress = Math.round((clickX / rect.width) * 100);
+                this.updateMovieProgress(movieId, Math.max(0, Math.min(100, newProgress)));
+            }
+
+            generateStars(rating) {
+                const fullStars = Math.floor(rating / 2);
+                const hasHalfStar = (rating % 2) >= 1;
+                const emptyStars= 5 - fullStars - (hasHalfStar ? 1 : 0);
+                
+                return '★'.repeat(fullStars) + 
+                       (hasHalfStar ? '☆' : '') + 
+                       '☆'.repeat(emptyStars);
+            }
+
+            capitalizeFirst(str) {
+                return str.charAt(0).toUpperCase() + str.slice(1);
+            }
+
+            getTimeAgo(timestamp) {
+                const now = Date.now();
+                const diff = now - timestamp;
+                const minutes = Math.floor(diff / (1000 * 60));
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const weeks = Math.floor(days / 7);
+                const months = Math.floor(days / 30);
+
+                if (minutes < 60) return `${minutes} Min`;
+                if (hours < 24) return `${hours} Std`;
+                if (days < 7) return `${days} Tage`;
+                if (weeks < 4) return `${weeks} Wochen`;
+                if (months < 12) return `${months} Monate`;
+                return 'Letztes Jahr';
+            }
+
+            setActiveButton(clickedBtn, selector) {
+                document.querySelectorAll(selector).forEach(btn => btn.classList.remove('active'));
+                clickedBtn.classList.add('active');
+            }
+
+            sortMovies(movies) {
+                return movies.sort((a, b) => {
+                    switch (this.currentSort) {
+                        case 'added':
+                            return b.added - a.added;
+                        case 'title':
+                            return a.title.localeCompare(b.title);
+                        case 'year':
+                            return b.year - a.year;
+                        case 'rating':
+                            return b.rating - a.rating;
+                        case 'progress':
+                            return b.progress - a.progress;
+                        case 'status':
+                            const statusOrder = { 'watching': 1, 'paused': 2, 'planned': 3, 'completed': 4 };
+                            return statusOrder[a.status] - statusOrder[b.status];
+                        default:
+                            return 0;
+                    }
+                });
+            }
+
+            filterMovies(movies) {
+                return movies.filter(movie => {
+                    const statusMatch = this.currentFilter === 'all' || movie.status === this.currentFilter;
+                    const genreMatch = this.currentGenre === 'all' || movie.genres.includes(this.currentGenre);
+                    return statusMatch && genreMatch;
+                });
+            }
+
+            updateResults(count) {
+                const totalCount = this.movies.length;
+                let text = `Zeige ${count} von ${totalCount} Filmen`;
+                
+                if (this.currentFilter !== 'all') {
+                    const filterText = {
+                        'watching': 'Schaue ich',
+                        'completed': 'Abgeschlossen',
+                        'planned': 'Geplant',
+                        'paused': 'Pausiert'
+                    };
+                    text += ` • Status: ${filterText[this.currentFilter]}`;
+                }
+                
+                if (this.currentGenre !== 'all') {
+                    text += ` • Genre: ${this.capitalizeFirst(this.currentGenre)}`;
+                }
+                
+                const sortText = {
+                    'added': 'Zuletzt hinzugefügt',
+                    'title': 'Titel A-Z',
+                    'year': 'Jahr (neueste zuerst)',
+                    'rating': 'Bewertung (höchste zuerst)',
+                    'progress': 'Fortschritt (höchster zuerst)',
+                    'status': 'Status'
+                };
+                text += ` • Sortiert nach: ${sortText[this.currentSort]}`;
+                
+                this.resultsInfo.textContent = text;
+            }
+
+            clearForm() {
+                document.getElementById('adminForm').reset();
+                document.querySelectorAll('.genre-checkbox input').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${type} show`;
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+
+            saveMovies() {
+                localStorage.setItem('movieList', JSON.stringify(this.movies));
+                localStorage.setItem('nextMovieId', this.nextId.toString());
+            }
+
+            loadMovies() {
+    const saved = localStorage.getItem('movieList');
+    const savedId = localStorage.getItem('nextMovieId');
+    
+    if (saved) {
+        this.movies = JSON.parse(saved);
+    } else {
+        this.movies = []; // Leere Liste statt Beispielfilme
+    }
+    
+    if (savedId) {
+        this.nextId = parseInt(savedId);
+    } else {
+        this.nextId = 1; // Start bei ID 1
+    }
+}
+
+// Die loadSampleMovies() Funktion kann komplett entfernt werden
+
+
+            loadSampleMovies() {
+                const sampleMovies = [
+                    {
+                        id: this.nextId++,
+                        title: "Inception",
+                        year: 2010,
+                        director: "Christopher Nolan",
+                        duration: 148,
+                        rating: 8.8,
+                        progress: 75,
+                        status: "watching",
+                        genres: "sci-fi,thriller",
+                        poster: "h",
+                        added: Date.now() - 86400000
+                    },
+                    {
+                        id: this.nextId++,
+                        title: "The Matrix",
+                        year: 1999,
+                        director: "Wachowski Sisters",
+                        duration: 136,
+                        rating: 8.7,
+                        progress: 100,
+                        status: "completed",
+                        genres: "action,sci-fi",
+                        poster: "",
+                        added: Date.now() - 172800000
+                    },
+                    {
+                        id: this.nextId++,
+                        title: "Interstellar",
+                        year: 2014,
+                        director: "Christopher Nolan",
+                        duration: 169,
+                        rating: 8.6,
+                        progress: 0,
+                        status: "planned",
+                        genres: "drama,sci-fi",
+                        poster: "",
+                        added: Date.now() - 259200000
+                    }
+                ];
+
+                this.movies = sampleMovies;
+                this.saveMovies();
+            }
+
+            exportMovies() {
+                const dataStr = JSON.stringify(this.movies, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `filmliste_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                this.showNotification('Liste wurde exportiert!');
+            }
+
+            importMovies(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedMovies = JSON.parse(e.target.result);
+                        if (Array.isArray(importedMovies)) {
+                            // IDs neu zuweisen um Konflikte zu vermeiden
+                            importedMovies.forEach(movie => {
+                                movie.id = this.nextId++;
+                                movie.added = movie.added || Date.now();
+                            });
+                            
+                            this.movies = [...this.movies, ...importedMovies];
+                            this.saveMovies();
+                            this.renderMovies();
+                            this.showNotification(`${importedMovies.length} Filme wurden importiert!`);
+                        } else {
+                            throw new Error('Ungültiges Format');
+                        }
+                    } catch (error) {
+                        this.showNotification('Fehler beim Importieren der Datei!', 'error');
+                    }
+                };
+                reader.readAsText(file);
+                event.target.value = '';
+            }
+
+            clearAllMovies() {
+                if (confirm('Wirklich ALLE Filme löschen? Diese Aktion kann nicht rückgängig gemacht werden!')) {
+                    this.movies = [];
+                    this.nextId = 1;
+                    this.saveMovies();
+                    this.renderMovies();
+                    this.showNotification('Alle Filme wurden gelöscht!');
+                }
+            }
+        }
+
+        // Global functions
+        function toggleAdmin() {
+            const form = document.getElementById('adminForm');
+            const button = document.querySelector('.admin-toggle');
+            
+            if (form.classList.contains('active')) {
+                form.classList.remove('active');
+                button.textContent = '🎬 Film hinzufügen';
+            } else {
+                form.classList.add('active');
+                button.textContent = '❌ Schließen';
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function exportMovies() {
+            movieManager.exportMovies();
+        }
+
+        function importMovies(event) {
+            movieManager.importMovies(event);
+        }
+
+        function clearAllMovies() {
+            movieManager.clearAllMovies();
+        }
+
+        // Initialize
+        let movieManager;
+        document.addEventListener('DOMContentLoaded', function() {
+            movieManager = new MovieManager();
+
+            // Auto-save beim Verlassen der Seite
+            window.addEventListener('beforeunload', () => {
+                movieManager.saveMovies();
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'n') {
+                    e.preventDefault();
+                    toggleAdmin();
+                }
+                if (e.key === 'Escape') {
+                    const form = document.getElementById('adminForm');
+                    if (form.classList.contains('active')) {
+                        toggleAdmin();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

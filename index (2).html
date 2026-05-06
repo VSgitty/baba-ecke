@@ -1,0 +1,3131 @@
+<!-- HTML FILE: index2.html -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baba Ecke</title>
+    <link rel="icon" type="image/png" href="/c/favicon.png">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="drag-drop.css">
+    <script src="categories.js"></script>
+    <script src="drag-drop.js"></script>
+    <script src="enhanced-interactions.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">Baba Marcos Baba Ecke - direkt ums Eck...</div>
+        <nav>
+            <a href="https://skullbonk.netlify.app">portfolio 1</a>
+            <a href="index.html">Streams</a>
+            <a href="https://enchanting-dieffenbachia-d0777d.netlify.app/">Projekte/portfoli</a>
+            <a href="mylist.html">My List & Progress</a>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <h1>watchlist, reviews, kritik, baba filme, babe serien/folgen und sogar kackfilme</h1>
+        <p></p>
+        <!--- <button id="startButton">geilomat 3000</button> --->
+    </div>
+
+
+ 
+    
+    <!-- Random Film Finder Banner Section -->
+<div class="movies-section"></div>
+
+<div class="random-finder-banner">
+    <div class="random-banner-container">
+        <!-- Left Side: Filters -->
+        <div class="random-filters-side">
+            <div class="filters-header">
+                <h3>🎲 Film Roulette</h3>
+                <p>top oder flop?</p>
+            </div>
+            
+            <div class="filters-compact">
+                <div class="filter-row">
+                    <select id="typeFilter" class="compact-select">
+                        <option value="all">📺 Alles</option>
+                        <option value="movies">🎬 Nur Filme</option>
+                        <option value="series">📺 Nur Serien</option>
+                    </select>
+                    
+                    <select id="genreFilter" class="compact-select">
+                        <option value="all">🎭 Alle Genres</option>
+                        <option value="horror">👻 Horror</option>
+                        <option value="action">💥 Action</option>
+                        <option value="comedy">😂 Comedy</option>
+                        <option value="drama">🎭 Drama</option>
+                        <option value="sci-fi">🚀 Sci-Fi</option>
+                        <option value="thriller">🔪 Thriller</option>
+                        <option value="mystery">🔍 Mystery</option>
+                        <option value="anime">🎌 Anime</option>
+                        <option value="k-drama">🇰🇷 K-Drama</option>
+                    </select>
+                </div>
+                
+                <div class="filter-row">
+                    <select id="seriesFilter" class="compact-select">
+                        <option value="include">🔢 Alle</option>
+                        <option value="exclude">🚫 Keine Mehrteiligen</option>
+                        <option value="only">📚 Nur Mehrteilige</option>
+                    </select>
+                    
+                    <select id="watchlistFilter" class="compact-select">
+                        <option value="all">❤️ Alle</option>
+                        <option value="not-in-watchlist">🆕 Nicht in Watchlist</option>
+                        <option value="in-watchlist">💖 Aus Watchlist</option>
+                    </select>
+                </div>
+                
+                <div class="filter-actions">
+                    <button id="randomFilmBtn" class="find-btn">
+                        <span class="btn-icon">🎲</span>
+                        <span class="btn-text">Film finden</span>
+                    </button>
+                    <button id="resetFiltersBtn" class="reset-btn">🔄</button>
+                </div>
+                
+                <div class="filter-counter">
+                    <span id="filteredCount">0</span> Filme verfügbar
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Side: Result -->
+        <div class="random-result-side">
+            <div id="randomFilmPlaceholder" class="result-placeholder">
+                <div class="placeholder-content">
+                    <div class="placeholder-icon">🎬</div>
+                    <h4>Bereit für deinen nächsten Film?</h4>
+                    <p>Wähle deine Filter und lass den Zufall entscheiden!</p>
+                </div>
+            </div>
+            
+            <div id="randomFilmResult" class="result-display" style="display: none;">
+                <div class="result-movie">
+                    <div class="result-poster">
+                        <img id="randomFilmImage" src="" alt="Random Film">
+                        <div class="result-overlay">
+                            <div class="result-tags-overlay">
+                                <span id="resultType" class="tag-overlay"></span>
+                                <span id="resultGenre" class="tag-overlay"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-details">
+                        <h4 id="randomFilmTitle"></h4>
+                        <p id="randomFilmDescription"></p>
+                        
+                        <div class="result-actions-compact">
+                            <button id="watchRandomFilm" class="action-btn primary">
+                                <span>👁️</span> Anschauen
+                            </button>
+                            <button id="newRandomFilm" class="action-btn secondary">
+                                <span>🔄</span> Neuer
+                            </button>
+                            <button id="addToWatchlistBtn" class="action-btn watchlist">
+                                <span>❤️</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<section class="parallax-section-fixed" style="background-image: url('https://img.freepik.com/vektoren-kostenlos/nachtmeerlandschaft-vollmond-und-sterne-leuchten_107791-7397.jpg?semt=ais_hybrid&w=740');">
+    <div class="parallax-content">
+        <h1>Geschaute Serien/Filme</h1>
+        <p>
+        </p>
+    </div>
+</section>  
+
+    
+
+    <div class="section-header">
+    <div class="main-container" id="moviesContainer">
+        <div class="movie-card" data-movie-id="alice-in-borderland" onclick="openMovie('alice-in-borderland')">
+            <img src="https://images.justwatch.com/poster/302278365/s718/Alice-in-Borderland.jpg" alt="Cover">
+            <div class="content">
+                <h3>Alice in Borderland</h3>
+                <p>geile anime adaption. paar leute finden sich in einem leeren tokyo wieder in dem sie spiele um leben und tod spielen sollen.</p>
+            </div>
+        </div>
+
+        <div class="movie-card" data-movie-id="alice-in-borderland" onclick="openMovie('the-8-show')">
+            <img src="https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p27171970_b_v8_aa.jpg" alt="Cover">
+            <div class="content">
+                <h3>The 8 Show</h3>
+                <p>8 Menschen finden sich einer Game Show wieder welche unsere dreckige Gesellschaft wiederspiegelt </p>
+            </div>
+        </div>
+
+        <div class="movie-card" data-movie-id="alice-in-borderland" onclick="openMovie('danganronpa')">
+            <img src="https://m.media-amazon.com/images/I/810bte0sz0L._UF1000,1000_QL80_.jpg" alt="Cover">
+            <div class="content">
+                <h3>Danganronpa</h3>
+                <p>PSP Spiel Adaption über Schüler die ohne Erinnerung in einer Schule eingesperrt aufwachen</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('pyramid-game')">
+            <img src="https://m.media-amazon.com/images/M/MV5BZDg5ZDkwODUtOTdkNy00NWM5LWFiNjUtYjc5NWRhMDQ3YmNlXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Pyramid Game</h3>
+                <p>k drama serie über eine klasse die ein spiel spielt</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('sweet-home')">
+            <img src="https://i.pinimg.com/736x/0a/fa/84/0afa84b6393d82d8c7ee6f9f1a08173f.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Sweet Home</h3>
+                <p>in einem wohnheim tauchen plötzlich zombieartige monster auf. der kampf ums leben beginnt.</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('squid-game')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNDNmNzUzMjEtNGVkYi00N2RjLWEwN2EtYjg3NzA4MGFkMjFkXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Squid Game</h3>
+                <p>456 Menschen finden sich bei tödlichen Kinderspielen zusammen</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('arcane')">
+            <img src="https://m.media-amazon.com/images/I/71xr7KyenWL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Arcane (League of Legends)</h3>
+                <p>Wunderschöne Serie zur Welt des MOBA Games - Meisterwek</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('archive-81')">
+            <img src="https://cdn.moviepilot.de/files/4ac4e2e1bd9952dc65a34e1633043b2cf8aefcf29ca94af1b259e2fdbc1e/copyright/FGlKDFsXIAQ3KN5.jpeg" alt="Movie Cover">
+            <div class="content">
+                <h3>Archive 81</h3>
+                <p>baba horror Mystery netflix serie. leider nur eine staffel weil keiner geschmack hat</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('lost')">
+            <img src="https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p185013_b_v8_af.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Lost</h3>
+                <p>baba serie über gestrandete menschen</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('supernatural')">
+            <img src="https://i0.wp.com/abacstallion.com/wp-content/uploads/2019/04/Supernatural-Poster.jpg?fit=2000%2C3000&ssl=1" alt="Movie Cover">
+            <div class="content">
+                <h3>Supernatural</h3>
+                <p>Zwei Brüder auf der Jagd nach dem Bösen und der Suche des Mörders ihrer Mutter</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('vampire-diaries')">
+            <img src="https://i.ebayimg.com/images/g/~yUAAOSwcHNg1MFw/s-l1200.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The Vampire Diaries</h3>
+                <p>Adaption des Romans über eine kleine Stadt voller mystischer Geheimnisse</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('primeval')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMDkyN2NjY2EtZDhhYS00MDVkLWI5NWUtMjlhYTIyN2EyODAwXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Primeval</h3>
+                <p>Insane geile Serie über ein Team, welches Uhrzeitmonster jagt</p>
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="carousel-nav">
+        <button class="carousel-btn prev" id="prevBtn">‹</button>
+        <button class="carousel-btn next" id="nextBtn">›</button>
+    </div>
+
+
+    <!-- Filme Section - genau wie die erste Movies Collection -->
+    <div class="movies-section"></div>
+
+    <div class="section-header">
+        <h2 style="text-align: center; color: #f4c10f; font-size: 2.5rem; margin: 40px 0 20px 0; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">🎬 Filme</h2>
+        <h3 style="text-align: center; background-color: #da7f09; color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); margin: 0 auto 30px auto; max-width: 800px;">Von Blockbustern bis zu Geheimtipps und der größten Scheiße xD</h3>
+        
+        <div class="main-container" id="filmsContainer">
+        
+         <div class="movie-card" onclick="openMovie('harold-und-kumar')">
+            <img src="https://image.tmdb.org/t/p/w154/lSSA64WF0M0BXnjwr2quMh6shCl.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Das Leben des Brian</h3>
+                <p>.</p>
+            </div>
+        </div>
+        
+        
+
+        <div class="movie-card" onclick="openMovie('harold-und-kumar')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNjk2MGI0M2YtZmIwOS00NGVjLWFlNDAtMDYzM2Y1MWM2OWNkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Harold & Kumar (1)</h3>
+                <p>Zwei Kiffer Bro's auf der Reise zum White Castle</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('harold-und-kumar')">
+            <img src="https://musicart.xboxlive.com/7/1dfa1100-0000-0000-0000-000000000002/504/image.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Harold & Kumar: Flucht aus Quantanamo (2)</h3>
+                <p>Ab ins Gefängnis und wieder raus</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('harold-und-kumar')">
+            <img src="https://m.media-amazon.com/images/I/91HhEdXSHwL._AC_UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Harold & Kumar: Alle Jahre wieder (3)</h3>
+                <p>Weihnachten mit den Homies. Und Neil Patrick Harris</p>
+            </div>
+        </div>  
+            
+
+        <div class="movie-card" onclick="openMovie('20th-century-girl')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjA4NzYxNWItZWJmNi00ODE2LTgwZDgtMzBkN2MzOGZhNDEzXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>20th Century Girl</h3>
+                <p>Süßer und lustiger Film über Highschoolliebe und so</p>
+            </div>
+        </div>
+
+
+        <div class="movie-card" onclick="openMovie('final-destination-6')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/a/ab/Final_Destination_Bloodlines_%282025%29_poster.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Final Destination 6: Bloodlines</h3>
+                <p>je weniger man weiß desto besser und geiler! wegen low twists. völlig klar</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('thunderbolts')">
+            <img src="https://cdn.marvel.com/content/1x/thunderboltsposter.jpeg" alt="Movie Cover">
+            <div class="content">
+                <h3>Thunderbolts* The New Avengers</h3>
+                <p>marvel halt. sucide squad in gut. eine antigruppe von helden? muss sich zusammenschließen</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('the-substance')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMWJkNjdmMzctZTk2YS00MDE1LWI0ZTEtNzc3OTEzNGJjZjE4XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The Substance</h3>
+                <p>geiler boddy horror ums thema schönheit und älter werden </p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('the-substance')">
+            <img src="https://www.actionfreunde.de/wp-content/uploads/Das-Ding-aus-einer-anderen-Welt.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Das Ding aus einer anderen Welt</h3>
+                <p>b</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('alita-battle-angel')">
+            <img src="https://deadline-magazin.de/wp-content/uploads/2019/02/alita-cover.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Alita: Battle Angel</h3>
+                <p>Baba Realverfilmung des Anime. von vielen fans zu unrecht missachtet</p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('bloodshot')">
+            <img src="https://de.web.img3.acsta.net/pictures/20/01/23/11/11/5678672.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Bloodshot</h3>
+                <p>ohne trailer sehen! und wenn man den comic charakter nicht kennt, noch besser! </p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('uncharted')">
+            <img src="https://www.sonypictures.de/sites/germany/files/2022-01/UNCHARTED_HP%20Online-Formate_FB_1400x2100.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Uncharted</h3>
+                <p>kein guter uncharted film aber ein solider film für fans. mit tom holland und mark wahlberg </p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('existenz')">
+            <img src="https://static.thcdn.com/images/large/original/productimg/1600/1600/11738213-1964572466290417.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>eXistenZ</h3>
+                <p>ein neuartiges, lebendiges videospiel?</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('existenz')">
+            <img src="https://static.thcdn.com/images/large/original/productimg/1600/1600/11738213-1964572466290417.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The Happening</h3>
+                <p>ein neuartiges, lebendiges videospiel?</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMDY2NTljOTctMzk5ZC00OTE0LWI1MWYtYjY1ZDBiOTgyMjgxXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Die Unendliche Geschichte</h3>
+                <p>Armer Artax :( Muss man einfach kennen. Filmadaption des Buches</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://de.web.img3.acsta.net/medias/nmedia/18/92/61/69/20208958.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Mein großer Freund Joe</h3>
+                <p>harter disney film</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://dx35vtwkllhj9.cloudfront.net/universalstudios/nope/images/regions/us/onesheet.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Nope</h3>
+                <p>Ein Film von Jordan Peele. Das reicht schon. Ohne Vorwissen gucken!</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://streamo.at/IMAGES/Posters%20%26%20Covers/G-J/image-thumb__3724__blog-single-main/Get-Out_poster_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Get Out</h3>
+                <p>Ein Film von Jordan Peele. Das reicht schon. Ohne Vorwissen gucken!</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('wir')">
+            <img src="https://m.media-amazon.com/images/M/MV5BY2M4NGQxOTYtM2ZlOC00OWRhLWI1NzMtZTUzYzA5Y2UwMTE5XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Wir</h3>
+                <p>Ein Film von Jordan Peele. Das reicht schon. Ohne Vorwissen gucken!</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/M/MV5BM2JkZjI5MjktNmQwZC00ZmYxLTg0OTYtYmVhNGFkMGZlMGYyXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Old</h3>
+                <p>Ein M. Night Shyamalan Film. Reicht! Blind rein da! Ein Strand der es in sich hat</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/I/51Z5OceoBPL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Signs Zeichen</h3>
+                <p>Ein M. Night Shyamalan Film. Reicht! Blind rein da! Spannender, realistischer Alien Film</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTkxMDAxNDUyNV5BMl5BanBnXkFtZTgwOTc3MzcxMjI@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Valerian - Die Stadt der Tausend Planeten</h3>
+                <p>Zwei Kinners reisen durchs All - Mehr Schein als Sein. Comic funzt da besser - Creditsong war baba. rest hart langweilig, I'm sorry....</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNjcxZjdkNmYtYWM1Yi00YWQ0LWFkZDEtMmIzNDVlMzVmZjY0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Freaks</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://image.tmdb.org/t/p/w154/26wEWZYt6yJkwRVkjcbwJEFh9IS.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Der seltsame Fall des Benjamin Button</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNjcxZjdkNmYtYWM1Yi00YWQ0LWFkZDEtMmIzNDVlMzVmZjY0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Freaks</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNjcxZjdkNmYtYWM1Yi00YWQ0LWFkZDEtMmIzNDVlMzVmZjY0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Freaks</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNjcxZjdkNmYtYWM1Yi00YWQ0LWFkZDEtMmIzNDVlMzVmZjY0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Freaks</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://www.schnittberichte.com/pics/titel/87000/87472_230.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>M3GAN</h3>
+                <p>Ein Killer Roboter auf freiem Fuß - Etwas anders als erwartet</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/I/41rTbHSlSEL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Cube Zero (1)</h3>
+                <p>Prequel zu Cube. Wir sehen mehr hinter den Kulissen des Würfels</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/I/41JapjkeAyL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Cube (2)</h3>
+                <p>Geiler und spannender Slasher in einem tödlichen Gefängnis aus Würfeln</p> <!--- https://vide0.net/e/shlo6njr8kex --->
+            </div>
+        </div>
+        
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNDg1Yzk1MzYtZWQ5OC00YWYyLWI2NjgtMzM1NzI3MjQyZDRkXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Cube 2: Hypercube (3)</h3>
+                <p>Nachfolger des Originals. War gottlos Scheiße</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('v')">
+            <img src="https://www.ofdb.de/images/film.370px/141/141118.jpg?v=1697000432" alt="Movie Cover">
+            <div class="content">
+                <h3>Cloverfield</h3>
+                <p>Found-Footage Film in New York. Und es passiert etwas mysteriöses...</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('v')">
+            <img src="https://m.media-amazon.com/images/I/61WX-kyIt5L._AC_UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>10 Cloverfield Lane</h3>
+                <p>Ein Gruppe Menschen wohnt in einem Bunker... Aber warum?</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('v')">
+            <img src="https://imusic.b-cdn.net/images/item/original/519/5053083179519.jpg?the-cloverfield-paradox-2019-the-cloverfield-paradox-dvd&class=scaled&v=1549106684" alt="Movie Cover">
+            <div class="content">
+                <h3>The Cloverfield Paradox</h3>
+                <p>Eine Crew im All... ist verantwortlich für das Cloverfield Ereignis</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/M/MV5BOWM1NTRlMTItZjM1MS00Y2Y1LTg3MWMtZDNhY2M0MGQwZDg0XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Der Schacht</h3>
+                <p>Spannender Gesellschaftskritischer Film in einem myteriösen Schacht</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMzNjZTUwYmEtZWU2MC00YzM0LTg5NTItYTFiNmVmMjY2NDQ0XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Der Schacht 2</h3>
+                <p>Fortsetzung des genialen Streifens...oder?</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://gfx.videobuster.de/archive/v/cBuKUZ9PPzaHsQtbxPIa4Ywcz0lMkawpyUyRjA4JTJGaW1hmSUyRmpwZWclMkZiY2UzZthm0dvjMNa5MGEwYs1i1WPMOS5qcGcmcj1opjAw/saw-blu-ray-front-cover.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW (1)</h3>
+                <p>Es begann alles in einem Badezimmer... Und einer Leiche?</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/I/61ZdLNKuGsL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW II (2)</h3>
+                <p>Die Spiele gehen in die zweite Runde. Ein Cop versucht sein Bestes zu geben</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/M/MV5BZWRkY2ZmM2ItNmNiMS00NGMwLWE1YzUtYzEzN2YxOGRhMDljXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW III (3)</h3>
+                <p>John Kramer ist totkrank... und nur eine Person kann helfen</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://cdn-a.prisma.de/cdn/img/default/1507/15069258_067df25037314f2dfbdda53984ef5b10_480re0.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW IV (4)</h3>
+                <p>Kramer ist tot aber die Spiele gehen weiter. what?</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/I/810gJj+nJoL.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW V (5)</h3>
+                <p>Jigsaws Plan wird fortgesetzt</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/I/919O7EHEuPL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW VI (6)</h3>
+                <p>neuer teil. neue falle. neue opfer</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/I/71ci3XM9ymL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW VII - Vollendung (7)</h3>
+                <p>Die Hoffman Ära endet</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://images.thalia.media/-/BF2000-2000/1e17d7e5dd834582ac475efd9197deea/jigsaw-saw-viii-dvd-misha-rasaiah.jpeg" alt="Movie Cover">
+            <div class="content">
+                <h3>JIGSAW (8)</h3>
+                <p>10 Jahre ist es her und plötzlich gehen die Spiele weiter...</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://media1.jpc.de/image/w1155/front/0/4006680094649.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW: Spiral (9)</h3>
+                <p>OG: From the Book of SAW - Kevin Hart hatte Bock auf ein Spiel</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/I/71fAF1bHQpL.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW X (10)</h3>
+                <p>Spielt zwischen Teil 1 und 2 und ist ein richtiger John Kramer Film</p>
+            </div>
+        </div>
+
+
+<div class="movie-card" onclick="openMovie('scream1')">
+            <img src="https://i.ebayimg.com/00/s/MTYwMFgxMDI1/z/CBIAAOSwBLlVIuJ8/$_57.JPG?set_id=880000500F" alt="Movie Cover">
+            <div class="content">
+                <h3>Scream I</h3>
+                <p>der meta horror slasher beginnt. classic </p>
+            </div>
+        </div>
+
+        
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://paramount-media.de/image/get/id/1043/q/85/w/367/h/0/name/cover.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Scream II</h3>
+                <p>Ghostface ist zurück. fast wie Teil 1</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('scream3')">
+            <img src="https://m.media-amazon.com/images/I/71Iv91gOENL._AC_UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Scream III</h3>
+                <p>Dritte Runde. Dritter Ghostface. zieht sich lowkey</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('scream4')">
+            <img src="https://m.media-amazon.com/images/I/61nQR9fZltL.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Scream IV</h3>
+                <p>Reebot aber gleichzeitig auch Sequel</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('scream5')">
+            <img src="https://m.media-amazon.com/images/I/81WzNuj6BGL._AC_UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Scream V</h3>
+                <p>Eine neue Ära. Zwei Schwestern. Eine ist Jenna Ortega xD</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/71NtLPdYYPL.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Scream VI</h3>
+                <p>Die Schwester ziehen um und der Killer gleich mit lol. Fan Service</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="carousel-nav">
+        <button class="carousel-btn prev" id="prevBtnFilms">‹</button>
+        <button class="carousel-btn next" id="nextBtnFilms">›</button>
+    </div>
+
+
+    <!-- Filme Section - genau wie die erste Movies Collection -->
+    <div class="movies-section"></div>
+
+    <section class="parallax-section" style="background-image: url('https://wallpapers-clan.com/wp-content/uploads/2024/10/killer-john-wick-neon-desktop-wallpaper-cover.jpg');">
+    <div class="parallax-content">
+        <h1>🎬 Watchlist</h1>
+        <p>Aktuell geplant zu schauen (auch Rewatch) und auch Filme die von vornerein Dreck sind....</p>
+    </div>
+</section>
+    
+    
+    
+    
+    
+    <!--<div class="section-header">
+        <h2 style="text-align: center; color: #f4c10f; font-size: 2.5rem; margin: 40px 0 20px 0; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">🎬 Watchlist</h2>
+        <h3 style="text-align: center; background-color: #da7f09; color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); margin: 0 auto 30px auto; max-width: 800px;">Aktuell geplant zu schauen (auch Rewatch)</h3>
+-->
+    <div class="main-container">
+
+        
+
+
+        <div class="movie-card" onclick="openMovie('v')">
+            <img src="https://trailer.kinopolis.de/grafiken/plakate_608x860/228825.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>M3GAN 2.0</h3>
+                <p>Megan bekommt Konkurrenz</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('v')">
+            <img src="https://fwcdn.pl/fpo/91/32/869132/8019844_1.3.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Cube (2021)</h3>
+                <p>Koreanischer Cube, kp. Hat bestimmt wenig mit dem Rest zu tun</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('v')">
+            <img src="https://m.media-amazon.com/images/M/MV5BYWU0MjZmYTAtMmQ4Yi00YzJkLWJkOGItYjBiNjU2NDhjMGQ3XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Phenomenon – Das Unmögliche wird wahr</h3>
+                <p>john travolta als mega human</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('v')">
+            <img src="https://m.media-amazon.com/images/M/MV5BOGQyOWNmYTgtZWY0NS00NzhjLTg3NmMtMzcwYzQ2OTA2OTJkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Face/Off - Im Körper des Feindes</h3>
+                <p>face swap mit john travolta und nicolas cage iwie</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('v')">
+            <img src="https://m.media-amazon.com/images/I/71zSZQzlK+L._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Pulp Fiction</h3>
+                <p>Klassiker halt. Samuel L. Jackson und Johny. Meme Source</p>
+            </div>
+        </div>
+
+         <div class="movie-card" onclick="openMovie('v')">
+            <img src="https://i.scdn.co/image/ab67616d0000b27301f07db306b6b676a5edce62" alt="Movie Cover">
+            <div class="content">
+                <h3>Emilia Pérez</h3>
+                <p>einfach weil cringe und der kack mehrere oscars bekam....</p>
+            </div>
+        </div>
+        
+        
+        <div class="movie-card" onclick="openMovie('cartmanland')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/1/15/Last_Breath_2025_film_poster.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Last Breath</h3>
+                <p>könnte n geiler drama unter wassser sein so isoliert... 127 hours vibes maybe oder so</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('scream1')">
+            <img src="https://m.media-amazon.com/images/M/MV5BOTYwZDE3ZDctOTc2Mi00MWIyLWFmMjctZTJmNzNmMjZkOTI0XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Ash</h3>
+                <p>keine ahnung worum es geht und das ist top!! rein da. sieht sci fi alien mäßig aus.</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMDIxYzI0OGQtZTZmZS00ZDU5LWI0Y2YtNzc5ZTk2NzMwMDM0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The Monkey</h3>
+                <p>neuverfilmung des alten steven king films bzw ja dem buch. gutes horror mit affenpuppe</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('scream3')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNzY0MmNlNGEtMTE1Ni00Y2RhLTkxN2ItYjY3ZDFiNTVmYmU0XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Blood & Sinners</h3>
+                <p>cowboy meets vampire oder so aber in gut</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('scream4')">
+            <img src="https://trailer.kinopolis.de/grafiken/plakate_608x860/237201.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>From the World of John Wick - Ballerina</h3>
+                <p>spin off aus dem john wick universum. reicht zu wissen</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('scream5')">
+            <img src="https://gfx.videobuster.de/archive/v/cATUs-3f6z8KwpXuudjyUMwcz0lMkawriUyRjAyJTJGaW1hmSUyRmpwZWclMkZmNmFlqGYwZsSqMGbUZmZkZNqu9zCoZDQuanBnJnI9aKYwMA/knock-knock-stream-cover.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Knock Knock</h3>
+                <p>John Wick ähm Kenau Reeves lässt zwei Mädels rein und das endet nicht gut</p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://www.thrillandkill.com/wordpress/wp-content/uploads/2020/09/the-gift_cover.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The Gift - Die dunkle Gabe</h3>
+                <p>mystey thriller krimi von sam raimi</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BOWYzNDNiYzUtNWMwOS00YmFkLTkzN2UtYmVmOGJlNDdjZWUyXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Totall Recall</h3>
+                <p>neuverfilmung des sci fi filmes mit arnold schwarzenegger. zukunft. erinnerungen. was ist echt?</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://cdn.kinocheck.com/i/d09ir49x24.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Peter Pans Neverland Nightmare</h3>
+                <p>horro abklatch von peter pan. so wie winnie pooh blood honey usw</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjIyMmY0MWYtZGRkMC00MjhhLTgwNGUtYWVjZmQ4YjhjZWRmXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Nimona</h3>
+                <p>sieht baba und cute aus. animationsfilm mit magie</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://www.booknerds.de/wp-content/uploads/2023/02/1186_18_Ant_Man_HP_DINA4_RZ_RGB_72dpi.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Ant-Man and the Wasp: Quantumania</h3>
+                <p>vierter ant-man teil mit dem enttäuschenden ende von kang</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BZTQ5OWEzNjMtNmUxZi00NzkxLWJlMTUtMTc3MDYxYTE0YTVlXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Until Dawn</h3>
+                <p>schlechte verfilmung des baba games von sony </p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://gfx.videobuster.de/archive/v/c1IfPl2rN6us2w_UclmRR5wcz0lMkawtSUyRjA0JTJGaW1hmSUyRmpwZWclMkZkYTJivTdkYjljZOYzYrsyY9YyY2FjYzhmZucuanBnJnI9Y3e_N3iUzjA/the-ugly-stepsister-poster.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The Ugly Stepsister</h3>
+                <p>krasser body horror nach der geschichte des aschenputels</p>
+            </div>
+        </div>
+
+       <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/614lcZY032L.jpg">
+            <div class="content">
+                <h3>Alien: Romulus (2025)</h3>
+                <p>neuer alien film findet zurück zu seinem ursprung. geil</p>
+            </div>
+        </div>
+
+           <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://sm.ign.com/ign_de/photo/f/furiosa-a-/furiosa-a-mad-max-sagas-first-poster-is-pretty-metal_4g93.jpg">
+            <div class="content">
+                <h3>Furiosa: A Mad Max Saga</h3>
+                <p>titel ist mehr als selbsterklärend xD</p>
+            </div>
+         </div>
+
+          <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMWJmOTIwZmItNTZkYy00YTM4LWI4ZDYtN2EwZGFiZDE5MzYxXkEyXkFqcGc@._V1_.jpg">
+            <div class="content">
+                <h3>Rise of the Phoenix</h3>
+                <p>Als ein Asteroidenschauer auf eine Raumstation trifft, entdecken die Wissenschaftler an Bord eine Kapsel, die zu einer bedrohlichen Kreatur mutiert.</p>
+            </div>
+         </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BOWIwY2Q4N2QtMjA1NC00Mzc3LTlhNDEtM2E1NjU1ZGVhODFkXkEyXkFqcGc@._V1_.jpg">
+            <div class="content">
+                <h3>The Bunker 06</h3>
+                <p>Alarmstufe Rot: Überall auf der Welt tauchen am Himmel über den großen Metropolen riesige Raumschiffe auf. Ihre unheimliche Präsenz ist ein Rätsel.</p>
+            </div>
+         </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNjM2MjA4YzQtYjBkNS00YmU3LTllOTgtMDQzMjkzM2Q4MmM5XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Predator: Killer of Killers</h3>
+                <p>Zeichentrickfilm über den Predator lol</p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://i.ebayimg.com/images/g/zKcAAOSw6SVkXg6H/s-l1200.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>PREY</h3>
+                <p>Predator aber in einem Land vor unserer Zeit ;)</p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://cdn.kinocheck.com/i/w=1200/mnlnfbbdwi.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Arrival</h3>
+                <p>die ankunft der aliens steht bevor...</p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://www.woki.de/images/Breite_400px_RGB/p_54932.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Passengers</h3>
+                <p>Chris Pratt und Jennifer Lawrence transportieren eine Fracht durchs All</p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNDIyYTU0ODAtYjgwYS00NzhkLWI5NmMtMTc3ZGM5OTRkZDRkXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The Creator</h3>
+                <p>Es geht um K.I Schöpfer und Schöpfung blabla</p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/91bttdpSpDL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Midsommar</h3>
+                <p>psycho horror oder so. blind da rein!</p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/715S7D8QY2L._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Hereditary</h3>
+                <p>psycho horror oder so. blind da rein!</p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://cdn.kinocheck.com/i/w=1200/w4q5g9lofa.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Everything, Everywhere All at Once </h3>
+                <p>multiversum action</p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://musicart.xboxlive.com/7/8a113a00-0000-0000-0000-000000000002/504/image.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Das Morgan Projekt</h3>
+                <p>K.I oder so. blind da rein!</p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://de.web.img3.acsta.net/pictures/22/01/11/10/18/2506710.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Moonfall</h3>
+                <p>weltuntergansfilm rund um den mond ala michael bay </p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://de.web.img3.acsta.net/pictures/23/01/26/15/28/5947694.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>65</h3>
+                <p>Adam Driver landet auf einem Planeten voller Dinos und so. wow</p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://i.redd.it/a9djjcw197pd1.jpeg" alt="Movie Cover">
+            <div class="content">
+                <h3>Afraid</h3>
+                <p>Wieder so ein K.I Ding</p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BY2Q0YWQxZWEtYWE5OC00YzliLTg2MDctODEwNjZjNjUzNzFkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>9 Windows</h3>
+                <p>sie trollt wohl vlogger. blind rein da!</p>
+            </div>
+        </div>
+
+<div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://de.web.img3.acsta.net/pictures/22/08/31/11/57/0454265.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Crimes of the Future</h3>
+                <p>Boddy Horror in einer fiktiven? Zukunft</p>
+            </div>
+        </div>
+
+        
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://images.justwatch.com/poster/250205578/s718/Gestaendnisse.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Geständnisse</h3>
+                <p>A psychological thriller of a grieving mother turned cold-blooded avenger with a twisty master plan to pay back those who were responsible for her daughter's death. </p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://image.tmdb.org/t/p/w154/as6Y50nUvu0JSPpcsm7yFckiJnZ.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Control Room</h3>
+                <p>, </p>
+            </div>
+        </div>
+        
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/81BAyXzAOsL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The World of Kanako</h3>
+                <p>Der Ex-Cop Akikazu begibt sich auf die Suche nach seiner verschwundenen Tochter Kanako</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://gfx.videobuster.de/archive/v/chmrlYcDzoFJUUTpqI2AlVgcz0lMkawsSUyRjA5JTJGaW1hmSUyRmpwZWclMkaxxrkwZGLTYWIzZf5mZWaqMWNiYTJmZDDtLmpwZyZyPWimMDA/bios-finch-cover.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Finch</h3>
+                <p>Nur noch ein Mann treibt sein Unwesen auf dem Planeten Erde. Aber er scheint nicht alleine zu sein</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://www.museum-lichtspiele.de/images/Breite_400px_RGB/p_62683.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Blade Runner 2049 </h3>
+                <p>Direkte Fortsetzung des Original Blader Runners</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://de.web.img3.acsta.net/c_310_420/medias/nmedia/18/76/11/03/19278832.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Unbreakable - Unzerbrechlich</h3>
+                <p>Teil 1 von Shyamalans Eastrail 177 Universe Trilogie </p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMzM5NTA3NjItOTA0ZS00MDI0LWIxNDUtNzczY2JmOTljODFjXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Split</h3>
+                <p>Teil 2 von Shyamalans Eastrail 177 Universe Trilogie </p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTY1OTA2MjI5OV5BMl5BanBnXkFtZTgwNzkxMjU4NjM@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Glass</h3>
+                <p>Teil 3 von Shyamalans Eastrail 177 Universe Trilogie </p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/51YmyhejjwL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3> Titan A.E.</h3>
+                <p>Geiler Zeichentrick Film im Weltall</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://gfx.videobuster.de/archive/v/cfRbx4hWJ7kdjWlEDgfB8Pwcz0lMkawrCUyRjAyJTJGaW1hmSUyRmpwZWclMkZhZPxm-co3ZORhZaq3YzllZdn-Y2NmYjMuanBnJnI9aKYwMA/deadly-home-poster.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Deadly Home</h3>
+                <p>Pflegefall im Haus. Blind rein</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BZmFlMTMyMzQtNmI4NC00YTcyLTgwOGUtMzc4YjcyNDUyOGY3XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Don't Move</h3>
+                <p>Eine Frau liegt gelähmt im Wald... Mit einem Mörder?</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BYWY1YzMyN2MtYmY2Zi00NTZmLWFjMzItOWU1OGIxZjY3OGU0XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Ghost Game</h3>
+                <p>Irgendein mysteriöses (tödliches?) Spiel</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTBkZDZkZWItNzA3MS00Y2ViLWJlZGQtZDNhYjkwZmIzNGRiXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>47 Meters Down</h3>
+                <p>tiefsee drama</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://de.web.img3.acsta.net/pictures/21/08/02/14/32/3778695.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Mosquito State</h3>
+                <p>Daten Analytiker hat Fliegen im Haus</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://www.dramawave.de/wp-content/uploads/2025/02/As-You-Stood-By.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>As You Stood By</h3>
+                <p>Zwei Frauen aus einer missbräuchlichen Ehe planen einen Mord</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://trailer.kinopolis.de/grafiken/plakate_608x860/211258.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The Fantastic Four: First Steps</h3>
+                <p>Kommt Juli ins Kino. Wird hoffentlich baba. Galactus endlich in seiner vollen Pracht</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://trailer.kinopolis.de/grafiken/plakate_608x860/257592.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Weapons</h3>
+                <p>Kommt August ins Kino</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://trailer.kinopolis.de/grafiken/plakate_608x860/252840.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Das Kanu des Manitu</h3>
+                <p>Kommt August ins Kino. Fortsetzung von Der Schuh des Manitu. Bullys Bester Film!</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BY2IzNzMxZjctZjUxZi00YzAxLTk3ZjMtODFjODdhMDU5NDM1XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Se7en</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Eraserhead.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Eraserhead</h3>
+                <p>uff</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/51PTV7242CL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>High Tension</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/S/pv-target-images/4a1a6beee3db00a22411e0a1c9b7445ab682e5b649f4ac4f3df39a9ac0dae8f9.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>1 Million Followers</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BOTM5ODBlOTAtYjcwZi00YzkzLWIzODEtMTM2MTZlNDFmMWU2XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Flow</h3>
+                <p>wunderschöner animationsfilm</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/5/5c/U-571_movie.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>U-571</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BOWQ0NTc2OTEtZTcyNC00ZDk3LWIyYzMtMDlkMmIwNmUwYmVlXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Pulse</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMGRjZTI5NmEtNWQzNi00ZDUxLWFmZmQtOGFiZmNkZGY1MDc5XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Brick</h3>
+                <p>Matthias Schweighöfer wird in seiner Wohnung gefangen oder so</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://paramount-media.de/image/get/id/81/q/85/w/367/h/0/name/cover.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Der Pate</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://images.booklooker.de/x/01KOgQ/8-Blickwinkel.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>8 Blickwinkel</h3>
+                <p>Ein Ereignis - Acht Blickwinkel</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://de.web.img2.acsta.net/medias/nmedia/18/79/35/14/19657735.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>127 Hours</h3>
+                <p>Ein Mann steckt 127 Stunden fest....</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://multimedia2018.kinowelt.de/khe/slumdogmillionr/plakat_highlight/SlumdogMillionaer_iTunes_2000x3000_webdetail_300.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Slumdog Millionär</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://www.closeup.de/media/oart_0/oart_t/oart_14204/19114_G596850.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The Beach</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BYTc1YzNjNWUtMzdkMS00NWRjLWIwM2QtYjNlYjZhZTY5MDY5XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Der Tag, an dem die Erde stillstand</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://i.ebayimg.com/00/s/OTMzWDY5Nw==/z/8eAAAOSw5jRnOaGt/$_57.JPG?set_id=880000500F" alt="Movie Cover">
+            <div class="content">
+                <h3>Smile 2</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTUyNzkwMzAxOF5BMl5BanBnXkFtZTgwMzc1OTk1NjE@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The Witch</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/71UewhmxlvL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Shutter Island</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://images2.medimops.eu/product/a587e9/M0B0000TPM5O-source.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Insects</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://www.schnittberichte.com/pics/titel/0000/298_230.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Die Brut</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/6/6e/Reanimator_poster.png" alt="Movie Cover">
+            <div class="content">
+                <h3>Re-Animator</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://www.schnittberichte.com/pics/titel/0000/243_230.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Bloodnight Intruder</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BM2FiMWMwNzgtYjk4MS00ZGU1LWEwMzUtNDVjZjY5OGI3NGRlXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>RawheadRex</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://upload.wikimedia.org/wikipedia/en/0/0f/Videodromeposter.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Videodrome</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BODU3OWU3MDgtOWUxMi00ZjljLWI5YjgtZGI1MWY1YTMwMGI1XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Waxwork</h3>
+                <p>Dummer deutscher Name: Reise zurück in der Zeit</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/71Sj02bWmIS._AC_UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Pumpkinhead</h3>
+                <p>Dummer deutscher Name: Das Halloween Monster</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BZGI4MzkzNzQtYjA3MC00ZjE1LWI0NWUtMDdjNWQ3OTgxZTkwXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Hellraiser 1 (Original)</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNThkYjI1MDUtMWY1Ny00ZTIwLTk2NDktMDllYzMwYjVkNzEyXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>From Beyond</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTI4MjFhMjAtNmQxYi00N2IxLWJjMGEtYWY1YmU3OTQ0Zjk3XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The Lighthouse</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://i.etsystatic.com/29653518/r/il/ac764b/4780229124/il_1080xN.4780229124_hfnv.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Possession</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://www.dvduncut.com/images/product_images/original_images/dvd--cabal--die-brut-der-nacht--uncut--directors-cut--.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Cabal – Die Brut der Nacht</h3>
+                <p>Originaltitel: Nightbreed</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://blob.cede.ch/catalog/15242000/15242362_1_92.jpg?v=1" alt="Movie Cover">
+            <div class="content">
+                <h3>Suspiria (Original)</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BOGI5OGIwOGUtMzM4MC00MTZkLWI0MWMtZDkzNzE2ZjYxYWZlXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Hausu</h3>
+                <p>Japanischer Horror</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/71JMy3HFv1L._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Tenebrae</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNTQ3NzJhYjktYmRkYy00ODMxLThhMGItYWQyODJmZjEyMTgzXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The Square</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/81wQy33CD3L.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Uncut Gems</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/716eSEYuYRL.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Black Swan</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://www.daskino.at/fileadmin/_processed_/d/d/csm_memoir_web_a0af921fb7.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Memoiren einer Schnecke</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BYjEyZDNlNjgtNDNjOS00ZDE5LWFhMjUtOTgyOGFmNTE1NmQ2XkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Possessions</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjkzMjZhYWQtYzg4My00NTEwLWE5YTAtZjBjNzNkZDM5NmNlXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Skinamarink</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjkzMjZhYWQtYzg4My00NTEwLWE5YTAtZjBjNzNkZDM5NmNlXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Skinamarink</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/71Q1aI9wauL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Rosso – Farbe des Todes</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://musicart.xboxlive.com/7/24f21000-0000-0000-0000-000000000002/504/image.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Rosemaries Baby</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/91j-X-k0rXL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Phenomena</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/91LqyAL6rIL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Die Farbe aus dem All (Color Out of Space)</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://blob.cede.ch/catalog/10349000/10349318_1_92.jpg?v=1" alt="Movie Cover">
+            <div class="content">
+                <h3>Die Fliege</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://gfx.videobuster.de/archive/v/cyccpxjOOvVWMdAJF96wO2Acz0lMkawriUyRjA4JTJGaW1hmSUyRmpwZWclMkZi9MpjOGJkyWJhZDVi1GIxYjhjY2ZhNWUzYWQyLmpwZw/dark-society-stream-cover.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Dark Society</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://blob.cede.ch/catalog/15956000/15956660_1_92.jpg?v=2" alt="Movie Cover">
+            <div class="content">
+                <h3>The Void</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://image.tmdb.org/t/p/w154/rz9s0U0xygmpXLk7QSsMz9jrNUd.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Dreamcatcher</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BNGY5NzEyZmEtMDUyYS00YTRmLWE0MjAtYTllM2YwMTg3OWUwXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Max Payne</h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/81QhI9qk9rL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Fear, Inc.</h3>
+                <p></p>
+            </div>
+        </div>
+
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/81kk0IGqaLL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Twin Peaks</h3>
+                <p>infominfo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://cdn-images.dzcdn.net/images/cover/f449e0697aa6dadf38f0cc011552b3f2/0x1900-000000-80-0-0.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Silo</h3>
+                <p>geilo</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/71LYhYOF9YL._AC_UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>All of Us Are Dead </h3>
+                <p>Eine Highschool wird von einem Zombievirus heimgesucht. Die eingepferchten Schüler müssen schleunigst entkommen, um nicht selbst in Zombies verwandelt zu werden.</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjJiZjUxYzEtY2IxZC00MGRmLTg5Y2EtMDhmN2IyYTljYjhhXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>Devil May Cry (2025)</h3>
+                <p>devil may cry anime halt</p>
+            </div>
+        </div>
+
+  
+        <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="https://m.media-amazon.com/images/I/81QMDxbYKfL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>The Magicians</h3>
+                <p>gute adaption mit zauberern oder so?</p>
+            </div>
+        </div>
+         
+
+            <div class="movie-card" onclick="openMovie('scream6')">
+            <img src="placeholder">
+            <div class="content">
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+    
+    </div>
+
+
+
+    </section>
+
+
+   
+
+
+    <section class="parallax-section" style="background-image: url('https://images4.alphacoders.com/117/1179438.jpg');">
+    <div class="parallax-content">
+        <h1>Alice in Borderland (Netflix)</h1>
+        <p>Survival-Trip, bei dem Arisu in einer tödlichen Spielwelt ums Überleben kämpft. Staffel 1 ist brutal und spannend, Staffel 2 wird emotionaler und mind-blowing</p>
+    </div>
+    </section>
+
+    <div class="section-header">
+    <div class="main-container" id="moviesContainer">
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://static.wikia.nocookie.net/aliceinborderland/images/a/a2/Alice_in_Borderland_%28Netflix%29_Season_1_Poster_03.jpg/revision/latest?cb=20201211074318" alt="Movie Cover">
+            <div class="content">
+                <h3>Staffel 1</h3>
+                <p>dsfdf</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://static.wikia.nocookie.net/aliceinborderland/images/7/7f/Alice_in_Borderland%27_season_2_Netflix_Poster.jpg/revision/latest?cb=20221225114642" alt="Movie Cover">
+            <div class="content">
+                <h3>Staffel 2</h3>
+                <p>dsfdf</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://images.microcms-assets.io/assets/14a7d8016d314002bb5f08852b1dd335/595c98e3f9b2410c97239bbdff8e3e0d/ja_jp_aibs3_main_teaser_ka_vertical_27x40_rgb_pre_1.jpg?w=1920" alt="Movie Cover">
+            <div class="content">
+                <h3>Staffel 3</h3>
+                <p>dsfdf</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('')">
+            <img src="" alt="Movie Cover">
+            <div class="content">
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('')">
+            <img src="" alt="Movie Cover">
+            <div class="content">
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('')">
+            <img src="" alt="Movie Cover">
+            <div class="content">
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('')">
+            <img src="" alt="Movie Cover">
+            <div class="content">
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('')">
+            <img src="" alt="Movie Cover">
+            <div class="content">
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('')">
+            <img src="" alt="Movie Cover">
+            <div class="content">
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('')">
+            <img src="" alt="Movie Cover">
+            <div class="content">
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+
+            
+   </div>
+
+        
+
+
+
+    <section class="parallax-section" style="background-image: url('https://wallpapersok.com/images/hd/saw-scary-face-dyszr923ro2p0xry.jpg');">
+    <div class="parallax-content">
+        <h1>SAW Franchise</h1>
+        <p></p>
+    </div>
+    </section>
+
+    <div class="section-header">
+    <div class="main-container" id="moviesContainer">
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://gfx.videobuster.de/archive/v/cBuKUZ9PPzaHsQtbxPIa4Ywcz0lMkawpyUyRjA4JTJGaW1hmSUyRmpwZWclMkZiY2UzZthm0dvjMNa5MGEwYs1i1WPMOS5qcGcmcj1opjAw/saw-blu-ray-front-cover.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW (1)</h3>
+                <p>Es begann alles in einem Badezimmer... Und einer Leiche?</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/I/61ZdLNKuGsL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW II (2)</h3>
+                <p>Die Spiele gehen in die zweite Runde. Ein Cop versucht sein Bestes zu geben</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/M/MV5BZWRkY2ZmM2ItNmNiMS00NGMwLWE1YzUtYzEzN2YxOGRhMDljXkEyXkFqcGc@._V1_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW III (3)</h3>
+                <p>John Kramer ist totkrank... und nur eine Person kann helfen</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://cdn-a.prisma.de/cdn/img/default/1507/15069258_067df25037314f2dfbdda53984ef5b10_480re0.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW IV (4)</h3>
+                <p>Kramer ist tot aber die Spiele gehen weiter. what?</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/I/810gJj+nJoL.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW V (5)</h3>
+                <p>Jigsaws Plan wird fortgesetzt</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/I/919O7EHEuPL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW VI (6)</h3>
+                <p>neuer teil. neue falle. neue opfer</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/I/71ci3XM9ymL._UF894,1000_QL80_.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW VII - Vollendung (7)</h3>
+                <p>Die Hoffman Ära endet</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://images.thalia.media/-/BF2000-2000/1e17d7e5dd834582ac475efd9197deea/jigsaw-saw-viii-dvd-misha-rasaiah.jpeg" alt="Movie Cover">
+            <div class="content">
+                <h3>JIGSAW (8)</h3>
+                <p>10 Jahre ist es her und plötzlich gehen die Spiele weiter...</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://media1.jpc.de/image/w1155/front/0/4006680094649.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW: Spiral (9)</h3>
+                <p>OG: From the Book of SAW - Kevin Hart hatte Bock auf ein Spiel</p>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="openMovie('scream2')">
+            <img src="https://m.media-amazon.com/images/I/71fAF1bHQpL.jpg" alt="Movie Cover">
+            <div class="content">
+                <h3>SAW X (10)</h3>
+                <p>Spielt zwischen Teil 1 und 2 und ist ein richtiger John Kramer Film</p>
+            </div>
+        </div>   
+        
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h1> geplante functions: konto erstellung und login, reviews zu filmen, daumen hoch, runter, watchlist für user, 
+kommentare, collectionen, beste folgen einer serie, random film/serien vorschlag (mit filter), custim tags (adaptionen von xxxx, spoiler, trailer...) wo zu sehen (neteflix, kack prime, disney schrott, apple - tv usw)
+
+
+<div class="footer">
+    <p>&copy; 2025 Baba Ecke by Marco Lorenz. All rights reserved.</p>
+</div>
+  
+<script>
+
+// Add drag instructions functionality
+    function hideDragInstructions() {
+        const instructions = document.getElementById('dragInstructions');
+        if (instructions) {
+            instructions.style.display = 'none';
+            localStorage.setItem('dragInstructionsShown', 'true');
+        }
+    }
+    
+    // Show instructions on first visit
+    document.addEventListener('DOMContentLoaded', function() {
+        const instructionsShown = localStorage.getItem('dragInstructionsShown');
+        if (!instructionsShown) {
+            setTimeout(() => {
+                const instructions = document.getElementById('dragInstructions');
+                if (instructions) {
+                    instructions.style.display = 'block';
+                }
+            }, 2000);
+        }
+    });
+    
+    // Enhanced movie card functionality with drag support
+    function enhanceMovieCards() {
+        const movieCards = document.querySelectorAll('.movie-card');
+        
+        movieCards.forEach(card => {
+            // Add data attributes for better drag handling
+            const title = card.querySelector('h3')?.textContent || '';
+            const movieId = extractMovieIdFromCard(card);
+            
+            card.setAttribute('data-movie-title', title);
+            card.setAttribute('data-movie-id', movieId || '');
+            
+            // Add visual drag indicator
+            if (!card.querySelector('.drag-handle')) {
+                const dragHandle = document.createElement('div');
+                dragHandle.className = 'drag-handle';
+                dragHandle.innerHTML = '⋮⋮';
+                dragHandle.title = 'Film verschieben';
+                card.appendChild(dragHandle);
+            }
+        });
+    }
+    
+    function extractMovieIdFromCard(card) {
+        const onclickAttr = card.getAttribute('onclick');
+        if (onclickAttr) {
+            const match = onclickAttr.match(/openMovie\(['"]([^'"]+)['"]\)/);
+            return match ? match[1] : null;
+        }
+        return null;
+    }
+    
+    // Initialize enhanced functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            enhanceMovieCards();
+        }, 500);
+    });
+    
+    // Add keyboard shortcuts for drag and drop
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'z') {
+            // Undo last move (if implemented)
+            console.log('🔄 Undo last move (feature coming soon)');
+        }
+        
+        if (e.ctrlKey && e.key === 'r') {
+            // Reset to original order
+            e.preventDefault();
+            if (confirm('Möchtest du die ursprüngliche Reihenfolge wiederherstellen?')) {
+                resetMovieOrder();
+            }
+        }
+    });
+    
+    function resetMovieOrder() {
+        // Clear saved orders
+        localStorage.removeItem('movieOrder_moviesContainer');
+        localStorage.removeItem('movieOrder_filmsContainer');
+        
+        // Reload page to restore original order
+        location.reload();
+    }
+    
+    // Add context menu for additional options
+    document.addEventListener('contextmenu', function(e) {
+        const movieCard = e.target.closest('.movie-card');
+        if (movieCard) {
+            e.preventDefault();
+            showMovieContextMenu(e, movieCard);
+        }
+    });
+    
+    function showMovieContextMenu(e, movieCard) {
+        // Remove existing context menu
+        const existingMenu = document.querySelector('.movie-context-menu');
+        if (existingMenu) {
+            existingMenu.remove();
+        }
+        
+        const menu = document.createElement('div');
+        menu.className = 'movie-context-menu';
+        menu.style.position = 'fixed';
+        menu.style.left = e.clientX + 'px';
+        menu.style.top = e.clientY + 'px';
+        menu.style.zIndex = '10000';
+        
+        const title = movieCard.querySelector('h3')?.textContent || 'Unbekannt';
+        
+        menu.innerHTML = `
+            <div class="context-menu-content">
+                <div class="context-menu-header">${title}</div>
+                <div class="context-menu-item" onclick="moveToTop('${movieCard.dataset.movieId}')">
+                    📌 Nach oben verschieben
+                </div>
+                <div class="context-menu-item" onclick="moveToBottom('${movieCard.dataset.movieId}')">
+                    📌 Nach unten verschieben
+                </div>
+                <div class="context-menu-separator"></div>
+                <div class="context-menu-item" onclick="toggleWatchlist('${movieCard.dataset.movieId}')">
+                    ❤️ Watchlist Status ändern
+                </div>
+                <div class="context-menu-item" onclick="openMovie('${movieCard.dataset.movieId}')">
+                    👁️ Film öffnen
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(menu);
+        
+        // Remove menu when clicking elsewhere
+        setTimeout(() => {
+            document.addEventListener('click', function removeMenu() {
+                menu.remove();
+                document.removeEventListener('click', removeMenu);
+            });
+        }, 100);
+    }
+    
+    function moveToTop(movieId) {
+        const movieCard = document.querySelector(`[data-movie-id="${movieId}"]`);
+        if (movieCard) {
+            const container = movieCard.parentNode;
+            container.insertBefore(movieCard, container.firstChild);
+            movieDragDrop.saveOrder(container);
+            movieDragDrop.showSuccessFeedback();
+        }
+    }
+    
+    function moveToBottom(movieId) {
+        const movieCard = document.querySelector(`[data-movie-id="${movieId}"]`);
+        if (movieCard) {
+            const container = movieCard.parentNode;
+            container.appendChild(movieCard);
+            movieDragDrop.saveOrder(container);
+            movieDragDrop.showSuccessFeedback();
+        }
+    }
+
+
+// Funktionierende Bildoptimierung mit Weserv.nl
+document.addEventListener('DOMContentLoaded', function() {
+    const movieImages = document.querySelectorAll('.movie-card img');
+    console.log(`🎬 Starte Optimierung von ${movieImages.length} Bildern mit Weserv...`);
+    
+    movieImages.forEach((img, index) => {
+        const originalSrc = img.src;
+        
+        const optimizedSrc = `https://images.weserv.nl/?url=${encodeURIComponent(originalSrc)}&w=300&h=450&fit=cover&q=100&output=webp`;
+        
+        setTimeout(() => {
+            const newImg = new Image();
+            
+            newImg.onload = function() {
+                img.src = optimizedSrc;
+                console.log(`✅ Bild ${index + 1} optimiert (CSS-Größe beibehalten)`);
+            };
+            
+            newImg.onerror = function() {
+                console.error(`❌ Fehler bei Bild ${index + 1}`);
+            };
+            
+            newImg.src = optimizedSrc;
+        }, index * 50);
+        
+        img.setAttribute('loading', 'lazy');
+    });
+});
+
+// Watchlist functionality
+let watchlist = JSON.parse(localStorage.getItem('watchlist')) || {};
+
+function toggleWatchlist(movieId) {
+    const heartElement = document.getElementById(`heart-${movieId}`);
+    
+    if (watchlist[movieId]) {
+        delete watchlist[movieId];
+        heartElement.textContent = '🤍';
+    } else {
+        watchlist[movieId] = {
+            addedAt: new Date().toISOString(),
+            addaddedAtFormatted: new Date().toLocaleString('de-DE')
+        };
+        heartElement.textContent = '❤️';
+    }
+    
+    localStorage.setItem('watchlist', JSON.stringify(watchlist));
+    updateWatchlistDisplay();
+}
+
+function updateWatchlistDisplay() {
+    const watchlistContainer = document.getElementById('watchlistContainer');
+    const emptyWatchlist = document.getElementById('emptyWatchlist');
+    
+    if (!watchlistContainer) return;
+    
+    const existingCards = watchlistContainer.querySelectorAll('.watchlist-item');
+    existingCards.forEach(card => card.remove());
+    
+    const watchlistItems = Object.keys(watchlist);
+    
+    if (watchlistItems.length === 0) {
+        if (emptyWatchlist) emptyWatchlist.style.display = 'block';
+    } else {
+        if (emptyWatchlist) emptyWatchlist.style.display = 'none';
+        
+        watchlistItems.sort((a, b) => {
+            return new Date(watchlist[b].addedAt) - new Date(watchlist[a].addedAt);
+        });
+        
+        watchlistItems.forEach(movieId => {
+            const movie = movieDatabase && movieDatabase[movieId];
+            const watchlistItem = watchlist[movieId];
+            
+            if (movie) {
+                const watchlistCard = document.createElement('div');
+                watchlistCard.className = 'watchlist-item';
+                watchlistCard.innerHTML = `
+                    <div class="watchlist-movie-card" onclick="openMovie('${movieId}')">
+                        <img src="${movie.cover}" alt="${movie.title}">
+                        <div class="watchlist-content">
+                            <h4>${movie.title}</h4>
+                            <p class="watchlist-genre">${movie.genre}</p>
+                            <p class="watchlist-added">Hinzugefügt: ${watchlistItem.addedAtFormatted}</p>
+                        </div>
+                        <div class="watchlist-remove" onclick="event.stopPropagation(); removeFromWatchlist('${movieId}')">
+                            <span>✕</span>
+                        </div>
+                    </div>
+                `;
+                watchlistContainer.appendChild(watchlistCard);
+            }
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    Object.keys(watchlist).forEach(movieId => {
+        const heartElement = document.getElementById(`heart-${movieId}`);
+        if (heartElement) {
+            heartElement.textContent = '❤️';
+        }
+    });
+    
+    updateWatchlistDisplay();
+});
+
+function removeFromWatchlist(movieId) {
+    delete watchlist[movieId];
+    localStorage.setItem('watchlist', JSON.stringify(watchlist));
+    
+    const heartElement = document.getElementById(`heart-${movieId}`);
+    if (heartElement) {
+        heartElement.textContent = '🤍';
+    }
+    
+    updateWatchlistDisplay();
+}
+
+function openMovie(movieId) {
+    if (typeof movieId === 'object' && movieId.dataset) {
+        movieId = movieId.dataset.movieId;
+    }
+    
+    const movieCard = document.querySelector(`[data-movie-id="${movieId}"]`) || 
+                     document.querySelector(`[onclick*="${movieId}"]`);
+    
+    if (!movieCard) {
+        console.error('Movie card not found for ID:', movieId);
+        return;
+    }
+    
+    const movieData = {
+        id: movieId,
+        title: movieCard.querySelector('h3').textContent,
+        cover: movieCard.querySelector('img').src,
+        description: movieCard.querySelector('p').textContent,
+        genre: movieCard.dataset.genre || 'Unbekannt',
+        releaseDate: movieCard.dataset.year || 'Unbekannt',
+        duration: movieCard.dataset.duration || 'Unbekannt',
+        rating: movieCard.dataset.rating || 'Unbekannt',
+        streamUrl: movieCard.dataset.streamUrl || ''
+    };
+    
+    localStorage.setItem('currentMovie', JSON.stringify(movieData));
+    window.location.href = `movie-detail.html?id=${encodeURIComponent(movieData.id)}`;
+}
+
+// Random Film Finder mit Filtern
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎬 Random Film Finder mit Filtern wird geladen...');
+    
+    const randomBtn = document.getElementById('randomFilmBtn');
+    const resultDiv = document.getElementById('randomFilmResult');
+    const newRandomBtn = document.getElementById('newRandomFilm');
+    const watchBtn = document.getElementById('watchRandomFilm');
+    const addToWatchlistBtn = document.getElementById('addToWatchlistBtn');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+    const filteredCountEl = document.getElementById('filteredCount');
+    
+    // Filter Elements
+    const typeFilter = document.getElementById('typeFilter');
+    const genreFilter = document.getElementById('genreFilter');
+    const seriesFilter = document.getElementById('seriesFilter');
+    const watchlistFilter = document.getElementById('watchlistFilter');
+    const watchedFilter = document.getElementById('watchedFilter');
+    const ratingFilter = document.getElementById('ratingFilter');
+    
+    if (!randomBtn) {
+        console.error('❌ Random Button nicht gefunden!');
+        return;
+    }
+    
+    let currentRandomMovie = null;
+    let allMovies = [];
+    
+    // Filme analysieren und kategorisieren
+    function analyzeMovie(card, index) {
+        const title = card.querySelector('h3')?.textContent || '';
+        const description = card.querySelector('p')?.textContent || '';
+        const image = card.querySelector('img')?.src || '';
+        const onclickAttr = card.getAttribute('onclick');
+        
+        // Typ bestimmen (Serie vs Film)
+        const isFromSeriesSection = card.closest('#moviesContainer') !== null;
+        const isFromFilmsSection = card.closest('#filmsContainer') !== null;
+        const isFromWatchlistSection = card.closest('.main-container') && 
+                                     card.closest('.section-header') && 
+                                     card.closest('.section-header').querySelector('h2')?.textContent.includes('Watchlist');
+        
+        let type = 'unknown';
+        if (isFromSeriesSection) type = 'series';
+        else if (isFromFilmsSection) type = 'movies';
+        else if (isFromWatchlistSection) type = 'watchlist';
+        
+        // Genre aus Titel/Beschreibung ableiten
+        const content = (title + ' ' + description).toLowerCase();
+        let genre = 'unknown';
+        
+        if (content.includes('horror') || content.includes('scary') || content.includes('monster')) genre = 'horror';
+        else if (content.includes('action') || content.includes('fight') || content.includes('kampf')) genre = 'action';
+        else if (content.includes('comedy') || content.includes('lustig') || content.includes('funny')) genre = 'comedy';
+        else if (content.includes('drama') || content.includes('emotional')) genre = 'drama';
+        else if (content.includes('sci-fi') || content.includes('alien') || content.includes('space') || content.includes('zukunft')) genre = 'sci-fi';
+        else if (content.includes('thriller') || content.includes('spannend') || content.includes('mystery')) genre = 'thriller';
+        else if (content.includes('anime') || content.includes('manga')) genre = 'anime';
+        else if (content.includes('k-drama') || content.includes('korean')) genre = 'k-drama';
+        
+        // Mehrteilige erkennen
+        const isMultiPart = content.includes('teil') || content.includes('staffel') || 
+                           content.includes('season') || content.includes('folge') ||
+                           /\b(i{1,3}|iv|v|vi{1,3}|ix|x)\b/i.test(title) ||
+                           /\b\d+\b/.test(title);
+        
+        // Movie ID extrahieren
+        let movieId = null;
+        if (onclickAttr) {
+            const movieIdMatch = onclickAttr.match(/openMovie\(['"]([^'"]+)['"]\)/);
+            movieId = movieIdMatch ? movieIdMatch[1] : `movie-${index}`;
+        }
+        
+        // Bewertung simulieren (basierend auf Beschreibung)
+        let rating = 3;
+        if (content.includes('baba') || content.includes('geil') || content.includes('meisterwerk')) rating = 5;
+        else if (content.includes('gut') || content.includes('empfehlen')) rating = 4;
+        else if (content.includes('schlecht') || content.includes('langweilig')) rating = 2;
+        
+        return {
+            id: movieId || `movie-${index}`,
+            title: title,
+            description: description,
+            image: image,
+            type: type,
+            genre: genre,
+            isMultiPart: isMultiPart,
+            rating: rating,
+            element: card,
+            inWatchlist: watchlist && watchlist[movieId] ? true : false
+        };
+    }
+    
+    // Alle Filme sammeln und analysieren
+    function getAllMovies() {
+        const movieCards = document.querySelectorAll('.movie-card');
+        allMovies = [];
+        
+        console.log(`🔍 Gefundene Movie Cards: ${movieCards.length}`);
+        
+        movieCards.forEach((card, index) => {
+            const movie = analyzeMovie(card, index);
+            if (movie.title && movie.image) {
+                allMovies.push(movie);
+            }
+        });
+        
+        console.log(`✅ Analysierte Filme: ${allMovies.length}`);
+        updateFilteredCount();
+        return allMovies;
+    }
+    
+    // Gefilterte Filme basierend auf aktuellen Filtereinstellungen
+    function getFilteredMovies() {
+        const typeValue = typeFilter?.value || 'all';
+        const genreValue = genreFilter?.value || 'all';
+        const seriesValue = seriesFilter?.value || 'include';
+        const watchlistValue = watchlistFilter?.value || 'all';
+        const watchedValue = watchedFilter?.value || 'all';
+        const ratingValue = parseInt(ratingFilter?.value) || 0;
+        
+        return allMovies.filter(movie => {
+            // Typ Filter
+            if (typeValue !== 'all') {
+                if (typeValue === 'movies' && movie.type !== 'movies') return false;
+                if (typeValue === 'series' && movie.type !== 'series') return false;
+            }
+            
+            // Genre Filter
+            if (genreValue !== 'all' && movie.genre !== genreValue) return false;
+            
+            // Mehrteilige Filter
+            if (seriesValue === 'exclude' && movie.isMultiPart) return false;
+            if (seriesValue === 'only' && !movie.isMultiPart) return false;
+            
+            // Watchlist Filter
+            if (watchlistValue === 'in-watchlist' && !movie.inWatchlist) return false;
+            if (watchlistValue === 'not-in-watchlist' && movie.inWatchlist) return false;
+            
+            // Bewertung Filter
+            if (ratingValue > 0 && movie.rating < ratingValue) return false;
+            
+            return true;
+        });
+    }
+    
+    // Anzahl gefilterter Filme aktualisieren
+    function updateFilteredCount() {
+        const filteredMovies = getFilteredMovies();
+        if (filteredCountEl) {
+            filteredCountEl.textContent = filteredMovies.length;
+        }
+    }
+    
+    // Zufälligen Film aus gefilterten Filmen auswählen
+    function getRandomFilteredMovie() {
+        const filteredMovies = getFilteredMovies();
+        if (filteredMovies.length === 0) {
+            console.error('❌ Keine Filme entsprechen den Filtern!');
+            return null;
+        }
+        
+        const randomIndex = Math.floor(Math.random() * filteredMovies.length);
+        const selectedMovie = filteredMovies[randomIndex];
+        console.log('🎲 Zufällig ausgewählter Film:', selectedMovie.title);
+        return selectedMovie;
+    }
+    
+    // Film anzeigen
+    function displayRandomMovie(movie) {
+        if (!movie) {
+            console.error('❌ Kein Film zum Anzeigen!');
+            return;
+        }
+        
+        console.log('🎬 Zeige Film an:', movie.title);
+        currentRandomMovie = movie;
+        
+        // Elemente aktualisieren
+        const imageEl = document.getElementById('randomFilmImage');
+        const titleEl = document.getElementById('randomFilmTitle');
+        const descEl = document.getElementById('randomFilmDescription');
+        const typeEl = document.getElementById('resultType');
+        const genreEl = document.getElementById('resultGenre');
+        const ratingEl = document.getElementById('resultRating');
+        
+        if (imageEl) imageEl.src = movie.image;
+        if (titleEl) titleEl.textContent = movie.title;
+        if (descEl) descEl.textContent = movie.description;
+        
+        // Tags anzeigen
+        if (typeEl) typeEl.textContent = movie.type === 'series' ? '📺 Serie' : '🎬 Film';
+        if (genreEl) genreEl.textContent = `🎭 ${movie.genre}`;
+        if (ratingEl) ratingEl.textContent = `⭐ ${movie.rating}/5`;
+        
+        // Watchlist Button aktualisieren
+        if (addToWatchlistBtn) {
+            if (movie.inWatchlist) {
+                addToWatchlistBtn.innerHTML = '<span>💔</span> Aus Watchlist entfernen';
+                addToWatchlistBtn.style.background = 'linear-gradient(135deg, #666666 0%, #444444 100%)';
+            } else {
+                addToWatchlistBtn.innerHTML = '<span>❤️</span> Zur Watchlist';
+                addToWatchlistBtn.style.background = 'linear-gradient(135deg, #e91e63 0%, #c2185b 100%)';
+            }
+        }
+        
+        // Result anzeigen
+        if (resultDiv) {
+            resultDiv.style.display = 'block';
+            setTimeout(() => {
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+    }
+    
+    // Event Listeners
+    randomBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log('🎲 Random Button geklickt!');
+        
+        randomBtn.classList.add('loading');
+        const btnText = randomBtn.querySelector('.btn-text');
+        if (btnText) btnText.textContent = 'Suche läuft...';
+        
+        setTimeout(() => {
+            const randomMovie = getRandomFilteredMovie();
+            
+            if (randomMovie) {
+                displayRandomMovie(randomMovie);
+            } else {
+                alert('Keine Filme entsprechen den gewählten Filtern! 😅\nVersuche andere Filter-Einstellungen.');
+            }
+            
+            randomBtn.classList.remove('loading');
+            if (btnText) btnText.textContent = 'Zufälligen Film finden';
+        }, 1500);
+    });
+    
+    // Neuer Random Film Button
+    if (newRandomBtn) {
+        newRandomBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const randomMovie = getRandomFilteredMovie();
+            if (randomMovie) {
+                displayRandomMovie(randomMovie);
+            } else {
+                alert('Keine weiteren Filme entsprechen den Filtern! 😅');
+            }
+        });
+    }
+    
+    // Watch Button
+    if (watchBtn) {
+        watchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (currentRandomMovie && currentRandomMovie.element) {
+                currentRandomMovie.element.click();
+            }
+        });
+    }
+    
+    // Watchlist Button
+    if (addToWatchlistBtn) {
+        addToWatchlistBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (currentRandomMovie && currentRandomMovie.id) {
+                toggleWatchlist(currentRandomMovie.id);
+                // Button aktualisieren
+                currentRandomMovie.inWatchlist = !currentRandomMovie.inWatchlist;
+                displayRandomMovie(currentRandomMovie);
+            }
+        });
+    }
+    
+    // Filter Reset Button
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (typeFilter) typeFilter.value = 'all';
+            if (genreFilter) genreFilter.value = 'all';
+            if (seriesFilter) seriesFilter.value = 'include';
+            if (watchlistFilter) watchlistFilter.value = 'all';
+            if (watchedFilter) watchedFilter.value = 'all';
+            if (ratingFilter) ratingFilter.value = 'all';
+            updateFilteredCount();
+        });
+    }
+    
+    // Filter Change Events
+    [typeFilter, genreFilter, seriesFilter, watchlistFilter, watchedFilter, ratingFilter].forEach(filter => {
+        if (filter) {
+            filter.addEventListener('change', updateFilteredCount);
+        }
+    });
+    
+    // Initialisierung
+    getAllMovies();
+    console.log('✅ Random Film Finder mit Filtern erfolgreich initialisiert!');
+});
+
+
+// In der displayRandomMovie Funktion hinzufügen:
+function displayRandomMovie(movie) {
+    if (!movie) {
+        console.error('❌ Kein Film zum Anzeigen!');
+        return;
+    }
+    
+    console.log('🎬 Zeige Film an:', movie.title);
+    currentRandomMovie = movie;
+    
+    // Placeholder ausblenden, Result anzeigen
+    const placeholderEl = document.getElementById('randomFilmPlaceholder');
+    if (placeholderEl) placeholderEl.style.display = 'none';
+    
+    // Elemente aktualisieren
+    const imageEl = document.getElementById('randomFilmImage');
+    const titleEl = document.getElementById('randomFilmTitle');
+    const descEl = document.getElementById('randomFilmDescription');
+    const typeEl = document.getElementById('resultType');
+    const genreEl = document.getElementById('resultGenre');
+    
+    if (imageEl) imageEl.src = movie.image;
+    if (titleEl) titleEl.textContent = movie.title;
+    if (descEl) descEl.textContent = movie.description;
+    
+    // Tags anzeigen
+    if (typeEl) typeEl.textContent = movie.type === 'series' ? '📺' : '🎬';
+    if (genreEl) genreEl.textContent = movie.genre;
+    
+    // Watchlist Button aktualisieren
+    if (addToWatchlistBtn) {
+        if (movie.inWatchlist) {
+            addToWatchlistBtn.innerHTML = '<span>💔</span>';
+            addToWatchlistBtn.style.background = 'linear-gradient(135deg, #666666 0%, #444444 100%)';
+        } else {
+            addToWatchlistBtn.innerHTML = '<span>❤️</span>';
+            addToWatchlistBtn.style.background = 'linear-gradient(135deg, #e91e63 0%, #c2185b 100%)';
+        }
+    }
+    
+    // Result anzeigen
+    if (resultDiv) {
+        resultDiv.style.display = 'block';
+    }
+}
+
+// Add this to the existing JavaScript in index.html
+// Update the displayRandomMovie function for better mobile handling
+function displayRandomMovie(movie) {
+    if (!movie) {
+        console.error('❌ Kein Film zum Anzeigen!');
+        return;
+    }
+    
+    console.log('🎬 Zeige Film an:', movie.title);
+    currentRandomMovie = movie;
+    
+    // Placeholder ausblenden, Result anzeigen
+    const placeholderEl = document.getElementById('randomFilmPlaceholder');
+    const resultDiv = document.getElementById('randomFilmResult');
+    
+    if (placeholderEl) placeholderEl.style.display = 'none';
+    
+    // Elemente aktualisieren
+    const imageEl = document.getElementById('randomFilmImage');
+    const titleEl = document.getElementById('randomFilmTitle');
+    const descEl = document.getElementById('randomFilmDescription');
+    const typeEl = document.getElementById('resultType');
+    const genreEl = document.getElementById('resultGenre');
+    
+    if (imageEl) {
+        imageEl.src = movie.image;
+        imageEl.alt = movie.title;
+        // Ensure image loads properly on mobile
+        imageEl.style.width = '100%';
+        imageEl.style.height = 'auto';
+        imageEl.style.minHeight = '280px';
+        imageEl.style.objectFit = 'cover';
+        imageEl.style.objectPosition = 'center top';
+    }
+    
+    if (titleEl) titleEl.textContent = movie.title;
+    if (descEl) descEl.textContent = movie.description;
+    
+    // Tags anzeigen
+    if (typeEl) typeEl.textContent = movie.type === 'series' ? '📺' : '🎬';
+    if (genreEl) genreEl.textContent = movie.genre;
+    
+    // Watchlist Button aktualisieren
+    const addToWatchlistBtn = document.getElementById('addToWatchlistBtn');
+    if (addToWatchlistBtn) {
+        if (movie.inWatchlist) {
+            addToWatchlistBtn.innerHTML = '<span>💔</span>';
+            addToWatchlistBtn.style.background = 'linear-gradient(135deg, #666666 0%, #444444 100%)';
+        } else {
+            addToWatchlistBtn.innerHTML = '<span>❤️</span>';
+            addToWatchlistBtn.style.background = 'linear-gradient(135deg, #e91e63 0%, #c2185b 100%)';
+        }
+    }
+    
+    // Result anzeigen
+    if (resultDiv) {
+        resultDiv.style.display = 'block';
+        resultDiv.style.width = '100%';
+        
+        // Smooth scroll to result on mobile
+        if (window.innerWidth <= 768) {
+            setTimeout(() => {
+                resultDiv.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center',
+                    inline: 'nearest'
+                });
+            }, 300);
+        }
+    }
+}
+
+// Enhanced Drag and Drop Features
+class EnhancedDragFeatures {
+    constructor() {
+        this.undoStack = [];
+        this.redoStack = [];
+        this.maxUndoSteps = 10;
+        this.selectedCards = new Set();
+        this.selectionMode = false;
+        this.init();
+    }
+
+    init() {
+        this.setupKeyboardShortcuts();
+        this.setupBatchOperations();
+        this.setupUndoRedo();
+        console.log('🎬 Enhanced Drag Features aktiviert!');
+    }
+
+    setupKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+Z für Undo
+            if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                this.undo();
+            }
+            
+            // Ctrl+Shift+Z für Redo
+            if (e.ctrlKey && e.shiftKey && e.key === 'Z') {
+                e.preventDefault();
+                this.redo();
+            }
+            
+            // Ctrl+A für alle auswählen
+            if (e.ctrlKey && e.key === 'a') {
+                e.preventDefault();
+                this.selectAll();
+            }
+            
+            // Escape für Auswahl aufheben
+            if (e.key === 'Escape') {
+                this.clearSelection();
+                this.exitSelectionMode();
+            }
+            
+            // Delete für ausgewählte Filme (aus Watchlist entfernen)
+            if (e.key === 'Delete' && this.selectedCards.size > 0) {
+                this.removeSelectedFromWatchlist();
+            }
+        });
+    }
+
+    setupBatchOperations() {
+        // Batch Operations Panel erstellen
+        const batchPanel = document.createElement('div');
+        batchPanel.className = 'batch-operations';
+        batchPanel.id = 'batchOperations';
+        batchPanel.innerHTML = `
+            <button class="batch-btn" onclick="enhancedDrag.moveSelectedToTop()">
+                📌 Nach oben
+            </button>
+            <button class="batch-btn" onclick="enhancedDrag.moveSelectedToBottom()">
+                📌 Nach unten
+            </button>
+            <button class="batch-btn" onclick="enhancedDrag.removeSelectedFromWatchlist()">
+                🗑️ Entfernen
+            </button>
+            <button class="batch-btn" onclick="enhancedDrag.clearSelection()">
+                ✕ Abbrechen
+            </button>
+        `;
+        document.body.appendChild(batchPanel);
+
+        // Selection Mode Toggle
+        this.addSelectionModeButton();
+    }
+
+    addSelectionModeButton() {
+        const containers = document.querySelectorAll('.main-container');
+        containers.forEach(container => {
+            if (container.querySelector('.selection-toggle')) return;
+            
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'selection-toggle';
+            toggleBtn.innerHTML = '☑️ Auswählen';
+            toggleBtn.onclick = () => this.toggleSelectionMode();
+            
+            // Button vor dem Container einfügen
+            container.parentNode.insertBefore(toggleBtn, container);
+        });
+    }
+
+    toggleSelectionMode() {
+        this.selectionMode = !this.selectionMode;
+        const movieCards = document.querySelectorAll('.movie-card');
+        const toggleBtns = document.querySelectorAll('.selection-toggle');
+        
+        if (this.selectionMode) {
+            movieCards.forEach(card => {
+                card.classList.add('selectable');
+                card.addEventListener('click', this.handleCardSelection.bind(this));
+            });
+            toggleBtns.forEach(btn => btn.innerHTML = '✕ Auswahl beenden');
+        } else {
+            this.exitSelectionMode();
+        }
+    }
+
+    exitSelectionMode() {
+        this.selectionMode = false;
+        this.clearSelection();
+        
+        const movieCards = document.querySelectorAll('.movie-card');
+        const toggleBtns = document.querySelectorAll('.selection-toggle');
+        
+        movieCards.forEach(card => {
+            card.classList.remove('selectable', 'selected');
+            card.removeEventListener('click', this.handleCardSelection.bind(this));
+        });
+        
+        toggleBtns.forEach(btn => btn.innerHTML = '☑️ Auswählen');
+        
+        const batchPanel = document.getElementById('batchOperations');
+        if (batchPanel) batchPanel.classList.remove('show');
+    }
+
+    handleCardSelection(e) {
+        if (!this.selectionMode) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const card = e.currentTarget;
+        const cardId = card.dataset.movieId || card.querySelector('h3')?.textContent;
+        
+        if (this.selectedCards.has(cardId)) {
+            this.selectedCards.delete(cardId);
+            card.classList.remove('selected');
+        } else {
+            this.selectedCards.add(cardId);
+            card.classList.add('selected');
+        }
+        
+        this.updateBatchOperations();
+    }
+
+    updateBatchOperations() {
+        const batchPanel = document.getElementById('batchOperations');
+        if (this.selectedCards.size > 0) {
+            batchPanel.classList.add('show');
+        } else {
+            batchPanel.classList.remove('show');
+        }
+    }
+
+        selectAll() {
+        if (!this.selectionMode) {
+            this.toggleSelectionMode();
+        }
+        
+        const movieCards = document.querySelectorAll('.movie-card');
+        movieCards.forEach(card => {
+            const cardId = card.dataset.movieId || card.querySelector('h3')?.textContent;
+            this.selectedCards.add(cardId);
+            card.classList.add('selected');
+        });
+        
+        this.updateBatchOperations();
+        this.showNotification('Alle Filme ausgewählt', '✅');
+    }
+
+    clearSelection() {
+        this.selectedCards.clear();
+        document.querySelectorAll('.movie-card.selected').forEach(card => {
+            card.classList.remove('selected');
+        });
+        this.updateBatchOperations();
+    }
+
+    moveSelectedToTop() {
+        if (this.selectedCards.size === 0) return;
+        
+        const containers = new Set();
+        const moves = [];
+        
+        this.selectedCards.forEach(cardId => {
+            const card = this.findCardById(cardId);
+            if (card) {
+                const container = card.parentNode;
+                containers.add(container);
+                moves.push({
+                    card: card,
+                    container: container,
+                    originalPosition: Array.from(container.children).indexOf(card)
+                });
+            }
+        });
+        
+        // Speichere für Undo
+        this.saveUndoState('moveToTop', moves);
+        
+        // Verschiebe alle ausgewählten Karten nach oben
+        moves.forEach(move => {
+            move.container.insertBefore(move.card, move.container.firstChild);
+        });
+        
+        // Speichere neue Reihenfolge
+        containers.forEach(container => {
+            if (movieDragDrop) {
+                movieDragDrop.saveOrder(container);
+            }
+        });
+        
+        this.showNotification(`${this.selectedCards.size} Filme nach oben verschoben`, '📌');
+        this.clearSelection();
+    }
+
+    moveSelectedToBottom() {
+        if (this.selectedCards.size === 0) return;
+        
+        const containers = new Set();
+        const moves = [];
+        
+        this.selectedCards.forEach(cardId => {
+            const card = this.findCardById(cardId);
+            if (card) {
+                const container = card.parentNode;
+                containers.add(container);
+                moves.push({
+                    card: card,
+                    container: container,
+                    originalPosition: Array.from(container.children).indexOf(card)
+                });
+            }
+        });
+        
+        // Speichere für Undo
+        this.saveUndoState('moveToBottom', moves);
+        
+        // Verschiebe alle ausgewählten Karten nach unten
+        moves.forEach(move => {
+            move.container.appendChild(move.card);
+        });
+        
+        // Speichere neue Reihenfolge
+        containers.forEach(container => {
+            if (movieDragDrop) {
+                movieDragDrop.saveOrder(container);
+            }
+        });
+        
+        this.showNotification(`${this.selectedCards.size} Filme nach unten verschoben`, '📌');
+        this.clearSelection();
+    }
+
+    removeSelectedFromWatchlist() {
+        if (this.selectedCards.size === 0) return;
+        
+        const confirmMsg = `${this.selectedCards.size} Filme aus der Watchlist entfernen?`;
+        if (!confirm(confirmMsg)) return;
+        
+        const removedCards = [];
+        
+        this.selectedCards.forEach(cardId => {
+            const card = this.findCardById(cardId);
+            if (card) {
+                removedCards.push({
+                    card: card.cloneNode(true),
+                    container: card.parentNode,
+                    position: Array.from(card.parentNode.children).indexOf(card)
+                });
+                
+                // Aus Watchlist entfernen
+                if (typeof toggleWatchlist === 'function') {
+                    toggleWatchlist(cardId);
+                }
+                
+                // Karte ausblenden
+                card.style.transition = 'all 0.3s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.8)';
+                
+                setTimeout(() => {
+                    if (card.parentNode) {
+                        card.remove();
+                    }
+                }, 300);
+            }
+        });
+        
+        // Speichere für Undo
+        this.saveUndoState('removeFromWatchlist', removedCards);
+        
+        this.showNotification(`${this.selectedCards.size} Filme entfernt`, '🗑️');
+        this.clearSelection();
+    }
+
+    findCardById(cardId) {
+        return document.querySelector(`[data-movie-id="${cardId}"]`) ||
+               Array.from(document.querySelectorAll('.movie-card')).find(card => 
+                   card.querySelector('h3')?.textContent === cardId
+               );
+    }
+
+    setupUndoRedo() {
+        // Undo/Redo Notification erstellen
+        const undoNotification = document.createElement('div');
+        undoNotification.className = 'undo-notification';
+        undoNotification.id = 'undoNotification';
+        undoNotification.innerHTML = `
+            <span class="undo-text">Aktion rückgängig machen?</span>
+            <button class="undo-btn" onclick="enhancedDrag.undo()">Rückgängig</button>
+        `;
+        document.body.appendChild(undoNotification);
+    }
+
+    saveUndoState(action, data) {
+        const undoState = {
+            action: action,
+            data: data,
+            timestamp: Date.now()
+        };
+        
+        this.undoStack.push(undoState);
+        
+        // Begrenze Undo-Stack
+        if (this.undoStack.length > this.maxUndoSteps) {
+            this.undoStack.shift();
+        }
+        
+        // Leere Redo-Stack bei neuer Aktion
+        this.redoStack = [];
+        
+        // Zeige Undo-Notification
+        this.showUndoNotification();
+    }
+
+    showUndoNotification() {
+        const notification = document.getElementById('undoNotification');
+        if (notification) {
+            notification.classList.add('show');
+            
+            // Automatisch nach 5 Sekunden ausblenden
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+    }
+
+    undo() {
+        if (this.undoStack.length === 0) {
+            this.showNotification('Nichts zum Rückgängigmachen', '❌');
+            return;
+        }
+        
+        const lastAction = this.undoStack.pop();
+        this.redoStack.push(lastAction);
+        
+        switch (lastAction.action) {
+            case 'moveToTop':
+            case 'moveToBottom':
+                this.undoMove(lastAction.data);
+                break;
+            case 'removeFromWatchlist':
+                this.undoRemove(lastAction.data);
+                break;
+            case 'dragDrop':
+                this.undoDragDrop(lastAction.data);
+                break;
+        }
+        
+        this.showNotification('Aktion rückgängig gemacht', '↶');
+        
+        // Verstecke Undo-Notification
+        const notification = document.getElementById('undoNotification');
+        if (notification) {
+            notification.classList.remove('show');
+        }
+    }
+
+    redo() {
+        if (this.redoStack.length === 0) {
+            this.showNotification('Nichts zum Wiederholen', '❌');
+            return;
+        }
+        
+        const redoAction = this.redoStack.pop();
+        this.undoStack.push(redoAction);
+        
+        // Implementiere Redo-Logik basierend auf Action-Typ
+        this.showNotification('Aktion wiederholt', '↷');
+    }
+
+    undoMove(moves) {
+        moves.forEach(move => {
+            const container = move.container;
+            const children = Array.from(container.children);
+            
+            // Finde die richtige Position
+            if (move.originalPosition < children.length) {
+                container.insertBefore(move.card, children[move.originalPosition]);
+            } else {
+                container.appendChild(move.card);
+            }
+        });
+        
+        // Speichere neue Reihenfolge
+        const containers = new Set(moves.map(m => m.container));
+        containers.forEach(container => {
+            if (movieDragDrop) {
+                movieDragDrop.saveOrder(container);
+            }
+        });
+    }
+
+    undoRemove(removedCards) {
+        removedCards.forEach(item => {
+            const container = item.container;
+            const children = Array.from(container.children);
+            
+            if (item.position < children.length) {
+                container.insertBefore(item.card, children[item.position]);
+            } else {
+                container.appendChild(item.card);
+            }
+            
+            // Wieder zur Watchlist hinzufügen
+            const cardId = item.card.dataset.movieId;
+            if (cardId && typeof toggleWatchlist === 'function') {
+                toggleWatchlist(cardId);
+            }
+        });
+    }
+
+    undoDragDrop(dragData) {
+        // Implementiere Undo für Drag & Drop
+        const { element, originalContainer, originalPosition } = dragData;
+        
+        if (originalContainer && element) {
+            const children = Array.from(originalContainer.children);
+            if (originalPosition < children.length) {
+                originalContainer.insertBefore(element, children[originalPosition]);
+            } else {
+                originalContainer.appendChild(element);
+            }
+            
+            if (movieDragDrop) {
+                movieDragDrop.saveOrder(originalContainer);
+            }
+        }
+    }
+
+    showNotification(message, icon = '✅') {
+        const notification = document.createElement('div');
+        notification.className = 'drag-success-notification show';
+        notification.innerHTML = `
+            <div class="notification-content">
+                <span class="notification-icon">${icon}</span>
+                <span class="notification-text">${message}</span>
+            </div>
+        `;
+        
+        const container = document.getElementById('dragNotifications') || document.body;
+        container.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }
+
+    // Erweiterte Drag & Drop Integration
+    enhanceDragDrop() {
+        // Überschreibe die ursprüngliche handleDrop Methode
+        if (window.movieDragDrop) {
+            const originalHandleDrop = movieDragDrop.handleDrop.bind(movieDragDrop);
+            
+            movieDragDrop.handleDrop = (e) => {
+                // Speichere Zustand für Undo
+                const draggedElement = movieDragDrop.draggedElement;
+                const dropTarget = e.target.closest('.movie-card');
+                
+                if (draggedElement && dropTarget) {
+                    const undoData = {
+                        element: draggedElement,
+                        originalContainer: draggedElement.parentNode,
+                        originalPosition: Array.from(draggedElement.parentNode.children).indexOf(draggedElement)
+                    };
+                    
+                    this.saveUndoState('dragDrop', undoData);
+                }
+                
+                // Führe ursprüngliche Drop-Logik aus
+                originalHandleDrop(e);
+            };
+        }
+    }
+
+    // Auto-Save Funktionalität
+    setupAutoSave() {
+        let saveTimeout;
+        
+        const autoSave = () => {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                this.saveAllOrders();
+                console.log('💾 Auto-Save: Alle Positionen gespeichert');
+            }, 2000);
+        };
+        
+        // Überwache Änderungen
+        const observer = new MutationObserver(autoSave);
+        
+        document.querySelectorAll('.main-container').forEach(container => {
+            observer.observe(container, {
+                childList: true,
+                subtree: false
+            });
+        });
+    }
+
+    saveAllOrders() {
+        const containers = document.querySelectorAll('.main-container[id]');
+        containers.forEach(container => {
+            if (movieDragDrop) {
+                movieDragDrop.saveOrder(container);
+            }
+        });
+    }
+
+    // Statistiken und Analytics
+    getStats() {
+        const stats = {
+            totalMoves: this.undoStack.length,
+            totalSelections: this.selectedCards.size,
+            containers: document.querySelectorAll('.main-container').length,
+            totalMovies: document.querySelectorAll('.movie-card').length
+        };
+        
+        console.log('📊 Drag & Drop Statistiken:', stats);
+        return stats;
+    }
+}
+
+// Initialisiere Enhanced Features
+const enhancedDrag = new EnhancedDragFeatures();
+
+// Integration mit bestehendem System
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        enhancedDrag.enhanceDragDrop();
+        enhancedDrag.setupAutoSave();
+    }, 1000);
+});
+
+// Globale Funktionen für HTML-Aufrufe
+window.enhancedDrag = enhancedDrag;
+
+
+
+
+</script>
+
+ 
+</body>
+</html>

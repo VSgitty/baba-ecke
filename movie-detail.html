@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Movie Details - Baba Ecke</title>
+    <link rel="stylesheet" href="movie-detail.css">
+</head>
+<body>
+    <header>
+        <div class="logo">Baba Marcos Baba Ecke - direkt ums Eck</div>
+        <nav>
+            <a href="https://skullbonk.netlify.app">Page mage</a>
+            <a href="index.html">Streams</a>
+            <a href="#">Series</a>
+            <a href="mylist.html">My List & Progress</a>
+        </nav>
+    </header>
+
+    <button class="back-button" onclick="history.back()">← Zurück zur Übersicht</button>
+    
+    <div class="movie-detail-container">
+        <div class="movie-poster" id="moviePoster">
+            <img id="movie-cover" src="" alt="Movie Cover" style="display: none;">
+            <div id="placeholderText">Film Cover</div>
+            <div class="watchlist-btn" onclick="toggleWatchlist(currentMovieId)">
+                <span id="heart-btn">🤍</span>
+            </div>
+        </div>
+        
+        <div class="movie-title" id="movie-title">Film wird geladen...</div>
+        
+        <div class="movie-meta" id="movieInfos">
+            <div class="section-title">Film Informationen</div>
+            <div id="infoContent">
+                <div class="info-item"><strong>Genre:</strong> <span id="movie-genre">Wird geladen...</span></div>
+                <div class="info-item"><strong>Erscheinungsjahr:</strong> <span id="movie-year">Wird geladen...</span></div>
+                <div class="info-item"><strong>Laufzeit:</strong> <span id="movie-duration">Wird geladen...</span></div>
+                <div class="info-item"><strong>Bewertung:</strong> <span class="rating" id="movie-rating">Wird geladen...</span></div>
+            </div>
+        </div>
+        
+        <div class="movie-description" id="movieDescription">
+            <div class="section-title">Beschreibung</div>
+            <div id="descriptionContent">Beschreibung wird geladen...</div>
+            <div class="movie-actions">
+                <button id="play-btn" class="play-button">▶ Jetzt schauen</button>
+            </div>
+        </div>
+        
+        <div class="movie-player" id="moviePlayer">
+            <iframe id="streamFrame" src="" allowfullscreen style="display: none;"></iframe>
+            <div id="noStreamMessage" class="no-stream">Stream wird geladen...</div>
+        </div>
+        
+        <div class="movie-kritik">
+            <div class="section-title">Kritik & Bewertung</div>
+            <p>Hier finden Sie professionelle Kritiken und Bewertungen zum Film. Die Analyse umfasst Aspekte wie Regie, Schauspiel, Cinematografie und Gesamteindruck.</p>
+            <div id="criticContent"></div>
+        </div>
+        
+        <div class="movie-kommentare">
+            <div class="section-title">Zuschauer Kommentare</div>
+            <p>Teilen Sie Ihre Meinung mit anderen Zuschauern und lesen Sie, was andere über diesen Film denken.</p>
+            <div id="commentsContent">
+                <div style="margin-top: 15px; padding: 10px; background: #fff; border-left: 4px solid #007bff;">
+                    <strong>Benutzer123:</strong> "Großartiger Film! Sehr empfehlenswert."
+                </div>
+                <div style="margin-top: 10px; padding: 10px; background: #fff; border-left: 4px solid #28a745;">
+                    <strong>FilmFan:</strong> "Spannend von Anfang bis Ende!"
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMovieId = null;
+        let moviesData = {};
+
+        // Lade JSON-Daten auch in der Detail-Seite
+        async function loadMoviesData() {
+            try {
+                const response = await fetch('movies-data.json');
+                moviesData = await response.json();
+                console.log('Movies data loaded in detail page:', moviesData);
+            } catch (error) {
+                console.error('Error loading movies data:', error);
+                moviesData = {};
+            }
+        }
+
+        // Load movie details from localStorage and JSON
+        async function loadMovieDetails() {
+            // Lade zuerst die JSON-Daten
+            await loadMoviesData();
+            
+            const movieData = JSON.parse(localStorage.getItem('currentMovie'));
+            
+            if (!movieData) {
+                document.body.innerHTML = '<h1>Film nicht gefunden!</h1><a href="index.html">Zurück zur Startseite</a>';
+                return;
+            }
+
+            currentMovieId = movieData.id;
+            
+            // Hole zusätzliche Daten aus JSON
+            const additionalData = moviesData[currentMovieId] || {};
+            console.log('Additional data for', currentMovieId, ':', additionalData);
+            
+            // Kombiniere localStorage Daten mit JSON Daten
+            const finalMovieData = {
+                ...movieData,
+                genre: additionalData.genre || movieData.genre || 'Unbekannt',
+                releaseDate: additionalData.year || movieData.releaseDate || 'Usadasdasdasnnt',
+                duration: additionalData.duration || movieData.duration || 'Uadsasdasdaannt',
+                rating: additionalData.rating || movieData.rating || 'Keine Bewertung',
+                streamUrl: additionalData.streamUrl || movieData.streamUrl || ''
+            };
+            
+            console.log('Final movie data:', finalMovieData);
+            
+            // Update page content
+            document.getElementById('page-title').textContent = finalMovieData.title + ' - Baba Ecke';
+            document.getElementById('movie-title').textContent = finalMovieData.title;
+
+            // Film Cover setzen
+            if (finalMovieData.cover) {
+                const coverImg = document.getElementById('movie-cover');
+                const placeholder = document.getElementById('placeholderText');
+                
+                coverImg.src = finalMovieData.cover;
+                coverImg.style.display = 'block';
+                placeholder.style.display = 'none';
+                
+                coverImg.onerror = function() {
+                    coverImg.style.display = 'none';
+                    placeholder.style.display = 'block';
+                    placeholder.textContent = 'Cover nicht verfügbar';
+                };
+            }
+
+            // Film Informationen setzen
+            document.getElementById('movie-genre').textContent = finalMovieData.genre;
+            document.getElementById('movie-year').textContent = finalMovieData.releaseDate;
+            document.getElementById('movie-duration').textContent = finalMovieData.duration;
+            document.getElementById('movie-rating').textContent = finalMovieData.rating;
+
+            // Film Beschreibung setzen
+            document.getElementById('descriptionContent').textContent = finalMovieData.description;
+
+            // Video Stream setzen
+            if (finalMovieData.streamUrl && finalMovieData.streamUrl !== '') {
+                const streamFrame = document.getElementById('streamFrame');
+                const noStreamMessage = document.getElementById('noStreamMessage');
+                
+                streamFrame.src = finalMovieData.streamUrl;
+                streamFrame.style.display = 'block';
+                noStreamMessage.style.display = 'none';
+                
+                streamFrame.onerror = function() {
+                    streamFrame.style.display = 'none';
+                    noStreamMessage.style.display = 'block';
+                    noStreamMessage.textContent = 'Stream konnte nicht geladen werden.';
+                };
+            } else {
+                document.getElementById('noStreamMessage').textContent = 'Für diesen Film ist derzeit kein Stream verfügbar.';
+            }
+
+            // Set up play button
+            document.getElementById('play-btn').onclick = function() {
+                if (finalMovieData.streamUrl && finalMovieData.streamUrl !== '') {
+                    window.open(finalMovieData.streamUrl, '_blank');
+                } else {
+                    alert('Stream noch nicht verfügbar!');
+                }
+            };
+
+            // Spezifische Kritiken setzen
+            setCriticContent(finalMovieData.id, finalMovieData);
+        }
+
+        // Function to set specific critic content
+        function setCriticContent(movieId, movie) {
+            const criticContent = document.getElementById('criticContent');
+            
+            criticContent.innerHTML = `
+                <div style="margin-top: 15px; padding: 10px; background: #fff; border-left: 4px solid #007bff;">
+                    <strong>Kritiker Bewertung:</strong> "Ein ${movie.genre.toLowerCase()} mit einer Bewertung von ${movie.rating}. Weitere Kritiken folgen in Kürze."
+                </div>
+            `;
+        }
+
+        // Watchlist functionality
+        let watchlist = JSON.parse(localStorage.getItem('watchlist')) || {};
+
+        function toggleWatchlist(movieId) {
+            const heartElement = document.getElementById('heart-btn');
+            
+            if (watchlist[movieId]) {
+                delete watchlist[movieId];
+                heartElement.textContent = '🤍';
+            } else {
+                watchlist[movieId] = {
+                    addedAt: new Date().toISOString(),
+                    addedAtFormatted: new Date().toLocaleString('de-DE')
+                };
+                heartElement.textContent = '❤️';
+            }
+            
+            localStorage.setItem('watchlist', JSON.stringify(watchlist));
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMovieDetails();
+            
+            // Update heart icon if in watchlist
+            setTimeout(() => {
+                if (currentMovieId && watchlist[currentMovieId]) {
+                    document.getElementById('heart-btn').textContent = '❤️';
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>
