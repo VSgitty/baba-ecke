@@ -391,12 +391,15 @@ function renderShelfBook(movie) {
     const ur = Number(appState.userRatings[movie.id] || 0);
     const inWL = isInWatchlist(movie.id);
     const ratingDisplay = movie.communityRating > 0 ? `${movie.communityRating}/10` : "TBA";
-    const esc = (s) => String(s).replace(/"/g, "&quot;");
+    const esc = (s) => String(s).replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    const stars = makeStars(movie.communityRating || 0);
     return `
         <div class="shelf-book${inWL ? " in-watchlist" : ""}" tabindex="0" role="button" aria-label="${esc(movie.title)}">
             <img class="shelf-book-cover" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
             <div class="shelf-popup" role="tooltip">
-                <img class="shelf-popup-poster" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
+                <div class="shelf-popup-poster-wrap">
+                    <img class="shelf-popup-poster" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
+                </div>
                 <div class="shelf-popup-body">
                     <h4 class="shelf-popup-title">${movie.title}</h4>
                     <div class="shelf-popup-meta">
@@ -407,7 +410,7 @@ function renderShelfBook(movie) {
                     </div>
                     <p class="shelf-popup-desc">${movie.description}</p>
                     <div class="shelf-popup-rating">
-                        <span class="popup-stars">${makeStars(movie.communityRating || 0)}</span>
+                        <span class="popup-stars">${stars}</span>
                         <select data-action="set-user-rating" data-movie-id="${esc(movie.id)}">
                             <option value="0" ${ur === 0 ? "selected" : ""}>Mein Rating</option>
                             <option value="6" ${ur === 6 ? "selected" : ""}>6/10</option>
@@ -451,6 +454,8 @@ function renderCatalogShelf() {
                     <h3 class="shelf-group-name">${group.label}</h3>
                     <span class="shelf-group-meta">${group.movies.length} Titel</span>
                 </div>
+            </div>
+            <div class="shelf-stage">
                 <div class="shelf-books">
                     ${group.movies.map(m => renderShelfBook(m)).join("")}
                 </div>
