@@ -406,9 +406,6 @@ function buildTooltipHTML(movie) {
     const esc = (s) => String(s).replace(/"/g, "&quot;").replace(/</g, "&lt;");
     const stars = makeStars(movie.communityRating || 0);
     return `
-        <div class="shelf-popup-poster-wrap">
-            <img class="shelf-popup-poster" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
-        </div>
         <div class="shelf-popup-body">
             <h4 class="shelf-popup-title">${movie.title}</h4>
             <div class="shelf-popup-meta">
@@ -432,25 +429,51 @@ function buildTooltipHTML(movie) {
             <div class="shelf-popup-actions">
                 <button type="button" data-action="open-movie" data-movie-id="${esc(movie.id)}">Details</button>
                 <button type="button" data-action="toggle-watchlist" data-movie-id="${esc(movie.id)}" data-title="${esc(movie.title)}">
+                let _activeBook = null;
+
+                function _setActiveBook(book) {
+                    if (_activeBook && _activeBook !== book) _activeBook.classList.remove("is-active");
+                    _activeBook = book || null;
+                    if (_activeBook) _activeBook.classList.add("is-active");
+                }
+
+                function _clearActiveBook() {
+                    if (_activeBook) _activeBook.classList.remove("is-active");
+                    _activeBook = null;
+                }
                     ${inWL ? "&#8722; Liste" : "&#43; Liste"}
                 </button>
             </div>
         </div>`;}
 
 /* ── Portal tooltip system ── */
-let _shelfTooltip = null;
+                    _shelfTooltip.addEventListener("mouseenter", () => {
+                        clearTimeout(_hideTimer);
+                        if (_activeBook) _activeBook.classList.add("is-active");
+                    });
 let _hideTimer = null;
+
+                    // Reposition/hide tooltip on viewport changes to avoid drift.
+                    window.addEventListener("resize", () => {
+                        if (_shelfTooltip?.classList.contains("popup-visible") && _activeBook) _positionTooltip(_activeBook);
+                    });
+                    window.addEventListener("scroll", () => {
+                        if (_shelfTooltip) _shelfTooltip.classList.remove("popup-visible");
+                        _clearActiveBook();
+                    }, { passive: true });
 
 function attachShelfPopups() {
     _shelfTooltip = document.createElement("div");
     _shelfTooltip.className = "shelf-popup";
-    _shelfTooltip.setAttribute("role", "tooltip");
-    document.body.appendChild(_shelfTooltip);
+                        if (_shelfTooltip) _shelfTooltip.classList.remove("popup-visible");
+                        _clearActiveBook();
+                    }, 130);
     _shelfTooltip.addEventListener("mouseenter", () => clearTimeout(_hideTimer));
     _shelfTooltip.addEventListener("mouseleave", _scheduleHide);
 }
 
 function _scheduleHide() {
+                    _setActiveBook(book);
     _hideTimer = setTimeout(() => {
         if (_shelfTooltip) _shelfTooltip.classList.remove("popup-visible");
     }, 80);
@@ -469,22 +492,32 @@ function _showTooltip(book) {
 
 function _positionTooltip(book) {
     const rect = book.getBoundingClientRect();
-    const pw = 230;
     // force layout to measure height before showing
     _shelfTooltip.style.visibility = "hidden";
     _shelfTooltip.style.left = "0px";
     _shelfTooltip.style.top = "0px";
-    const ph = _shelfTooltip.offsetHeight || 340;
+    const pw = _shelfTooltip.offsetWidth || 260;
+    const ph = _shelfTooltip.offsetHeight || 280;
     _shelfTooltip.style.visibility = "";
 
-    // center horizontally over book, appear above
+    // Prefer centered above the cover.
     let left = rect.left + rect.width / 2 - pw / 2;
     let top  = rect.top - ph - 16;
 
-    // clamp to viewport
+    // If top space is tight, place tooltip to the right instead of below to avoid overlap flicker.
+    if (top < 12) {
+        left = rect.right + 14;
+        top = Math.max(12, rect.top - 8);
+    }
+
+    // Clamp to viewport.
+    if (left + pw > window.innerWidth - 8) {
+        left = rect.left - pw - 14;
+    }
     if (left < 8) left = 8;
     if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
-    if (top < 8) top = rect.bottom + 16; // flip below if no space above
+    if (top + ph > window.innerHeight - 8) top = window.innerHeight - ph - 8;
+    if (top < 8) top = 8;
 
     _shelfTooltip.style.left = left + "px";
     _shelfTooltip.style.top  = top  + "px";
