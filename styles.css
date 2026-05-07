@@ -1377,11 +1377,11 @@ body.page-ready .hero-actions  { opacity: 1; transform: none; transition-delay: 
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(2, 4, 14, 0.93);
-    backdrop-filter: blur(16px);
+    background: rgba(2, 4, 14, 0.90);
+    backdrop-filter: blur(20px);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 360ms ease;
+    transition: opacity 400ms ease;
 }
 
 .dvd-overlay.is-open {
@@ -1394,56 +1394,77 @@ body.page-ready .hero-actions  { opacity: 1; transform: none; transition-delay: 
     position: fixed;
     top: 22px;
     right: 28px;
-    width: 44px;
-    height: 44px;
-    border: 1px solid rgba(255,255,255,0.18);
+    width: 46px;
+    height: 46px;
+    border: 1px solid rgba(255,255,255,0.16);
     border-radius: 50%;
-    background: rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.05);
     color: var(--text);
     font-size: 1.1rem;
     cursor: pointer;
     display: grid;
     place-items: center;
-    transition: background 200ms ease, transform 200ms ease;
+    transition: background 200ms ease, transform 260ms cubic-bezier(0.34, 1.36, 0.64, 1);
     z-index: 10001;
     line-height: 1;
     font-family: inherit;
 }
-
 .dvd-close:hover {
-    background: rgba(255,255,255,0.14);
-    transform: scale(1.1);
+    background: rgba(255,255,255,0.13);
+    transform: scale(1.12) rotate(90deg);
 }
 
-/* 3D case wrapper */
+/* Case outer wrapper */
 .dvd-case-wrap {
+    position: relative;
     display: flex;
     align-items: stretch;
-    max-width: min(900px, 96vw);
+    max-width: min(1060px, 96vw);
     width: 100%;
-    max-height: 90vh;
-    border-radius: 14px;
+    max-height: 88vh;
+    border-radius: 20px;
     overflow: hidden;
     box-shadow:
-        0 80px 160px rgba(0,0,0,0.95),
-        0 0 0 1px rgba(255,255,255,0.06),
-        0 0 80px rgba(255,186,45,0.04);
+        0 100px 200px rgba(0,0,0,0.98),
+        0 0 0 1px rgba(255,255,255,0.07),
+        0 0 140px rgba(255,186,45,0.04);
+    transform: translateY(28px) scale(0.97);
+    transition: transform 480ms cubic-bezier(0.22, 1, 0.36, 1) 40ms;
+}
+.dvd-overlay.is-opening .dvd-case-wrap {
+    transform: translateY(0) scale(1);
 }
 
-/* Left panel — cover that rotates open */
+/* Cinematic blurred poster backdrop behind everything */
+.dvd-case-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image: var(--cover);
+    background-size: cover;
+    background-position: center 20%;
+    filter: blur(52px) brightness(0.11) saturate(0.65);
+    transform: scale(1.14);
+    pointer-events: none;
+}
+
+/* Left panel — poster, slides in */
 .dvd-case-front {
     position: relative;
-    width: min(260px, 33vw);
+    width: min(290px, 31vw);
+    min-height: 440px;
     flex-shrink: 0;
-    transform-origin: right center;
-    transform-style: preserve-3d;
-    transition: transform 580ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transform: rotateY(0deg);
     z-index: 2;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateX(-44px) scale(0.97);
+    transition:
+        opacity 540ms cubic-bezier(0.22, 1, 0.36, 1) 60ms,
+        transform 540ms cubic-bezier(0.22, 1, 0.36, 1) 60ms;
 }
-
 .dvd-overlay.is-opening .dvd-case-front {
-    transform: rotateY(-55deg);
+    opacity: 1;
+    transform: translateX(0) scale(1);
 }
 
 .dvd-case-front-img {
@@ -1454,17 +1475,25 @@ body.page-ready .hero-actions  { opacity: 1; transform: none; transition-delay: 
     display: block;
 }
 
-/* Hinge sheen */
+/* Right-edge shadow to blend into content */
 .dvd-case-front::after {
     content: '';
     position: absolute;
-    right: 0;
-    top: 0; bottom: 0;
-    width: 16px;
-    background: linear-gradient(90deg,
-        rgba(255,255,255,0.03) 0%,
-        rgba(0,0,0,0.55) 100%);
-    border-right: 1px solid rgba(0,0,0,0.7);
+    top: 0; right: 0; bottom: 0;
+    width: 80px;
+    background: linear-gradient(270deg, rgba(6,9,20,0.92) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+/* Bottom gradient on poster */
+.dvd-case-front::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(180deg, transparent 0%, rgba(6,9,20,0.88) 100%);
+    pointer-events: none;
+    z-index: 1;
 }
 
 /* Spine text */
@@ -1477,52 +1506,137 @@ body.page-ready .hero-actions  { opacity: 1; transform: none; transition-delay: 
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    z-index: 2;
 }
-
 .dvd-spine-text {
     writing-mode: vertical-rl;
     font-family: "Bebas Neue", sans-serif;
     font-size: 0.6rem;
     letter-spacing: 0.14em;
-    color: rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.18);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-height: 220px;
 }
 
-/* Right panel — content inside the open case */
+/* Right panel — slides in from left */
 .dvd-case-content {
     flex: 1;
-    background: linear-gradient(160deg, rgba(10,16,32,0.99) 0%, rgba(6,9,20,0.99) 100%);
-    border-left: 1px solid rgba(255,255,255,0.06);
-    padding: 30px 28px 26px;
-    overflow-y: auto;
-    opacity: 0;
-    transform: translateX(-24px);
-    transition:
-        opacity 360ms ease 220ms,
-        transform 360ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 220ms;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255,186,45,0.2) transparent;
     position: relative;
+    z-index: 2;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateX(-18px);
+    transition:
+        opacity 440ms ease 230ms,
+        transform 440ms cubic-bezier(0.22, 1, 0.36, 1) 230ms;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,186,45,0.18) transparent;
 }
-
-.dvd-case-content::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg,
-        var(--accent) 0%,
-        rgba(88,225,255,0.85) 50%,
-        var(--accent) 100%);
-    opacity: 0.75;
-}
-
 .dvd-overlay.is-opening .dvd-case-content {
     opacity: 1;
     transform: translateX(0);
+}
+
+/* Hero banner at top of right panel */
+.dvd-hero-banner {
+    position: relative;
+    height: 200px;
+    flex-shrink: 0;
+    overflow: hidden;
+    background-image: var(--cover);
+    background-size: cover;
+    background-position: center 18%;
+}
+.dvd-hero-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+        rgba(0,0,0,0.15) 0%,
+        rgba(0,0,0,0.55) 65%,
+        rgba(8,11,22,1) 100%);
+    z-index: 1;
+}
+/* Cinematic letterbox bars */
+.dvd-hero-banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg, rgba(0,0,0,0.52) 0%, transparent 16%, transparent 84%, rgba(0,0,0,0.52) 100%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* NOW PLAYING label on banner */
+.dvd-now-playing {
+    position: absolute;
+    bottom: 18px;
+    left: 22px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.66rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--accent);
+    pointer-events: none;
+}
+.dvd-now-playing::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 2px;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    flex-shrink: 0;
+}
+
+/* Stream button on banner */
+.dvd-stream-btn {
+    position: absolute;
+    bottom: 14px;
+    right: 20px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,186,45,0.13);
+    border: 1px solid rgba(255,186,45,0.38);
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    color: #ffe09a;
+    cursor: pointer;
+    transition: background 200ms ease, transform 200ms cubic-bezier(0.34, 1.36, 0.64, 1);
+    font-family: inherit;
+}
+.dvd-stream-btn:hover {
+    background: rgba(255,186,45,0.28);
+    transform: scale(1.06);
+}
+
+/* Content body below banner */
+.dvd-content-body {
+    flex: 1;
+    background: linear-gradient(180deg, rgba(8,11,22,1) 0%, rgba(5,8,18,0.97) 100%);
+    padding: 20px 24px 26px;
+}
+.dvd-content-body::before {
+    content: '';
+    display: block;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent) 0%, rgba(88,225,255,0.7) 55%, transparent 100%);
+    margin-bottom: 18px;
+    opacity: 0.65;
+    border-radius: 2px;
 }
 
 /* Meta pills */
@@ -1530,121 +1644,80 @@ body.page-ready .hero-actions  { opacity: 1; transform: none; transition-delay: 
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
 }
-
 .dvd-pill {
-    border: 1px solid rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.13);
     border-radius: 999px;
-    padding: 4px 10px;
-    font-size: 0.72rem;
+    padding: 4px 11px;
+    font-size: 0.71rem;
     color: var(--muted);
     background: rgba(255,255,255,0.04);
 }
-
 .dvd-pill-rating {
     background: rgba(255,186,45,0.12);
     color: #ffe09a;
     border-color: rgba(255,186,45,0.28);
+    font-weight: 700;
 }
-
 .dvd-pill-wl {
-    background: rgba(88,225,255,0.1);
+    background: rgba(88,225,255,0.09);
     color: var(--accent-2);
-    border-color: rgba(88,225,255,0.24);
+    border-color: rgba(88,225,255,0.22);
 }
 
-/* DVD case title */
+/* Title */
 .dvd-title {
-    margin: 0 0 8px;
+    margin: 0 0 6px;
     font-family: "Bebas Neue", sans-serif;
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    letter-spacing: 0.03em;
-    line-height: 0.94;
+    font-size: clamp(2rem, 5vw, 3.3rem);
+    letter-spacing: 0.04em;
+    line-height: 0.92;
     color: var(--text);
+    text-shadow: 0 2px 16px rgba(0,0,0,0.9);
 }
 
-/* Community stars */
+/* Stars */
 .dvd-stars {
     color: var(--accent);
-    font-size: 1rem;
+    font-size: 1.05rem;
     letter-spacing: 3px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
-/* Preview / cinematic banner */
-.dvd-preview-area {
-    position: relative;
-    height: 128px;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 16px;
-    cursor: pointer;
-    background-image: var(--cover);
-    background-size: cover;
-    background-position: center 25%;
-    isolation: isolate;
-    transition: transform 240ms ease;
-}
-
-.dvd-preview-area:hover {
-    transform: scale(1.01);
-}
-
-.dvd-preview-area::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg,
-        rgba(0,0,0,0.72) 0%,
-        rgba(0,0,0,0.32) 50%,
-        rgba(0,0,0,0.72) 100%);
-    z-index: 1;
-    transition: background 240ms ease;
-}
-
-.dvd-preview-area:hover::before {
-    background: linear-gradient(135deg,
-        rgba(0,0,0,0.50) 0%,
-        rgba(0,0,0,0.12) 50%,
-        rgba(0,0,0,0.50) 100%);
-}
-
-.dvd-preview-overlay {
-    position: absolute;
-    inset: 0;
+/* Genre tags */
+.dvd-genre-bar {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
 }
-
-.dvd-preview-label {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    background: rgba(255,186,45,0.16);
-    border: 1px solid rgba(255,186,45,0.35);
-    border-radius: 999px;
-    padding: 9px 22px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: #ffe09a;
-    transition: background 220ms ease, transform 220ms ease;
-}
-
-.dvd-preview-area:hover .dvd-preview-label {
-    background: rgba(255,186,45,0.28);
-    transform: scale(1.05);
+.dvd-genre-tag {
+    background: rgba(88,225,255,0.06);
+    border: 1px solid rgba(88,225,255,0.16);
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 0.68rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent-2);
 }
 
 /* Description */
 .dvd-desc {
-    font-size: 0.88rem;
+    font-size: 0.89rem;
     color: var(--muted);
-    line-height: 1.62;
+    line-height: 1.66;
     margin: 0 0 18px;
+    border-left: 2px solid rgba(255,186,45,0.22);
+    padding-left: 12px;
+}
+
+/* Divider */
+.dvd-divider {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.07) 0%, transparent 80%);
+    margin: 14px 0 16px;
 }
 
 /* Rating row */
@@ -1652,19 +1725,17 @@ body.page-ready .hero-actions  { opacity: 1; transform: none; transition-delay: 
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
-
 .dvd-rating-label {
-    font-size: 0.78rem;
+    font-size: 0.77rem;
     color: var(--muted);
     white-space: nowrap;
 }
-
 .dvd-rating-select {
     flex: 1;
-    background: rgba(8,13,28,0.95);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(6,10,22,0.95);
+    border: 1px solid rgba(255,255,255,0.11);
     color: var(--text);
     border-radius: 10px;
     padding: 8px 10px;
@@ -1679,46 +1750,43 @@ body.page-ready .hero-actions  { opacity: 1; transform: none; transition-delay: 
     gap: 8px;
     flex-wrap: wrap;
 }
-
 .dvd-btn {
     flex: 1;
     min-width: 120px;
     border-radius: 999px;
     border: 1px solid transparent;
-    padding: 12px 16px;
+    padding: 13px 18px;
     font-family: inherit;
-    font-size: 0.84rem;
+    font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
     transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.04em;
 }
-
 .dvd-btn-primary {
-    background: linear-gradient(135deg, var(--accent), #ffe088);
+    background: linear-gradient(135deg, var(--accent) 0%, #ffe088 100%);
     color: #1b1a17;
 }
-
 .dvd-btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(255,186,45,0.36);
+    box-shadow: 0 12px 30px rgba(255,186,45,0.44);
 }
-
 .dvd-btn-wl {
     background: rgba(255,255,255,0.04);
     border-color: rgba(255,255,255,0.14);
     color: var(--text);
 }
-
 .dvd-btn-wl:hover {
-    background: rgba(88,225,255,0.1);
+    background: rgba(88,225,255,0.09);
     border-color: rgba(88,225,255,0.3);
+    transform: translateY(-1px);
 }
 
-/* Responsive: hide cover panel on tiny screens */
-@media (max-width: 580px) {
+/* Responsive */
+@media (max-width: 600px) {
     .dvd-case-front { display: none; }
-    .dvd-case-content { padding: 24px 18px 20px; }
+    .dvd-content-body { padding: 16px 15px 20px; }
+    .dvd-hero-banner { height: 150px; }
 }
 
 /* Legacy popup class kept as no-op (no JS uses it anymore) */

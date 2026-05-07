@@ -405,41 +405,47 @@ function buildDVDCaseHTML(movie) {
     const ratingDisplay = movie.communityRating > 0 ? `${movie.communityRating}/10` : "TBA";
     const esc = (s) => String(s).replace(/"/g, "&quot;").replace(/</g, "&lt;");
     const stars = makeStars(movie.communityRating || 0);
+    const genreLabel = movie.genre ? movie.genre.charAt(0).toUpperCase() + movie.genre.slice(1) : "";
+    const typeLabel = movie.type === "movie" ? "Film" : "Serie";
     return `
+        <div class="dvd-case-bg" style="--cover: url('${esc(movie.poster)}')"></div>
         <div class="dvd-case-front">
             <img class="dvd-case-front-img" src="${esc(movie.poster)}" alt="${esc(movie.title)}">
             <div class="dvd-case-spine"><span class="dvd-spine-text">${movie.title}</span></div>
         </div>
         <div class="dvd-case-content">
-            <div class="dvd-meta-pills">
-                <span class="dvd-pill">${movie.type === "movie" ? "Film" : "Serie"}</span>
-                ${movie.year ? `<span class="dvd-pill">${movie.year}</span>` : ""}
-                ${movie.duration ? `<span class="dvd-pill">${movie.duration}</span>` : ""}
-                <span class="dvd-pill dvd-pill-rating">&#9733; ${ratingDisplay}</span>
-                ${inWL ? '<span class="dvd-pill dvd-pill-wl">Watchlist</span>' : ""}
+            <div class="dvd-hero-banner" style="--cover: url('${esc(movie.poster)}')">
+                <span class="dvd-now-playing">NOW PLAYING</span>
+                <button class="dvd-stream-btn" type="button" data-action="open-movie" data-movie-id="${esc(movie.id)}">&#9654;&nbsp; Stream ansehen</button>
             </div>
-            <h2 class="dvd-title">${movie.title}</h2>
-            <div class="dvd-stars">${stars}</div>
-            <div class="dvd-preview-area" style="--cover: url('${esc(movie.poster)}')">
-                <div class="dvd-preview-overlay">
-                    <span class="dvd-preview-label">&#9654; Stream ansehen</span>
+            <div class="dvd-content-body">
+                <div class="dvd-meta-pills">
+                    <span class="dvd-pill">${typeLabel}</span>
+                    ${movie.year ? `<span class="dvd-pill">${movie.year}</span>` : ""}
+                    ${movie.duration ? `<span class="dvd-pill">${movie.duration}</span>` : ""}
+                    ${movie.communityRating > 0 ? `<span class="dvd-pill dvd-pill-rating">&#9733; ${ratingDisplay}</span>` : ""}
+                    ${inWL ? '<span class="dvd-pill dvd-pill-wl">&#10003; Watchlist</span>' : ""}
                 </div>
-            </div>
-            <p class="dvd-desc">${movie.description}</p>
-            <div class="dvd-user-row">
-                <label class="dvd-rating-label">Mein Rating</label>
-                <select class="dvd-rating-select" data-action="set-user-rating" data-movie-id="${esc(movie.id)}">
-                    <option value="0" ${ur === 0 ? "selected" : ""}>&#8212;</option>
-                    <option value="6" ${ur === 6 ? "selected" : ""}>6/10</option>
-                    <option value="7" ${ur === 7 ? "selected" : ""}>7/10</option>
-                    <option value="8" ${ur === 8 ? "selected" : ""}>8/10</option>
-                    <option value="9" ${ur === 9 ? "selected" : ""}>9/10</option>
-                    <option value="10" ${ur === 10 ? "selected" : ""}>10/10</option>
-                </select>
-            </div>
-            <div class="dvd-actions">
-                <button class="dvd-btn dvd-btn-primary" type="button" data-action="open-movie" data-movie-id="${esc(movie.id)}">Details &amp; Stream</button>
-                <button class="dvd-btn dvd-btn-wl" type="button" data-action="toggle-watchlist" data-movie-id="${esc(movie.id)}" data-title="${esc(movie.title)}">${inWL ? "&#8722; Watchlist" : "&#43; Watchlist"}</button>
+                <h2 class="dvd-title">${movie.title}</h2>
+                <div class="dvd-stars">${stars}</div>
+                ${genreLabel ? `<div class="dvd-genre-bar"><span class="dvd-genre-tag">${genreLabel}</span></div>` : ""}
+                <p class="dvd-desc">${movie.description}</p>
+                <div class="dvd-divider"></div>
+                <div class="dvd-user-row">
+                    <label class="dvd-rating-label">Mein Rating</label>
+                    <select class="dvd-rating-select" data-action="set-user-rating" data-movie-id="${esc(movie.id)}">
+                        <option value="0" ${ur === 0 ? "selected" : ""}>&#8212;</option>
+                        <option value="6" ${ur === 6 ? "selected" : ""}>6/10</option>
+                        <option value="7" ${ur === 7 ? "selected" : ""}>7/10</option>
+                        <option value="8" ${ur === 8 ? "selected" : ""}>8/10</option>
+                        <option value="9" ${ur === 9 ? "selected" : ""}>9/10</option>
+                        <option value="10" ${ur === 10 ? "selected" : ""}>10/10</option>
+                    </select>
+                </div>
+                <div class="dvd-actions">
+                    <button class="dvd-btn dvd-btn-primary" type="button" data-action="open-movie" data-movie-id="${esc(movie.id)}">Details &amp; Stream</button>
+                    <button class="dvd-btn dvd-btn-wl" type="button" data-action="toggle-watchlist" data-movie-id="${esc(movie.id)}" data-title="${esc(movie.title)}">${inWL ? "&#8722; Watchlist" : "&#43; Watchlist"}</button>
+                </div>
             </div>
         </div>`;
 }
