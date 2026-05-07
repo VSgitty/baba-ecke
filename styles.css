@@ -1215,38 +1215,29 @@ body.page-ready .hero-actions  { opacity: 1; transform: none; transition-delay: 
     background: linear-gradient(180deg, rgba(8,11,20,0.45) 0%, rgba(5,7,15,0.85) 100%);
 }
 
-/* Scrollable track — single row, scrolls horizontally */
+/* Books track — continuous flow, no horizontal scroll */
 .shelf-scroll {
-    overflow-x: auto;
-    overflow-y: visible;   /* browsers coerce this to auto, but popup uses fixed */
-    padding-bottom: 4px;   /* room for scrollbar */
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255,186,45,0.35) rgba(255,255,255,0.04);
+    overflow: visible;
 }
 
-.shelf-scroll::-webkit-scrollbar       { height: 4px; }
-.shelf-scroll::-webkit-scrollbar-track  { background: rgba(255,255,255,0.04); border-radius: 2px; }
-.shelf-scroll::-webkit-scrollbar-thumb  { background: rgba(255,186,45,0.35); border-radius: 2px; }
-
-/* Perspective wrapper — single row */
+/* Perspective wrapper — wraps naturally, no scroll boxes */
 .shelf-books {
     display: flex;
-    flex-wrap: nowrap;      /* single row — no wrap = no popup collision */
-    gap: 4px;
-    padding: 90px 28px 0;   /* tall top padding = popup space above 180px covers */
+    flex-wrap: wrap;
+    gap: 14px 10px;
+    padding: 24px 22px 14px;
     perspective: 1400px;
-    perspective-origin: 50% -60%;
+    perspective-origin: 50% -20%;
     align-items: flex-end;
     position: relative;
     z-index: 2;
-    width: max-content;     /* shrink-wrap to content for scroll */
-    min-width: 100%;
+    width: 100%;
 }
 
 /* ── Individual cover ── */
 .shelf-book {
-    width: 120px;
-    height: 180px;         /* proper 2:3 poster ratio, clearly readable */
+    width: 140px;
+    height: 210px;         /* 2:3 poster ratio */
     flex-shrink: 0;
     position: relative;
     cursor: pointer;
@@ -1377,162 +1368,369 @@ body.page-ready .hero-actions  { opacity: 1; transform: none; transition-delay: 
     transform: none;
 }
 
-/* ── Info popup card ── */
-.shelf-popup {
-    position: fixed;        /* fixed escapes ALL overflow:hidden ancestors */
-    width: 260px;
-    background: linear-gradient(180deg, rgba(7,11,22,0.98) 0%, rgba(7,10,18,0.98) 100%);
-    backdrop-filter: blur(22px);
-    border: 1px solid rgba(255,255,255,0.14);
-    border-radius: 16px;
-    overflow: hidden;
+/* ── DVD Case Modal Overlay ── */
+.dvd-overlay {
+    position: fixed;
+    inset: 0;
     z-index: 9999;
-    pointer-events: none;
-
-    /* Start hidden — JS sets top/left then removes this class */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(2, 4, 14, 0.93);
+    backdrop-filter: blur(16px);
     opacity: 0;
-    transform: translateY(8px) scale(0.94);
-    transition:
-        opacity  200ms ease,
-        transform 240ms cubic-bezier(0.34, 1.2, 0.64, 1);
-
-    box-shadow:
-        0 24px 64px rgba(0,0,0,0.82),
-        0 0 0  1px  rgba(255,186,45,0.08),
-        0 0 24px    rgba(255,186,45,0.08);
+    pointer-events: none;
+    transition: opacity 360ms ease;
 }
 
-/* Visible when JS adds .popup-visible */
-.shelf-popup.popup-visible {
+.dvd-overlay.is-open {
     opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0) scale(1);
+    pointer-events: all;
 }
 
-/* Popup poster (tall crop at top) */
-.shelf-popup-poster {
+/* Close button */
+.dvd-close {
+    position: fixed;
+    top: 22px;
+    right: 28px;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background 200ms ease, transform 200ms ease;
+    z-index: 10001;
+    line-height: 1;
+    font-family: inherit;
+}
+
+.dvd-close:hover {
+    background: rgba(255,255,255,0.14);
+    transform: scale(1.1);
+}
+
+/* 3D case wrapper */
+.dvd-case-wrap {
+    display: flex;
+    align-items: stretch;
+    max-width: min(900px, 96vw);
     width: 100%;
-    height: 140px;
+    max-height: 90vh;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow:
+        0 80px 160px rgba(0,0,0,0.95),
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 0 80px rgba(255,186,45,0.04);
+}
+
+/* Left panel — cover that rotates open */
+.dvd-case-front {
+    position: relative;
+    width: min(260px, 33vw);
+    flex-shrink: 0;
+    transform-origin: right center;
+    transform-style: preserve-3d;
+    transition: transform 580ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: rotateY(0deg);
+    z-index: 2;
+}
+
+.dvd-overlay.is-opening .dvd-case-front {
+    transform: rotateY(-55deg);
+}
+
+.dvd-case-front-img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     object-position: center top;
     display: block;
-    position: relative;
 }
 
-/* Gold gradient mask over poster bottom */
-.shelf-popup-poster-wrap {
-    position: relative;
+/* Hinge sheen */
+.dvd-case-front::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0; bottom: 0;
+    width: 16px;
+    background: linear-gradient(90deg,
+        rgba(255,255,255,0.03) 0%,
+        rgba(0,0,0,0.55) 100%);
+    border-right: 1px solid rgba(0,0,0,0.7);
+}
+
+/* Spine text */
+.dvd-case-spine {
+    position: absolute;
+    right: 0;
+    top: 0; bottom: 0;
+    width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
-    line-height: 0;
 }
 
-/* Popup is intentionally text-first; no duplicate poster over hovered cover. */
-.shelf-popup-poster-wrap {
-    display: none;
+.dvd-spine-text {
+    writing-mode: vertical-rl;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 220px;
 }
 
-.shelf-popup-poster-wrap::after {
+/* Right panel — content inside the open case */
+.dvd-case-content {
+    flex: 1;
+    background: linear-gradient(160deg, rgba(10,16,32,0.99) 0%, rgba(6,9,20,0.99) 100%);
+    border-left: 1px solid rgba(255,255,255,0.06);
+    padding: 30px 28px 26px;
+    overflow-y: auto;
+    opacity: 0;
+    transform: translateX(-24px);
+    transition:
+        opacity 360ms ease 220ms,
+        transform 360ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 220ms;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,186,45,0.2) transparent;
+    position: relative;
+}
+
+.dvd-case-content::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        var(--accent) 0%,
+        rgba(88,225,255,0.85) 50%,
+        var(--accent) 100%);
+    opacity: 0.75;
+}
+
+.dvd-overlay.is-opening .dvd-case-content {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Meta pills */
+.dvd-meta-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.dvd-pill {
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    color: var(--muted);
+    background: rgba(255,255,255,0.04);
+}
+
+.dvd-pill-rating {
+    background: rgba(255,186,45,0.12);
+    color: #ffe09a;
+    border-color: rgba(255,186,45,0.28);
+}
+
+.dvd-pill-wl {
+    background: rgba(88,225,255,0.1);
+    color: var(--accent-2);
+    border-color: rgba(88,225,255,0.24);
+}
+
+/* DVD case title */
+.dvd-title {
+    margin: 0 0 8px;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: 0.03em;
+    line-height: 0.94;
+    color: var(--text);
+}
+
+/* Community stars */
+.dvd-stars {
+    color: var(--accent);
+    font-size: 1rem;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+}
+
+/* Preview / cinematic banner */
+.dvd-preview-area {
+    position: relative;
+    height: 128px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    cursor: pointer;
+    background-image: var(--cover);
+    background-size: cover;
+    background-position: center 25%;
+    isolation: isolate;
+    transition: transform 240ms ease;
+}
+
+.dvd-preview-area:hover {
+    transform: scale(1.01);
+}
+
+.dvd-preview-area::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg,
-        transparent 30%,
-        rgba(6,9,18,0.72) 75%,
-        rgba(6,9,18,0.97) 100%);
-    pointer-events: none;
+    background: linear-gradient(135deg,
+        rgba(0,0,0,0.72) 0%,
+        rgba(0,0,0,0.32) 50%,
+        rgba(0,0,0,0.72) 100%);
+    z-index: 1;
+    transition: background 240ms ease;
 }
 
-/* Popup body */
-.shelf-popup-body {
-    padding: 14px 14px 13px;
-    border-top: 2px solid rgba(255,186,45,0.45);
+.dvd-preview-area:hover::before {
+    background: linear-gradient(135deg,
+        rgba(0,0,0,0.50) 0%,
+        rgba(0,0,0,0.12) 50%,
+        rgba(0,0,0,0.50) 100%);
 }
 
-.shelf-popup-title {
-    margin: 0 0 8px;
-    font-size: 1rem;
-    font-weight: 700;
-    line-height: 1.25;
-    letter-spacing: 0.02em;
-}
-
-.shelf-popup-meta {
+.dvd-preview-overlay {
+    position: absolute;
+    inset: 0;
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-bottom: 8px;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
 }
 
-/* Popup uses the same meta-pill class */
+.dvd-preview-label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: rgba(255,186,45,0.16);
+    border: 1px solid rgba(255,186,45,0.35);
+    border-radius: 999px;
+    padding: 9px 22px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #ffe09a;
+    transition: background 220ms ease, transform 220ms ease;
+}
+
+.dvd-preview-area:hover .dvd-preview-label {
+    background: rgba(255,186,45,0.28);
+    transform: scale(1.05);
+}
+
+/* Description */
+.dvd-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.62;
+    margin: 0 0 18px;
+}
+
+/* Rating row */
+.dvd-user-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.dvd-rating-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+.dvd-rating-select {
+    flex: 1;
+    background: rgba(8,13,28,0.95);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+/* Action buttons */
+.dvd-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.dvd-btn {
+    flex: 1;
+    min-width: 120px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    padding: 12px 16px;
+    font-family: inherit;
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+    letter-spacing: 0.03em;
+}
+
+.dvd-btn-primary {
+    background: linear-gradient(135deg, var(--accent), #ffe088);
+    color: #1b1a17;
+}
+
+.dvd-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(255,186,45,0.36);
+}
+
+.dvd-btn-wl {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.14);
+    color: var(--text);
+}
+
+.dvd-btn-wl:hover {
+    background: rgba(88,225,255,0.1);
+    border-color: rgba(88,225,255,0.3);
+}
+
+/* Responsive: hide cover panel on tiny screens */
+@media (max-width: 580px) {
+    .dvd-case-front { display: none; }
+    .dvd-case-content { padding: 24px 18px 20px; }
+}
+
+/* Legacy popup class kept as no-op (no JS uses it anymore) */
+.shelf-popup {
+    display: none !important;
+}
+
+/* wl-pill kept for backward compatibility */
 .wl-pill {
     background: rgba(255,186,45,0.12) !important;
     color: var(--accent) !important;
     border-color: rgba(255,186,45,0.3) !important;
-}
-
-.shelf-popup-desc {
-    font-size: 0.78rem;
-    color: var(--muted);
-    line-height: 1.46;
-    margin: 0 0 10px;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-/* Rating row inside popup */
-.shelf-popup-rating {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 9px;
-}
-
-.popup-stars {
-    color: var(--accent);
-    font-size: 0.8rem;
-    letter-spacing: 2px;
-    flex-shrink: 0;
-}
-
-.shelf-popup-rating select {
-    flex: 1;
-    background: rgba(11,16,32,0.92);
-    border: 1px solid var(--line);
-    color: var(--text);
-    border-radius: 8px;
-    padding: 4px 6px;
-    font-family: inherit;
-    font-size: 0.72rem;
-    cursor: pointer;
-}
-
-/* Action buttons in popup */
-.shelf-popup-actions {
-    display: flex;
-    gap: 6px;
-}
-
-.shelf-popup-actions button {
-    flex: 1;
-    border: 1px solid rgba(255,255,255,0.14);
-    background: rgba(255,255,255,0.05);
-    color: var(--text);
-    border-radius: 999px;
-    padding: 7px 8px;
-    cursor: pointer;
-    font-size: 0.72rem;
-    font-family: inherit;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    transition: background 160ms ease, border-color 160ms ease, transform 140ms ease;
-}
-
-.shelf-popup-actions button:hover {
-    background: rgba(255,186,45,0.16);
-    border-color: rgba(255,186,45,0.4);
-    transform: translateY(-1px);
 }
 
 /* ── Wooden shelf plank ── */

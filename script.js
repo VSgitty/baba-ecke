@@ -398,30 +398,38 @@ function renderShelfBook(movie) {
             <img class="shelf-book-cover" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
         </div>`;}
 
-/* ── Build tooltip content for a given movie ── */
-function buildTooltipHTML(movie) {
+/* ── Build DVD Case content HTML ── */
+function buildDVDCaseHTML(movie) {
     const ur = Number(appState.userRatings[movie.id] || 0);
     const inWL = isInWatchlist(movie.id);
     const ratingDisplay = movie.communityRating > 0 ? `${movie.communityRating}/10` : "TBA";
     const esc = (s) => String(s).replace(/"/g, "&quot;").replace(/</g, "&lt;");
     const stars = makeStars(movie.communityRating || 0);
     return `
-        <div class="shelf-popup-poster-wrap">
-            <img class="shelf-popup-poster" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
+        <div class="dvd-case-front">
+            <img class="dvd-case-front-img" src="${esc(movie.poster)}" alt="${esc(movie.title)}">
+            <div class="dvd-case-spine"><span class="dvd-spine-text">${movie.title}</span></div>
         </div>
-        <div class="shelf-popup-body">
-            <h4 class="shelf-popup-title">${movie.title}</h4>
-            <div class="shelf-popup-meta">
-                <span class="meta-pill">${movie.type === "movie" ? "Film" : "Serie"}</span>
-                ${movie.year ? `<span class="meta-pill">${movie.year}</span>` : ""}
-                <span class="meta-pill">${ratingDisplay}</span>
-                ${inWL ? '<span class="meta-pill wl-pill">&#9733; Watchlist</span>' : ""}
+        <div class="dvd-case-content">
+            <div class="dvd-meta-pills">
+                <span class="dvd-pill">${movie.type === "movie" ? "Film" : "Serie"}</span>
+                ${movie.year ? `<span class="dvd-pill">${movie.year}</span>` : ""}
+                ${movie.duration ? `<span class="dvd-pill">${movie.duration}</span>` : ""}
+                <span class="dvd-pill dvd-pill-rating">&#9733; ${ratingDisplay}</span>
+                ${inWL ? '<span class="dvd-pill dvd-pill-wl">Watchlist</span>' : ""}
             </div>
-            <p class="shelf-popup-desc">${movie.description}</p>
-            <div class="shelf-popup-rating">
-                <span class="popup-stars">${stars}</span>
-                <select data-action="set-user-rating" data-movie-id="${esc(movie.id)}">
-                    <option value="0" ${ur === 0 ? "selected" : ""}>Mein Rating</option>
+            <h2 class="dvd-title">${movie.title}</h2>
+            <div class="dvd-stars">${stars}</div>
+            <div class="dvd-preview-area" style="--cover: url('${esc(movie.poster)}')">
+                <div class="dvd-preview-overlay">
+                    <span class="dvd-preview-label">&#9654; Stream ansehen</span>
+                </div>
+            </div>
+            <p class="dvd-desc">${movie.description}</p>
+            <div class="dvd-user-row">
+                <label class="dvd-rating-label">Mein Rating</label>
+                <select class="dvd-rating-select" data-action="set-user-rating" data-movie-id="${esc(movie.id)}">
+                    <option value="0" ${ur === 0 ? "selected" : ""}>&#8212;</option>
                     <option value="6" ${ur === 6 ? "selected" : ""}>6/10</option>
                     <option value="7" ${ur === 7 ? "selected" : ""}>7/10</option>
                     <option value="8" ${ur === 8 ? "selected" : ""}>8/10</option>
@@ -429,73 +437,74 @@ function buildTooltipHTML(movie) {
                     <option value="10" ${ur === 10 ? "selected" : ""}>10/10</option>
                 </select>
             </div>
-            <div class="shelf-popup-actions">
-                <button type="button" data-action="open-movie" data-movie-id="${esc(movie.id)}">Details</button>
-                <button type="button" data-action="toggle-watchlist" data-movie-id="${esc(movie.id)}" data-title="${esc(movie.title)}">
-                    ${inWL ? "&#8722; Liste" : "&#43; Liste"}
-                </button>
+            <div class="dvd-actions">
+                <button class="dvd-btn dvd-btn-primary" type="button" data-action="open-movie" data-movie-id="${esc(movie.id)}">Details &amp; Stream</button>
+                <button class="dvd-btn dvd-btn-wl" type="button" data-action="toggle-watchlist" data-movie-id="${esc(movie.id)}" data-title="${esc(movie.title)}">${inWL ? "&#8722; Watchlist" : "&#43; Watchlist"}</button>
             </div>
-        </div>`;}
-
-/* ── Portal tooltip system ── */
-let _shelfTooltip = null;
-let _hideTimer = null;
-
-function attachShelfPopups() {
-    _shelfTooltip = document.createElement("div");
-    _shelfTooltip.className = "shelf-popup";
-    _shelfTooltip.setAttribute("role", "tooltip");
-    document.body.appendChild(_shelfTooltip);
-    _shelfTooltip.addEventListener("mouseenter", () => clearTimeout(_hideTimer));
-    _shelfTooltip.addEventListener("mouseleave", _scheduleHide);
+        </div>`;
 }
 
-function _scheduleHide() {
-    _hideTimer = setTimeout(() => {
-        if (_shelfTooltip) _shelfTooltip.classList.remove("popup-visible");
-    }, 80);
+/* ── DVD Case Modal System ── */
+let _dvdOverlay = null;
+
+function attachDVDCase() {
+    _dvdOverlay = document.createElement("div");
+    _dvdOverlay.className = "dvd-overlay";
+    _dvdOverlay.setAttribute("role", "dialog");
+    _dvdOverlay.setAttribute("aria-modal", "true");
+    _dvdOverlay.innerHTML = `<div class="dvd-case-wrap" id="dvdCaseWrap"></div><button class="dvd-close" id="dvdClose" aria-label="Schlie\u00DFen">\u2715</button>`;
+    document.body.appendChild(_dvdOverlay);
+
+    _dvdOverlay.addEventListener("click", (e) => {
+        if (e.target === _dvdOverlay) hideDVDCase();
+        if (e.target.closest(".dvd-preview-area")) {
+            const openBtn = _dvdOverlay.querySelector('button[data-action="open-movie"]');
+            if (openBtn) openBtn.click();
+        }
+    });
+    _dvdOverlay.querySelector("#dvdClose").addEventListener("click", hideDVDCase);
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") hideDVDCase();
+    });
 }
 
-function _showTooltip(book) {
-    if (!_shelfTooltip) return;
-    clearTimeout(_hideTimer);
-    const id = book.dataset.id;
-    const movie = CATALOG.find(m => m.id === id);
-    if (!movie) return;
-    _shelfTooltip.innerHTML = buildTooltipHTML(movie);
-    _positionTooltip(book);
-    _shelfTooltip.classList.add("popup-visible");
+function showDVDCase(movie) {
+    if (!_dvdOverlay) return;
+    const wrap = _dvdOverlay.querySelector("#dvdCaseWrap");
+    if (!wrap) return;
+    wrap.innerHTML = buildDVDCaseHTML(movie);
+    _dvdOverlay.classList.remove("is-opening");
+    _dvdOverlay.classList.add("is-open");
+    document.body.style.overflow = "hidden";
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => { _dvdOverlay.classList.add("is-opening"); });
+    });
 }
 
-function _positionTooltip(book) {
-    const rect = book.getBoundingClientRect();
-    const pw = 230;
-    // force layout to measure height before showing
-    _shelfTooltip.style.visibility = "hidden";
-    _shelfTooltip.style.left = "0px";
-    _shelfTooltip.style.top = "0px";
-    const ph = _shelfTooltip.offsetHeight || 340;
-    _shelfTooltip.style.visibility = "";
-
-    // center horizontally over book, appear above
-    let left = rect.left + rect.width / 2 - pw / 2;
-    let top  = rect.top - ph - 16;
-
-    // clamp to viewport
-    if (left < 8) left = 8;
-    if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
-    if (top < 8) top = rect.bottom + 16; // flip below if no space above
-
-    _shelfTooltip.style.left = left + "px";
-    _shelfTooltip.style.top  = top  + "px";
+function hideDVDCase() {
+    if (!_dvdOverlay) return;
+    _dvdOverlay.classList.remove("is-opening");
+    setTimeout(() => {
+        _dvdOverlay.classList.remove("is-open");
+        document.body.style.overflow = "";
+    }, 380);
 }
 
 function bindShelfBooks() {
     document.querySelectorAll(".shelf-book").forEach(book => {
-        book.addEventListener("mouseenter", () => _showTooltip(book));
-        book.addEventListener("mouseleave", _scheduleHide);
-        book.addEventListener("focus",  () => _showTooltip(book));
-        book.addEventListener("blur",   _scheduleHide);
+        book.addEventListener("mouseenter", () => book.classList.add("is-active"));
+        book.addEventListener("mouseleave", () => book.classList.remove("is-active"));
+        book.addEventListener("click", () => {
+            const movie = CATALOG.find(m => m.id === book.dataset.id);
+            if (movie) showDVDCase(movie);
+        });
+        book.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                const movie = CATALOG.find(m => m.id === book.dataset.id);
+                if (movie) showDVDCase(movie);
+            }
+        });
     });
 }
 
@@ -524,10 +533,8 @@ function renderCatalogShelf() {
                 </div>
             </div>
             <div class="shelf-stage">
-                <div class="shelf-scroll">
-                    <div class="shelf-books">
-                        ${group.movies.map(m => renderShelfBook(m)).join("")}
-                    </div>
+                <div class="shelf-books">
+                    ${group.movies.map(m => renderShelfBook(m)).join("")}
                 </div>
             </div>
             <div class="shelf-plank"></div>
@@ -822,7 +829,7 @@ async function init() {
     renderContinueWatching();
     renderFranchiseGrid();
     renderCatalog();
-    attachShelfPopups();
+    attachDVDCase();
     attachEvents();
     attachAccordions();
     attachParallaxHero();
