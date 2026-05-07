@@ -387,48 +387,119 @@ function applyShelfFilters(groups) {
     return result;
 }
 
+/* ── Shelf book: just the cover; tooltip is a portal in <body> ── */
 function renderShelfBook(movie) {
+    const inWL = isInWatchlist(movie.id);
+    const esc = (s) => String(s).replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    return `
+        <div class="shelf-book${inWL ? " in-watchlist" : ""}"
+             data-id="${esc(movie.id)}"
+             tabindex="0" role="button" aria-label="${esc(movie.title)}">
+            <img class="shelf-book-cover" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
+        </div>`;}
+
+/* ── Build tooltip content for a given movie ── */
+function buildTooltipHTML(movie) {
     const ur = Number(appState.userRatings[movie.id] || 0);
     const inWL = isInWatchlist(movie.id);
     const ratingDisplay = movie.communityRating > 0 ? `${movie.communityRating}/10` : "TBA";
     const esc = (s) => String(s).replace(/"/g, "&quot;").replace(/</g, "&lt;");
     const stars = makeStars(movie.communityRating || 0);
     return `
-        <div class="shelf-book${inWL ? " in-watchlist" : ""}" tabindex="0" role="button" aria-label="${esc(movie.title)}">
-            <img class="shelf-book-cover" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
-            <div class="shelf-popup" role="tooltip">
-                <div class="shelf-popup-poster-wrap">
-                    <img class="shelf-popup-poster" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
-                </div>
-                <div class="shelf-popup-body">
-                    <h4 class="shelf-popup-title">${movie.title}</h4>
-                    <div class="shelf-popup-meta">
-                        <span class="meta-pill">${movie.type === "movie" ? "Film" : "Serie"}</span>
-                        ${movie.year ? `<span class="meta-pill">${movie.year}</span>` : ""}
-                        <span class="meta-pill">${ratingDisplay}</span>
-                        ${inWL ? '<span class="meta-pill wl-pill">&#9733; Watchlist</span>' : ""}
-                    </div>
-                    <p class="shelf-popup-desc">${movie.description}</p>
-                    <div class="shelf-popup-rating">
-                        <span class="popup-stars">${stars}</span>
-                        <select data-action="set-user-rating" data-movie-id="${esc(movie.id)}">
-                            <option value="0" ${ur === 0 ? "selected" : ""}>Mein Rating</option>
-                            <option value="6" ${ur === 6 ? "selected" : ""}>6/10</option>
-                            <option value="7" ${ur === 7 ? "selected" : ""}>7/10</option>
-                            <option value="8" ${ur === 8 ? "selected" : ""}>8/10</option>
-                            <option value="9" ${ur === 9 ? "selected" : ""}>9/10</option>
-                            <option value="10" ${ur === 10 ? "selected" : ""}>10/10</option>
-                        </select>
-                    </div>
-                    <div class="shelf-popup-actions">
-                        <button type="button" data-action="open-movie" data-movie-id="${esc(movie.id)}">Details</button>
-                        <button type="button" data-action="toggle-watchlist" data-movie-id="${esc(movie.id)}" data-title="${esc(movie.title)}">
-                            ${inWL ? "&#8722; Liste" : "&#43; Liste"}
-                        </button>
-                    </div>
-                </div>
+        <div class="shelf-popup-poster-wrap">
+            <img class="shelf-popup-poster" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
+        </div>
+        <div class="shelf-popup-body">
+            <h4 class="shelf-popup-title">${movie.title}</h4>
+            <div class="shelf-popup-meta">
+                <span class="meta-pill">${movie.type === "movie" ? "Film" : "Serie"}</span>
+                ${movie.year ? `<span class="meta-pill">${movie.year}</span>` : ""}
+                <span class="meta-pill">${ratingDisplay}</span>
+                ${inWL ? '<span class="meta-pill wl-pill">&#9733; Watchlist</span>' : ""}
             </div>
-        </div>`;
+            <p class="shelf-popup-desc">${movie.description}</p>
+            <div class="shelf-popup-rating">
+                <span class="popup-stars">${stars}</span>
+                <select data-action="set-user-rating" data-movie-id="${esc(movie.id)}">
+                    <option value="0" ${ur === 0 ? "selected" : ""}>Mein Rating</option>
+                    <option value="6" ${ur === 6 ? "selected" : ""}>6/10</option>
+                    <option value="7" ${ur === 7 ? "selected" : ""}>7/10</option>
+                    <option value="8" ${ur === 8 ? "selected" : ""}>8/10</option>
+                    <option value="9" ${ur === 9 ? "selected" : ""}>9/10</option>
+                    <option value="10" ${ur === 10 ? "selected" : ""}>10/10</option>
+                </select>
+            </div>
+            <div class="shelf-popup-actions">
+                <button type="button" data-action="open-movie" data-movie-id="${esc(movie.id)}">Details</button>
+                <button type="button" data-action="toggle-watchlist" data-movie-id="${esc(movie.id)}" data-title="${esc(movie.title)}">
+                    ${inWL ? "&#8722; Liste" : "&#43; Liste"}
+                </button>
+            </div>
+        </div>`;}
+
+/* ── Portal tooltip system ── */
+let _shelfTooltip = null;
+let _hideTimer = null;
+
+function attachShelfPopups() {
+    _shelfTooltip = document.createElement("div");
+    _shelfTooltip.className = "shelf-popup";
+    _shelfTooltip.setAttribute("role", "tooltip");
+    document.body.appendChild(_shelfTooltip);
+    _shelfTooltip.addEventListener("mouseenter", () => clearTimeout(_hideTimer));
+    _shelfTooltip.addEventListener("mouseleave", _scheduleHide);
+}
+
+function _scheduleHide() {
+    _hideTimer = setTimeout(() => {
+        if (_shelfTooltip) _shelfTooltip.classList.remove("popup-visible");
+    }, 80);
+}
+
+function _showTooltip(book) {
+    if (!_shelfTooltip) return;
+    clearTimeout(_hideTimer);
+    const id = book.dataset.id;
+    const movie = CATALOG.find(m => m.id === id);
+    if (!movie) return;
+    _shelfTooltip.innerHTML = buildTooltipHTML(movie);
+    _positionTooltip(book);
+    _shelfTooltip.classList.add("popup-visible");
+}
+
+function _positionTooltip(book) {
+    const rect = book.getBoundingClientRect();
+    const pw = 230;
+    // force layout to measure height before showing
+    _shelfTooltip.style.visibility = "hidden";
+    _shelfTooltip.style.left = "0px";
+    _shelfTooltip.style.top = "0px";
+    const ph = _shelfTooltip.offsetHeight || 340;
+    _shelfTooltip.style.visibility = "";
+
+    // center horizontally over book, appear above
+    let left = rect.left + rect.width / 2 - pw / 2;
+    let top  = rect.top - ph - 16;
+
+    // clamp to viewport
+    if (left < 8) left = 8;
+    if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+    if (top < 8) top = rect.bottom + 16; // flip below if no space above
+
+    _shelfTooltip.style.left = left + "px";
+    _shelfTooltip.style.top  = top  + "px";
+}
+
+function bindShelfBooks() {
+    document.querySelectorAll(".shelf-book").forEach(book => {
+        book.addEventListener("mouseenter", () => _showTooltip(book));
+        book.addEventListener("mouseleave", _scheduleHide);
+        book.addEventListener("focus",  () => _showTooltip(book));
+        book.addEventListener("blur",   _scheduleHide);
+    });
+}
+
+
 }
 
 function renderCatalogShelf() {
@@ -456,13 +527,17 @@ function renderCatalogShelf() {
                 </div>
             </div>
             <div class="shelf-stage">
-                <div class="shelf-books">
-                    ${group.movies.map(m => renderShelfBook(m)).join("")}
+                <div class="shelf-scroll">
+                    <div class="shelf-books">
+                        ${group.movies.map(m => renderShelfBook(m)).join("")}
+                    </div>
                 </div>
             </div>
             <div class="shelf-plank"></div>
         </div>
     `).join("");
+
+    bindShelfBooks();
 }
 
 // legacy alias kept for backward compatibility
@@ -729,9 +804,12 @@ async function init() {
     renderContinueWatching();
     renderFranchiseGrid();
     renderCatalog();
-    attachEvents();    attachAccordions();
+    attachShelfPopups();
+    attachEvents();
+    attachAccordions();
     attachParallaxHero();
-    attachCatalogFilters();    attachPageTransitions();
+    attachCatalogFilters();
+    attachPageTransitions();
 
     window.requestAnimationFrame(() => {
         document.body.classList.add("page-ready");
