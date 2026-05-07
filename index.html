@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baba Ecke | Cine Community</title>
+    <link rel="icon" type="image/png" href="/c/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="introCurtain" class="intro-curtain" aria-hidden="true">
+        <div class="intro-reel">Loading Projection</div>
+    </div>
+    <div class="noise-layer" aria-hidden="true"></div>
+    <div class="scanline-layer" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <div class="brand-wrap">
+            <span class="brand-icon">🎞</span>
+            <div>
+                <p class="brand-kicker">BABA ECKE</p>
+                <h1 class="brand-title">cineastische Community</h1>
+            </div>
+        </div>
+        <nav class="topnav">
+            <a href="index.html">Streams</a>
+            <a href="mylist.html">My List & Progress</a>
+            <a href="#franchise-lab">Franchise Tracker</a>
+            <a href="#community-pulse">Community</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-stage" id="hero">
+            <div class="hero-copy">
+                <p class="hero-eyebrow">Now Playing</p>
+                <h2>Keine Standard-Filmseite.<br>Eine interaktive Filmwelt.</h2>
+                <p>
+                    Watchlists, Reviews, Kommentare und Franchise-Tracking in einer cineastischen Oberfläche
+                    mit Retro-VHS-Vibe und modernen Animationen.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="#franchise-lab">Franchise Progress starten</a>
+                    <a class="btn btn-ghost" href="mylist.html">Zum bestehenden Progress-System</a>
+                </div>
+            </div>
+
+            <article class="featured-frame" id="featuredFrame">
+                <img src="https://images.justwatch.com/poster/302278365/s718/Alice-in-Borderland.jpg" alt="Featured Film">
+                <div class="featured-overlay">
+                    <p class="ticker">Featured</p>
+                    <h3>Alice in Borderland</h3>
+                    <div class="featured-stats">
+                        <span>⭐ 8.2/10</span>
+                        <span>❤️ 31.4k</span>
+                        <span>👥 92%</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="section-block personal-hub" id="personal-hub">
+            <div class="section-head">
+                <h2>Weiter schauen & persönliche Sammlung</h2>
+                <p>Dein Live-Bereich mit Watchlist, Fortschritt und zuletzt getrackten Titeln.</p>
+            </div>
+            <div class="stats-strip" id="quickStats"></div>
+            <div class="continue-grid" id="continueWatching"></div>
+        </section>
+
+        <section class="section-block roulette-lab" id="roulette-lab">
+            <div class="section-head">
+                <h2>Film Roulette</h2>
+                <p>Filter setzen, Projektor starten, den nächsten Film zufällig finden.</p>
+            </div>
+            <div class="roulette-controls">
+                <select id="typeFilter" aria-label="Typ-Filter">
+                    <option value="all">Alles</option>
+                    <option value="movie">Nur Filme</option>
+                    <option value="series">Nur Serien</option>
+                </select>
+                <select id="genreFilter" aria-label="Genre-Filter">
+                    <option value="all">Alle Genres</option>
+                    <option value="fantasy">Fantasy</option>
+                    <option value="action">Action</option>
+                    <option value="animation">Animation</option>
+                    <option value="sci-fi">Sci-Fi</option>
+                    <option value="drama">Drama</option>
+                </select>
+                <select id="watchlistFilter" aria-label="Watchlist-Filter">
+                    <option value="all">Watchlist + Katalog</option>
+                    <option value="watchlist">Nur Watchlist</option>
+                    <option value="not-watchlist">Nicht in Watchlist</option>
+                </select>
+                <button class="btn btn-primary" id="randomFilmBtn" type="button">Projektor starten</button>
+            </div>
+            <div class="roulette-result" id="randomFilmResult">
+                <p class="result-placeholder">Warte auf den ersten Spin...</p>
+            </div>
+        </section>
+
+        <section class="section-block franchise-lab" id="franchise-lab">
+            <div class="section-head">
+                <h2>Franchise Tracking</h2>
+                <p>Pro Teil abhaken, Status setzen, bewerten und kommentieren. Fortschritt erscheint sofort auf der Main-Seite.</p>
+            </div>
+            <div class="franchise-grid" id="franchiseGrid"></div>
+        </section>
+
+        <section class="section-block catalog-lab" id="catalogSection">
+            <div class="section-head">
+                <h2>Cine Katalog</h2>
+                <p>Bewertungen, Prozent, Likes, Community-Score und deine persönliche Bewertung direkt auf jeder Karte.</p>
+            </div>
+            <div class="catalog-grid" id="catalogGrid"></div>
+        </section>
+
+        <section class="section-block community-pulse" id="community-pulse">
+            <div class="section-head">
+                <h2>Community Pulse</h2>
+                <p>Trending Reviews, Aktivität und Reaktionen aus der Baba Ecke.</p>
+            </div>
+            <div class="community-grid">
+                <article class="pulse-card">
+                    <p class="pulse-tag">Trending Review</p>
+                    <h3>"Shrek 2 bleibt Peak Cinema"</h3>
+                    <p>"Der Humor altert nicht. Plus Soundtrack-Gold."</p>
+                    <span>237 Reaktionen</span>
+                </article>
+                <article class="pulse-card">
+                    <p class="pulse-tag">Top Kommentar</p>
+                    <h3>"Toy Story 3 hat mich zerstört"</h3>
+                    <p>"Dachte an Kinderfilm, bekam Existenzkrise."</p>
+                    <span>198 Reaktionen</span>
+                </article>
+                <article class="pulse-card">
+                    <p class="pulse-tag">Aktivste User</p>
+                    <h3>marco_lenz, spookyjane, retromax</h3>
+                    <p>Diese Woche die meisten Bewertungen und Watchlist-Updates.</p>
+                    <span>Live aktualisiert</span>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>Baba Ecke 2026 | Cine-Community mit Charakter, Nostalgie und Progress.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
