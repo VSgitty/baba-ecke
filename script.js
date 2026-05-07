@@ -121,6 +121,20 @@ const appState = {
     roulettePick: null
 };
 
+// ── Catalog filter/sort state ──────────────────────────
+let catalogFilterType = "all";
+let catalogFilterGenre = "all";
+let catalogSort = "default";
+
+// ── Franchise groups detected from catalog IDs ────────
+const CATALOG_FRANCHISE_MAP = {
+    "saw":              { label: "SAW Universe",          ids: ["saw-1","saw-2","saw-3","saw-4","saw-5","saw-6","saw-7","jigsaw","saw-spiral","saw-x"] },
+    "final-dest":       { label: "Final Destination",     ids: ["final-destination","final-destination-6"] },
+    "scream":           { label: "Scream Franchise",      ids: ["scream-1","scream-2","scream-3","scream-4","scream-5","scream-6"] },
+    "cloverfield":      { label: "Cloverfield Universe",  ids: ["cloverfield","10-cloverfield-lane","cloverfield-paradox"] },
+    "cube":             { label: "Cube Franchise",        ids: ["cube-zero","cube","cube-2","cube-2021"] },
+};
+
 function safeGetJSON(key, fallback) {
     try {
         const raw = localStorage.getItem(key);
@@ -184,7 +198,7 @@ function toggleWatchlist(movieId, title) {
 
     saveJSON(STORAGE_KEYS.watchlist, appState.watchlist);
     renderStats();
-    renderCatalog();
+    renderCatalogShelf();
     renderContinueWatching();
 }
 
@@ -203,15 +217,27 @@ function renderStats() {
     const allParts = FRANCHISES.flatMap((f) => f.parts.map((p) => ({ franchise: f.slug, id: p.id })));
     const seen = allParts.filter((part) => appState.franchise[part.franchise][part.id].seen).length;
     const ratings = Object.values(appState.userRatings).filter((v) => Number(v) > 0);
-    const avgRating = ratings.length ? (ratings.reduce((a, b) => a + Number(b), 0) / ratings.length).toFixed(1) : "0.0";
+    const avgRating = ratings.length ? (ratings.reduce((a, b) => a + Number(b), 0) / ratings.length).toFixed(1) : "—";
     const completedFranchises = FRANCHISES.filter((f) => getFranchiseStats(f).progress === 100).length;
 
     statsEl.innerHTML = `
-        <div class="quick-stat"><b>${Object.keys(appState.watchlist).length}</b><span>Watchlist Titel</span></div>
-        <div class="quick-stat"><b>${seen}/${allParts.length}</b><span>Franchise Teile gesehen</span></div>
-        <div class="quick-stat"><b>${avgRating}/10</b><span>Dein Schnitt</span></div>
-        <div class="quick-stat"><b>${completedFranchises}</b><span>Achievements freigeschaltet</span></div>
+        <div class="quick-stat"><b>${CATALOG.length}</b><span>Titel</span></div>
+        <div class="quick-stat"><b>${Object.keys(appState.watchlist).length}</b><span>Watchlist</span></div>
+        <div class="quick-stat"><b>${seen}/${allParts.length}</b><span>Franchise gesehen</span></div>
+        <div class="quick-stat"><b>${avgRating}</b><span>Mein Schnitt</span></div>
+        <div class="quick-stat"><b>${completedFranchises}</b><span>Achievements</span></div>
     `;
+
+    // Update accordion badges
+    const fb = document.getElementById("franchiseBadge");
+    if (fb) fb.textContent = `${completedFranchises}/${FRANCHISES.length} abgeschlossen`;
+
+    const cb = document.getElementById("continueCount");
+    if (cb) {
+        const remaining = FRANCHISES.filter(f => f.parts.some(p => !appState.franchise[f.slug][p.id].seen)).length;
+        cb.textContent = remaining > 0 ? String(remaining) : "";
+        cb.style.display = remaining > 0 ? "" : "none";
+    }
 }
 
 function renderContinueWatching() {
@@ -298,50 +324,144 @@ function renderFranchiseGrid() {
     }).join("");
 }
 
-function renderCatalog() {
-    const grid = document.getElementById("catalogGrid");
-    if (!grid) return;
+// ── Group catalog movies into franchise/genre buckets ──
+function buildCatalogGroups(movies) {
+    const assigned = new Set();
+    const groups = [];
 
-    grid.innerHTML = CATALOG.map((movie) => {
-        const userRating = Number(appState.userRatings[movie.id] || 0);
-        const ratingDisplay = movie.communityRating > 0 ? `${movie.communityRating}/10` : "TBA";
-        const starsDisplay = movie.communityRating > 0 ? makeStars(movie.communityRating) : "☆☆☆☆☆";
-        return `
-            <article class="catalog-card">
-                <img class="catalog-cover" src="${movie.poster}" alt="${movie.title}" loading="lazy">
-                <div class="catalog-body">
-                    <h3>${movie.title}</h3>
-                    <div class="meta-line">
+    for (const [key, def] of Object.entries(CATALOG_FRANCHISE_MAP)) {
+        const grouped = def.ids.map(id => movies.find(m => m.id === id)).filter(Boolean);
+        if (!grouped.length) continue;
+        grouped.forEach(m => assigned.add(m.id));
+        groups.push({ key, label: def.label, type: "franchise", movies: grouped, bgImage: grouped[0].poster });
+    }
+
+    const rest = movies.filter(m => !assigned.has(m.id));
+
+    // Series as their own group
+    const seriesMovies = rest.filter(m => m.type === "series");
+    if (seriesMovies.length) groups.push({ key: "series", label: "Serien", type: "group", movies: seriesMovies, bgImage: seriesMovies[0].poster });
+
+    // Remaining films grouped by genre
+    const byGenre = {};
+    rest.filter(m => m.type !== "series").forEach(m => { (byGenre[m.genre] = byGenre[m.genre] || []).push(m); });
+
+    const genreLabels = {
+        horror: "Horror & Schock", thriller: "Thriller & Spannung",
+        "sci-fi": "Sci-Fi & Zukunft", action: "Action & Abenteuer",
+        drama: "Drama", animation: "Animation", fantasy: "Fantasy & Märchen",
+        crime: "Crime", other: "Weitere Titel"
+    };
+
+    for (const [genre, gMovies] of Object.entries(byGenre)) {
+        groups.push({ key: `genre-${genre}`, label: genreLabels[genre] || genre, type: "genre", movies: gMovies, bgImage: gMovies[0].poster });
+    }
+
+    return groups;
+}
+
+function applyShelfFilters(groups) {
+    let result = groups.map(g => ({
+        ...g,
+        movies: g.movies.filter(m => {
+            if (catalogFilterType !== "all" && m.type !== catalogFilterType) return false;
+            if (catalogFilterGenre !== "all" && m.genre !== catalogFilterGenre) return false;
+            if (catalogSort === "watchlist" && !isInWatchlist(m.id)) return false;
+            if (catalogSort === "rated" && !Number(appState.userRatings[m.id])) return false;
+            return true;
+        })
+    })).filter(g => g.movies.length > 0);
+
+    const sortFns = {
+        "rating-desc": (a, b) => b.communityRating - a.communityRating,
+        "rating-asc":  (a, b) => a.communityRating - b.communityRating,
+        "year-desc":   (a, b) => String(b.year || "0").localeCompare(String(a.year || "0")),
+        "year-asc":    (a, b) => String(a.year || "0").localeCompare(String(b.year || "0")),
+    };
+
+    if (sortFns[catalogSort]) {
+        const flat = result.flatMap(g => g.movies).sort(sortFns[catalogSort]);
+        return flat.length ? [{ key: "sorted", label: "Sortierte Ansicht", movies: flat, bgImage: flat[0].poster }] : [];
+    }
+
+    return result;
+}
+
+function renderShelfBook(movie) {
+    const ur = Number(appState.userRatings[movie.id] || 0);
+    const inWL = isInWatchlist(movie.id);
+    const ratingDisplay = movie.communityRating > 0 ? `${movie.communityRating}/10` : "TBA";
+    const esc = (s) => String(s).replace(/"/g, "&quot;");
+    return `
+        <div class="shelf-book${inWL ? " in-watchlist" : ""}" tabindex="0" role="button" aria-label="${esc(movie.title)}">
+            <img class="shelf-book-cover" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
+            <div class="shelf-popup" role="tooltip">
+                <img class="shelf-popup-poster" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
+                <div class="shelf-popup-body">
+                    <h4 class="shelf-popup-title">${movie.title}</h4>
+                    <div class="shelf-popup-meta">
                         <span class="meta-pill">${movie.type === "movie" ? "Film" : "Serie"}</span>
-                        <span class="meta-pill">${movie.genre}</span>
                         ${movie.year ? `<span class="meta-pill">${movie.year}</span>` : ""}
+                        <span class="meta-pill">${ratingDisplay}</span>
+                        ${inWL ? '<span class="meta-pill wl-pill">&#9733; Watchlist</span>' : ""}
                     </div>
-                    <div class="rating-line">
-                        <span class="rating-pill"><strong>${starsDisplay}</strong></span>
-                        <span class="rating-pill">${ratingDisplay}</span>
-                    </div>
-                    <p class="catalog-desc">${movie.description}</p>
-                    <div class="user-line">
-                        <select data-action="set-user-rating" data-movie-id="${movie.id}">
-                            <option value="0" ${userRating === 0 ? "selected" : ""}>Eigene Bewertung</option>
-                            <option value="6" ${userRating === 6 ? "selected" : ""}>6/10</option>
-                            <option value="7" ${userRating === 7 ? "selected" : ""}>7/10</option>
-                            <option value="8" ${userRating === 8 ? "selected" : ""}>8/10</option>
-                            <option value="9" ${userRating === 9 ? "selected" : ""}>9/10</option>
-                            <option value="10" ${userRating === 10 ? "selected" : ""}>10/10</option>
+                    <p class="shelf-popup-desc">${movie.description}</p>
+                    <div class="shelf-popup-rating">
+                        <span class="popup-stars">${makeStars(movie.communityRating || 0)}</span>
+                        <select data-action="set-user-rating" data-movie-id="${esc(movie.id)}">
+                            <option value="0" ${ur === 0 ? "selected" : ""}>Mein Rating</option>
+                            <option value="6" ${ur === 6 ? "selected" : ""}>6/10</option>
+                            <option value="7" ${ur === 7 ? "selected" : ""}>7/10</option>
+                            <option value="8" ${ur === 8 ? "selected" : ""}>8/10</option>
+                            <option value="9" ${ur === 9 ? "selected" : ""}>9/10</option>
+                            <option value="10" ${ur === 10 ? "selected" : ""}>10/10</option>
                         </select>
                     </div>
-                    <div class="card-actions">
-                        <button type="button" data-action="open-movie" data-movie-id="${movie.id}">Details</button>
-                        <button type="button" data-action="toggle-watchlist" data-movie-id="${movie.id}" data-title="${movie.title}">
-                            ${isInWatchlist(movie.id) ? "Aus Watchlist" : "Zur Watchlist"}
+                    <div class="shelf-popup-actions">
+                        <button type="button" data-action="open-movie" data-movie-id="${esc(movie.id)}">Details</button>
+                        <button type="button" data-action="toggle-watchlist" data-movie-id="${esc(movie.id)}" data-title="${esc(movie.title)}">
+                            ${inWL ? "&#8722; Liste" : "&#43; Liste"}
                         </button>
                     </div>
                 </div>
-            </article>
-        `;
-    }).join("");
+            </div>
+        </div>`;
 }
+
+function renderCatalogShelf() {
+    const host = document.getElementById("catalogShelf");
+    if (!host) return;
+
+    const groups = buildCatalogGroups(CATALOG);
+    const visible = applyShelfFilters(groups);
+
+    const countEl = document.getElementById("catalogCount");
+    const total = visible.reduce((n, g) => n + g.movies.length, 0);
+    if (countEl) countEl.textContent = `${total} Titel`;
+
+    if (!visible.length) {
+        host.innerHTML = '<p class="empty-note">Keine Treffer für diesen Filter.</p>';
+        return;
+    }
+
+    host.innerHTML = visible.map(group => `
+        <div class="shelf-group" style="--bg-img: url('${group.bgImage}')">
+            <div class="shelf-group-inner">
+                <div class="shelf-group-label">
+                    <h3 class="shelf-group-name">${group.label}</h3>
+                    <span class="shelf-group-meta">${group.movies.length} Titel</span>
+                </div>
+                <div class="shelf-books">
+                    ${group.movies.map(m => renderShelfBook(m)).join("")}
+                </div>
+            </div>
+            <div class="shelf-plank"></div>
+        </div>
+    `).join("");
+}
+
+// legacy alias kept for backward compatibility
+function renderCatalog() { renderCatalogShelf(); }
 
 function getFilteredPool() {
     const type = document.getElementById("typeFilter")?.value || "all";
@@ -523,6 +643,67 @@ function attachEvents() {
     }, true);
 }
 
+function attachAccordions() {
+    document.querySelectorAll(".section-toggle-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const drawer = document.getElementById(btn.dataset.target);
+            const section = btn.closest(".accordion-section");
+            if (!drawer) return;
+            if (section.classList.contains("is-open")) {
+                drawer.style.maxHeight = drawer.scrollHeight + "px";
+                requestAnimationFrame(() => { drawer.style.maxHeight = "0"; });
+                section.classList.remove("is-open");
+            } else {
+                section.classList.add("is-open");
+                drawer.style.maxHeight = drawer.scrollHeight + "px";
+                drawer.addEventListener("transitionend", () => {
+                    if (section.classList.contains("is-open")) drawer.style.maxHeight = "none";
+                }, { once: true });
+            }
+        });
+    });
+}
+
+function attachParallaxHero() {
+    const hero = document.getElementById("cineHero");
+    const bg = document.getElementById("heroLayerBg");
+    const mid = document.getElementById("heroLayerMid");
+    if (!hero || !bg) return;
+    hero.addEventListener("mousemove", (e) => {
+        const r = hero.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        bg.style.transform = `translate(${x * -16}px, ${y * -10}px)`;
+        if (mid) mid.style.transform = `translate(${x * -28}px, ${y * -18}px)`;
+    });
+}
+
+function attachCatalogFilters() {
+    document.getElementById("scrollToCatalog")?.addEventListener("click", () => {
+        document.getElementById("catalogSection")?.scrollIntoView({ behavior: "smooth" });
+    });
+    document.querySelectorAll("[data-filter-type]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            catalogFilterType = btn.dataset.filterType;
+            document.querySelectorAll("[data-filter-type]").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            renderCatalogShelf();
+        });
+    });
+    document.querySelectorAll("[data-filter-genre]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            catalogFilterGenre = btn.dataset.filterGenre;
+            document.querySelectorAll("[data-filter-genre]").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            renderCatalogShelf();
+        });
+    });
+    document.getElementById("catalogSort")?.addEventListener("change", (e) => {
+        catalogSort = e.target.value;
+        renderCatalogShelf();
+    });
+}
+
 function attachPageTransitions() {
     document.querySelectorAll('.topnav a[href]').forEach(link => {
         link.addEventListener('click', function(e) {
@@ -543,8 +724,9 @@ async function init() {
     renderContinueWatching();
     renderFranchiseGrid();
     renderCatalog();
-    attachEvents();
-    attachPageTransitions();
+    attachEvents();    attachAccordions();
+    attachParallaxHero();
+    attachCatalogFilters();    attachPageTransitions();
 
     window.requestAnimationFrame(() => {
         document.body.classList.add("page-ready");
