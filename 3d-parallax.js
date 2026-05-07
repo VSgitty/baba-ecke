@@ -3,9 +3,11 @@ class BabaParallax3D {
     constructor() {
         this.mouseX = 0;
         this.mouseY = 0;
+        this.scrollY = 0;
         this.windowHalfX = window.innerWidth / 2;
         this.windowHalfY = window.innerHeight / 2;
         this.isMobile = window.innerWidth < 768;
+        this.particleInterval = null;
         this.init();
     }
 
@@ -74,7 +76,8 @@ class BabaParallax3D {
         
         const container = document.getElementById('babaParallax3d');
         
-        setInterval(() => {
+        this.particleInterval = setInterval(() => {
+            if (document.hidden) return;
             if (document.querySelectorAll('.particle').length < 30) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
@@ -136,10 +139,11 @@ class BabaParallax3D {
             const rotateX = this.mouseY * rotationSpeed * 8;
             const rotateY = this.mouseX * rotationSpeed * 8;
             const scale = element.dataset.scale || 1;
+            const scrollOffset = (Number(element.dataset.scrollOffset) || 0);
             
             element.style.transform = `
                 translateX(${translateX}px) 
-                translateY(${translateY}px) 
+                translateY(${translateY + scrollOffset}px) 
                 rotateX(${rotateX}deg) 
                 rotateY(${rotateY}deg)
                 scale(${scale})
@@ -156,12 +160,7 @@ class BabaParallax3D {
         floatingElements.forEach((element, index) => {
             const speed = (index % 4 + 1) * 0.1;
             const yPos = scrolled * speed;
-            const currentTransform = element.style.transform;
-            
-            // Preserve existing transforms and add scroll effect
-            if (currentTransform) {
-                element.style.transform = currentTransform + ` translateY(${yPos}px)`;
-            }
+            element.dataset.scrollOffset = String(yPos);
         });
     }
 
@@ -183,22 +182,6 @@ class BabaParallax3D {
                     this.createSparkles(card, '#00ffff');
                 });
             }
-            
-            // Add special effects to certain movies
-            const title = card.querySelector('h3')?.textContent.toLowerCase() || '';
-            
-            if (title.includes('saw') || title.includes('scream') || title.includes('horror')) {
-                card.addEventListener('mouseenter', () => {
-                    this.createSparkles(card, '#ff0000');
-                });
-            }
-            
-            if (title.includes('sci-fi') || title.includes('alien') || title.includes('space')) {
-                card.addEventListener('mouseenter', () => {
-                    this.createSparkles(card, '#00ffff');
-                });
-            }
-            
             // Enhanced hover effect
             card.addEventListener('mousemove', (e) => {
                 if (this.isMobile) return;

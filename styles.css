@@ -466,6 +466,109 @@ main, .topbar, .site-footer { position: relative; z-index: 2; }
 .pulse-card p { margin: 0; color: var(--muted); }
 .pulse-card span { display: block; margin-top: 9px; color: var(--accent-2); font-size: 0.8rem; }
 
+.franchise-lab-panel,
+.community-pulse-panel {
+    width: min(1200px, 92vw);
+    margin: 18px auto;
+}
+
+.franchise-lab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.lab-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)),
+        rgba(255,255,255,0.03);
+    padding: 16px;
+    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.lab-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), rgba(88,225,255,0.8), transparent);
+    opacity: 0.85;
+}
+
+.lab-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255,255,255,0.28);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.28);
+}
+
+.lab-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.lab-card-header h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.lab-kicker,
+.lab-chip {
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 0.68rem;
+    color: var(--muted);
+    background: rgba(255,255,255,0.04);
+    letter-spacing: 0.04em;
+}
+
+.lab-copy {
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.5;
+}
+
+.lab-meta-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 10px 0 12px;
+    color: var(--muted);
+    font-size: 0.78rem;
+}
+
+.lab-btn {
+    width: 100%;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+    padding: 10px 14px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.lab-btn:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,186,45,0.35);
+    background: rgba(255,186,45,0.12);
+}
+
+.pulse-card strong {
+    color: var(--text);
+}
+
 .site-footer {
     width: min(1200px, 92vw);
     margin: 24px auto 34px;

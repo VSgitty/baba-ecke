@@ -238,6 +238,9 @@ function renderStats() {
         cb.textContent = remaining > 0 ? String(remaining) : "";
         cb.style.display = remaining > 0 ? "" : "none";
     }
+
+    renderFranchiseLab();
+    renderCommunityPulse();
 }
 
 function renderContinueWatching() {
@@ -268,6 +271,82 @@ function renderContinueWatching() {
             <h3>${item.title}</h3>
             <p>${item.note}</p>
             <div class="progress-track"><div class="progress-fill" style="width:${item.progress}%"></div></div>
+        </article>
+    `).join("");
+}
+
+function renderFranchiseLab() {
+    const host = document.getElementById("franchiseLabGrid");
+    if (!host) return;
+
+    const spotlight = FRANCHISES.map((franchise) => {
+        const stats = getFranchiseStats(franchise);
+        const nextPart = franchise.parts.find((part) => !appState.franchise[franchise.slug][part.id].seen);
+        return { franchise, stats, nextPart };
+    })
+        .sort((a, b) => b.stats.progress - a.stats.progress || a.stats.total - b.stats.total)
+        .slice(0, 3);
+
+    host.innerHTML = spotlight.map(({ franchise, stats, nextPart }) => `
+        <article class="lab-card">
+            <div class="lab-card-header">
+                <span class="lab-kicker">Spotlight</span>
+                <span class="lab-chip">${stats.progress}%</span>
+            </div>
+            <h3>${franchise.title}</h3>
+            <p class="lab-copy">${nextPart ? `Nächster Teil: ${nextPart.title}` : "Komplett abgeschlossen und bereit für den nächsten Rewatch."}</p>
+            <div class="progress-track"><div class="progress-fill" style="width:${stats.progress}%"></div></div>
+            <div class="lab-meta-row">
+                <span>${stats.seenCount}/${stats.total} gesehen</span>
+                <span>${nextPart ? nextPart.year : "Done"}</span>
+            </div>
+            <button class="lab-btn" type="button" data-scroll-target="franchiseSection">Tracker öffnen</button>
+        </article>
+    `).join("");
+}
+
+function renderCommunityPulse() {
+    const host = document.getElementById("communityPulseGrid");
+    if (!host) return;
+
+    const watchlistCount = Object.keys(appState.watchlist).length;
+    const ratedTitles = Object.entries(appState.userRatings)
+        .filter(([, value]) => Number(value) > 0)
+        .sort((a, b) => Number(b[1]) - Number(a[1]));
+    const topRatedMovie = ratedTitles.length ? findMovieById(ratedTitles[0][0]) : null;
+    const mostRepresentedGenre = Object.entries(CATALOG.reduce((acc, movie) => {
+        acc[movie.genre] = (acc[movie.genre] || 0) + 1;
+        return acc;
+    }, {})).sort((a, b) => b[1] - a[1])[0];
+    const completedFranchises = FRANCHISES.filter((f) => getFranchiseStats(f).progress === 100).length;
+
+    const cards = [
+        {
+            tag: "Watchlist Fokus",
+            title: watchlistCount ? `${watchlistCount} Titel in deiner Watchlist` : "Deine Watchlist wartet auf den ersten Titel",
+            copy: watchlistCount ? "MAIN übernimmt hier den Live-Status aus deiner Sammlung statt statischer Beispielkarten." : "Sobald du Titel speicherst, wird dieser Block automatisch lebendig.",
+            meta: watchlistCount ? "Live aus deiner Liste" : "Noch keine Einträge"
+        },
+        {
+            tag: "Top Bewertung",
+            title: topRatedMovie ? `${topRatedMovie.title} ist gerade dein Favorit` : "Noch keine persönliche Top-Bewertung gesetzt",
+            copy: topRatedMovie ? `Dein aktueller Höchstwert liegt bei ${appState.userRatings[topRatedMovie.id]}/10.` : "Bewerte Titel im Katalog oder im DVD-Case, um hier Trends zu sehen.",
+            meta: topRatedMovie ? "Direkt aus deinem Rating-State" : "Wird automatisch gefüllt"
+        },
+        {
+            tag: "Library Signal",
+            title: mostRepresentedGenre ? `${mostRepresentedGenre[0]} dominiert aktuell die Sammlung` : "Katalog wird geladen",
+            copy: `Abgeschlossene Reihen: ${completedFranchises}/${FRANCHISES.length}. Diese Karte verbindet Franchise-Lab und Katalog-Fokus der REFERENCE.`,
+            meta: mostRepresentedGenre ? `${mostRepresentedGenre[1]} Titel in diesem Genre` : "Noch keine Daten"
+        }
+    ];
+
+    host.innerHTML = cards.map((card) => `
+        <article class="pulse-card">
+            <p class="pulse-tag">${card.tag}</p>
+            <h3>${card.title}</h3>
+            <p>${card.copy}</p>
+            <span>${card.meta}</span>
         </article>
     `).join("");
 }
@@ -667,6 +746,20 @@ function attachEvents() {
     document.getElementById("randomFilmBtn")?.addEventListener("click", runRoulette);
 
     document.addEventListener("click", (event) => {
+        const scrollButton = event.target.closest("button[data-scroll-target]");
+        if (scrollButton) {
+            const targetId = scrollButton.dataset.scrollTarget;
+            const target = document.getElementById(targetId);
+            if (target) {
+                const section = target.closest(".accordion-section");
+                if (section && !section.classList.contains("is-open")) {
+                    section.querySelector(".section-toggle-btn")?.click();
+                }
+                target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+            return;
+        }
+
         const button = event.target.closest("button[data-action]");
         if (!button) return;
 
@@ -765,12 +858,28 @@ function attachParallaxHero() {
     const bg = document.getElementById("heroLayerBg");
     const mid = document.getElementById("heroLayerMid");
     if (!hero || !bg) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let rafId = 0;
+    let pointerX = 0;
+    let pointerY = 0;
+
     hero.addEventListener("mousemove", (e) => {
         const r = hero.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width - 0.5;
-        const y = (e.clientY - r.top) / r.height - 0.5;
-        bg.style.transform = `translate(${x * -16}px, ${y * -10}px)`;
-        if (mid) mid.style.transform = `translate(${x * -28}px, ${y * -18}px)`;
+        pointerX = (e.clientX - r.left) / r.width - 0.5;
+        pointerY = (e.clientY - r.top) / r.height - 0.5;
+
+        if (rafId) return;
+        rafId = window.requestAnimationFrame(() => {
+            bg.style.transform = `translate(${pointerX * -16}px, ${pointerY * -10}px)`;
+            if (mid) mid.style.transform = `translate(${pointerX * -28}px, ${pointerY * -18}px)`;
+            rafId = 0;
+        });
+    });
+
+    hero.addEventListener("mouseleave", () => {
+        bg.style.transform = "translate(0, 0)";
+        if (mid) mid.style.transform = "translate(0, 0)";
     });
 }
 
@@ -823,7 +932,7 @@ function attachScrollReveal() {
         });
     }, { threshold: 0.08, rootMargin: "0px 0px -40px 0px" });
 
-    document.querySelectorAll(".shelf-group, .accordion-section, .catalog-section").forEach(el => {
+    document.querySelectorAll(".shelf-group, .accordion-section, .catalog-section, .section-block").forEach(el => {
         observer.observe(el);
     });
 }
