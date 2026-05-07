@@ -499,9 +499,6 @@ function bindShelfBooks() {
     });
 }
 
-
-}
-
 function renderCatalogShelf() {
     const host = document.getElementById("catalogShelf");
     if (!host) return;
@@ -797,6 +794,21 @@ function attachPageTransitions() {
     });
 }
 
+function attachScrollReveal() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("is-visible");
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.08, rootMargin: "0px 0px -40px 0px" });
+
+    document.querySelectorAll(".shelf-group, .accordion-section, .catalog-section").forEach(el => {
+        observer.observe(el);
+    });
+}
+
 async function init() {
     CATALOG = await loadMoviesData();
     initState();
@@ -810,6 +822,7 @@ async function init() {
     attachParallaxHero();
     attachCatalogFilters();
     attachPageTransitions();
+    attachScrollReveal();
 
     window.requestAnimationFrame(() => {
         document.body.classList.add("page-ready");
