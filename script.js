@@ -4,74 +4,52 @@ const STORAGE_KEYS = {
     userRatings: "baba_user_ratings_v2"
 };
 
-const CATALOG = [
-    {
-        id: "alice-in-borderland",
-        title: "Alice in Borderland",
-        type: "series",
-        genre: "sci-fi",
-        poster: "https://images.justwatch.com/poster/302278365/s718/Alice-in-Borderland.jpg",
-        communityRating: 8.2,
-        communityPercent: 92,
-        likes: 31400,
-        description: "Todesgames in einem leeren Tokio. Extrem spannend und emotional."
-    },
-    {
-        id: "arcane",
-        title: "Arcane",
-        type: "series",
-        genre: "animation",
-        poster: "https://m.media-amazon.com/images/I/71xr7KyenWL._UF894,1000_QL80_.jpg",
-        communityRating: 9.0,
-        communityPercent: 95,
-        likes: 58900,
-        description: "Starke Animation, starke Figuren, starke Musik."
-    },
-    {
-        id: "squid-game",
-        title: "Squid Game",
-        type: "series",
-        genre: "drama",
-        poster: "https://m.media-amazon.com/images/M/MV5BNDNmNzUzMjEtNGVkYi00N2RjLWEwN2EtYjg3NzA4MGFkMjFkXkEyXkFqcGc@._V1_.jpg",
-        communityRating: 8.0,
-        communityPercent: 88,
-        likes: 46100,
-        description: "Kinderspiele, aber brutal. Gesellschaftskritik mit Druck."
-    },
-    {
-        id: "toy-story-3",
-        title: "Toy Story 3",
-        type: "movie",
-        genre: "animation",
-        poster: "https://m.media-amazon.com/images/I/81u4Q9i4HCL._UF894,1000_QL80_.jpg",
-        communityRating: 8.3,
-        communityPercent: 94,
-        likes: 27500,
-        description: "Nostalgie und Emotion in perfekter Balance."
-    },
-    {
-        id: "interstellar",
-        title: "Interstellar",
-        type: "movie",
-        genre: "sci-fi",
-        poster: "https://m.media-amazon.com/images/I/81kL2qTeXOL._UF1000,1000_QL80_.jpg",
-        communityRating: 8.7,
-        communityPercent: 93,
-        likes: 67200,
-        description: "Wissenschaft, Liebe und Zeit in einem riesigen Kinoerlebnis."
-    },
-    {
-        id: "shrek-2",
-        title: "Shrek 2",
-        type: "movie",
-        genre: "fantasy",
-        poster: "https://m.media-amazon.com/images/I/81QfJ0xQZBL._UF1000,1000_QL80_.jpg",
-        communityRating: 7.9,
-        communityPercent: 90,
-        likes: 24100,
-        description: "Humor, Herz und ein absolut ikonischer Soundtrack."
+let CATALOG = [];
+
+function normalizeGenre(genreStr) {
+    if (!genreStr) return "other";
+    const first = genreStr.split(",")[0].trim().toLowerCase();
+    const map = {
+        "body horror": "horror",
+        "slasher": "horror",
+        "mystery": "thriller",
+        "romance": "drama",
+        "musical": "drama",
+        "western": "action",
+        "adventure": "action",
+        "superhero": "action",
+        "family": "fantasy"
+    };
+    return map[first] || first;
+}
+
+function parseMovieRating(ratingStr) {
+    if (!ratingStr || ratingStr === "TBA") return 0;
+    const n = parseFloat(ratingStr);
+    return isNaN(n) ? 0 : n;
+}
+
+async function loadMoviesData() {
+    try {
+        const res = await fetch("movies-data.json");
+        const data = await res.json();
+        return Object.entries(data).map(([id, movie]) => ({
+            id,
+            title: movie.title,
+            type: movie.type || "movie",
+            genre: normalizeGenre(movie.genre),
+            year: movie.year || "",
+            duration: movie.duration || "",
+            poster: movie.cover || "",
+            communityRating: parseMovieRating(movie.rating),
+            description: movie.description || "",
+            streamUrl: movie.streamUrl || ""
+        }));
+    } catch (err) {
+        console.error("Fehler beim Laden von movies-data.json:", err);
+        return [];
     }
-];
+}
 
 const FRANCHISES = [
     {
@@ -326,21 +304,23 @@ function renderCatalog() {
 
     grid.innerHTML = CATALOG.map((movie) => {
         const userRating = Number(appState.userRatings[movie.id] || 0);
+        const ratingDisplay = movie.communityRating > 0 ? `${movie.communityRating}/10` : "TBA";
+        const starsDisplay = movie.communityRating > 0 ? makeStars(movie.communityRating) : "☆☆☆☆☆";
         return `
             <article class="catalog-card">
-                <img class="catalog-cover" src="${movie.poster}" alt="${movie.title}">
+                <img class="catalog-cover" src="${movie.poster}" alt="${movie.title}" loading="lazy">
                 <div class="catalog-body">
                     <h3>${movie.title}</h3>
                     <div class="meta-line">
                         <span class="meta-pill">${movie.type === "movie" ? "Film" : "Serie"}</span>
                         <span class="meta-pill">${movie.genre}</span>
+                        ${movie.year ? `<span class="meta-pill">${movie.year}</span>` : ""}
                     </div>
                     <div class="rating-line">
-                        <span class="rating-pill"><strong>${makeStars(movie.communityRating)}</strong></span>
-                        <span class="rating-pill">${movie.communityRating}/10</span>
-                        <span class="rating-pill">${movie.communityPercent}%</span>
-                        <span class="rating-pill">${formatLikes(movie.likes)} Likes</span>
+                        <span class="rating-pill"><strong>${starsDisplay}</strong></span>
+                        <span class="rating-pill">${ratingDisplay}</span>
                     </div>
+                    <p class="catalog-desc">${movie.description}</p>
                     <div class="user-line">
                         <select data-action="set-user-rating" data-movie-id="${movie.id}">
                             <option value="0" ${userRating === 0 ? "selected" : ""}>Eigene Bewertung</option>
@@ -556,7 +536,8 @@ function attachPageTransitions() {
     });
 }
 
-function init() {
+async function init() {
+    CATALOG = await loadMoviesData();
     initState();
     renderStats();
     renderContinueWatching();

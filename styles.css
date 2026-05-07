@@ -414,6 +414,7 @@ main, .topbar, .site-footer { position: relative; z-index: 2; }
 .catalog-cover { width: 100%; aspect-ratio: 2 / 2.7; object-fit: cover; }
 .catalog-body { padding: 10px; }
 .catalog-body h3 { margin: 0; font-size: 1.02rem; }
+.catalog-desc { font-size: 0.78rem; color: var(--muted); margin: 7px 0 4px; line-height: 1.4; }
 
 .meta-line, .rating-line, .user-line {
     display: flex;
