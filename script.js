@@ -1,1148 +1,573 @@
+const STORAGE_KEYS = {
+    watchlist: "watchlist",
+    franchiseProgress: "baba_franchise_progress_v2",
+    userRatings: "baba_user_ratings_v2"
+};
 
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Handle series carousel
-    const seriesContainer = document.querySelector('.main-container');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    
-    if (prevBtn && nextBtn && seriesContainer) {
-        nextBtn.addEventListener('click', () => {
-            const cardWidth = document.querySelector('.movie-card').offsetWidth;
-            seriesContainer.scrollLeft += cardWidth + 30;
-        });
-        
-        prevBtn.addEventListener('click', () => {
-            const cardWidth = document.querySelector('.movie-card').offsetWidth;
-            seriesContainer.scrollLeft -= cardWidth + 30;
-        });
+const CATALOG = [
+    {
+        id: "alice-in-borderland",
+        title: "Alice in Borderland",
+        type: "series",
+        genre: "sci-fi",
+        poster: "https://images.justwatch.com/poster/302278365/s718/Alice-in-Borderland.jpg",
+        communityRating: 8.2,
+        communityPercent: 92,
+        likes: 31400,
+        description: "Todesgames in einem leeren Tokio. Extrem spannend und emotional."
+    },
+    {
+        id: "arcane",
+        title: "Arcane",
+        type: "series",
+        genre: "animation",
+        poster: "https://m.media-amazon.com/images/I/71xr7KyenWL._UF894,1000_QL80_.jpg",
+        communityRating: 9.0,
+        communityPercent: 95,
+        likes: 58900,
+        description: "Starke Animation, starke Figuren, starke Musik."
+    },
+    {
+        id: "squid-game",
+        title: "Squid Game",
+        type: "series",
+        genre: "drama",
+        poster: "https://m.media-amazon.com/images/M/MV5BNDNmNzUzMjEtNGVkYi00N2RjLWEwN2EtYjg3NzA4MGFkMjFkXkEyXkFqcGc@._V1_.jpg",
+        communityRating: 8.0,
+        communityPercent: 88,
+        likes: 46100,
+        description: "Kinderspiele, aber brutal. Gesellschaftskritik mit Druck."
+    },
+    {
+        id: "toy-story-3",
+        title: "Toy Story 3",
+        type: "movie",
+        genre: "animation",
+        poster: "https://m.media-amazon.com/images/I/81u4Q9i4HCL._UF894,1000_QL80_.jpg",
+        communityRating: 8.3,
+        communityPercent: 94,
+        likes: 27500,
+        description: "Nostalgie und Emotion in perfekter Balance."
+    },
+    {
+        id: "interstellar",
+        title: "Interstellar",
+        type: "movie",
+        genre: "sci-fi",
+        poster: "https://m.media-amazon.com/images/I/81kL2qTeXOL._UF1000,1000_QL80_.jpg",
+        communityRating: 8.7,
+        communityPercent: 93,
+        likes: 67200,
+        description: "Wissenschaft, Liebe und Zeit in einem riesigen Kinoerlebnis."
+    },
+    {
+        id: "shrek-2",
+        title: "Shrek 2",
+        type: "movie",
+        genre: "fantasy",
+        poster: "https://m.media-amazon.com/images/I/81QfJ0xQZBL._UF1000,1000_QL80_.jpg",
+        communityRating: 7.9,
+        communityPercent: 90,
+        likes: 24100,
+        description: "Humor, Herz und ein absolut ikonischer Soundtrack."
     }
+];
 
-    // Handle films carousel
-    const filmsContainer = document.getElementById('filmsContainer');
-    const prevBtnFilms = document.getElementById('prevBtnFilms');
-    const nextBtnFilms = document.getElementById('nextBtnFilms');
-    
-    if (prevBtnFilms && nextBtnFilms && filmsContainer) {
-        nextBtnFilms.addEventListener('click', () => {
-            const cardWidth = document.querySelector('.movie-card').offsetWidth;
-            filmsContainer.scrollLeft += cardWidth + 30;
-        });
-        
-        prevBtnFilms.addEventListener('click', () => {
-            const cardWidth = document.querySelector('.movie-card').offsetWidth;
-            filmsContainer.scrollLeft -= cardWidth + 30;
-        });
+const FRANCHISES = [
+    {
+        slug: "harry-potter",
+        title: "Harry Potter",
+        parts: [
+            { id: "hp-1", title: "Stein der Weisen", year: 2001, communityRating: 7.6, likes: 21000 },
+            { id: "hp-2", title: "Kammer des Schreckens", year: 2002, communityRating: 7.4, likes: 18600 },
+            { id: "hp-3", title: "Gefangener von Askaban", year: 2004, communityRating: 8.0, likes: 23300 },
+            { id: "hp-4", title: "Feuerkelch", year: 2005, communityRating: 7.7, likes: 19800 }
+        ]
+    },
+    {
+        slug: "fast-furious",
+        title: "Fast & Furious",
+        parts: [
+            { id: "ff-1", title: "The Fast and the Furious", year: 2001, communityRating: 6.8, likes: 14100 },
+            { id: "ff-2", title: "2 Fast 2 Furious", year: 2003, communityRating: 6.0, likes: 9800 },
+            { id: "ff-3", title: "Tokyo Drift", year: 2006, communityRating: 6.3, likes: 12000 },
+            { id: "ff-4", title: "Fast & Furious", year: 2009, communityRating: 6.6, likes: 10200 }
+        ]
+    },
+    {
+        slug: "star-wars",
+        title: "Star Wars",
+        parts: [
+            { id: "sw-4", title: "Episode IV", year: 1977, communityRating: 8.6, likes: 26100 },
+            { id: "sw-5", title: "Episode V", year: 1980, communityRating: 8.8, likes: 29400 },
+            { id: "sw-6", title: "Episode VI", year: 1983, communityRating: 8.3, likes: 20100 },
+            { id: "sw-7", title: "Episode VII", year: 2015, communityRating: 7.8, likes: 18800 }
+        ]
+    },
+    {
+        slug: "marvel",
+        title: "Marvel",
+        parts: [
+            { id: "m-ironman", title: "Iron Man", year: 2008, communityRating: 7.9, likes: 22400 },
+            { id: "m-avengers", title: "The Avengers", year: 2012, communityRating: 8.0, likes: 24100 },
+            { id: "m-infwar", title: "Infinity War", year: 2018, communityRating: 8.4, likes: 27300 },
+            { id: "m-endgame", title: "Endgame", year: 2019, communityRating: 8.3, likes: 28600 }
+        ]
+    },
+    {
+        slug: "shrek",
+        title: "Shrek",
+        parts: [
+            { id: "shrek-1", title: "Shrek", year: 2001, communityRating: 7.9, likes: 17800 },
+            { id: "shrek-2", title: "Shrek 2", year: 2004, communityRating: 7.9, likes: 24100 },
+            { id: "shrek-3", title: "Shrek der Dritte", year: 2007, communityRating: 6.2, likes: 10200 },
+            { id: "shrek-4", title: "Fuer immer Shrek", year: 2010, communityRating: 6.3, likes: 9600 }
+        ]
+    },
+    {
+        slug: "toy-story",
+        title: "Toy Story",
+        parts: [
+            { id: "ts-1", title: "Toy Story", year: 1995, communityRating: 8.3, likes: 21900 },
+            { id: "ts-2", title: "Toy Story 2", year: 1999, communityRating: 7.9, likes: 17300 },
+            { id: "ts-3", title: "Toy Story 3", year: 2010, communityRating: 8.3, likes: 27500 },
+            { id: "ts-4", title: "Toy Story 4", year: 2019, communityRating: 7.7, likes: 16000 }
+        ]
     }
-});
+];
 
+const appState = {
+    watchlist: {},
+    franchise: {},
+    userRatings: {},
+    roulettePick: null
+};
 
-// Enhanced book hover effects with audio feedback
-document.addEventListener('DOMContentLoaded', function() {
-    const movieCards = document.querySelectorAll('.movie-card');
-    
-    // Optional: Add subtle sound effects
-    const createHoverSound = () => {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
-        
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.01, audioContext.currentTime + 0.01);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.1);
-    };
-    
-    movieCards.forEach((card, index) => {
-        // Staggered entrance animation
-        card.style.animationDelay = `${index * 0.1}s`;
-        
-        // Enhanced hover effects
-        card.addEventListener('mouseenter', function() {
-            // Optional sound effect (uncomment if desired)
-            // try { createHoverSound(); } catch(e) {}
-            
-            // Add ripple effect
-            const ripple = document.createElement('div');
-            ripple.className = 'hover-ripple';
-            ripple.style.cssText = `
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 0;
-                height: 0;
-                background: radial-gradient(circle, rgba(244, 193, 15, 0.3) 0%, transparent 70%);
-                border-radius: 50%;
-                transform: translate(-50%, -50%);
-                animation: rippleEffect 0.6s ease-out;
-                pointer-events: none;
-                z-index: 1;
-            `;
-            
-            this.appendChild(ripple);
-            
-            setTimeout(() => {
-                if (ripple.parentNode) {
-                    ripple.remove();
-                }
-            }, 600);
-        });
-        
-        // Smooth exit animation
-        card.addEventListener('mouseleave', function() {
-            this.style.transition = 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+function safeGetJSON(key, fallback) {
+    try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : fallback;
+    } catch {
+        return fallback;
+    }
+}
+
+function saveJSON(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+}
+
+function initState() {
+    appState.watchlist = safeGetJSON(STORAGE_KEYS.watchlist, {});
+    appState.franchise = safeGetJSON(STORAGE_KEYS.franchiseProgress, {});
+    appState.userRatings = safeGetJSON(STORAGE_KEYS.userRatings, {});
+
+    FRANCHISES.forEach((franchise) => {
+        if (!appState.franchise[franchise.slug]) appState.franchise[franchise.slug] = {};
+        franchise.parts.forEach((part) => {
+            if (!appState.franchise[franchise.slug][part.id]) {
+                appState.franchise[franchise.slug][part.id] = {
+                    seen: false,
+                    status: "planned",
+                    rating: 0,
+                    comment: ""
+                };
+            }
         });
     });
-    
-    // Add ripple animation keyframes
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes rippleEffect {
-            0% {
-                width: 0;
-                height: 0;
-                opacity: 1;
-            }
-            100% {
-                width: 200px;
-                height: 200px;
-                opacity: 0;
-            }
-        }
-        
-        .hover-ripple {
-            animation: rippleEffect 0.6s ease-out;
-        }
+
+    saveJSON(STORAGE_KEYS.franchiseProgress, appState.franchise);
+}
+
+function formatLikes(n) {
+    return `${Math.round(n / 100) / 10}k`;
+}
+
+function makeStars(value) {
+    const full = Math.round(value / 2);
+    return `${"★".repeat(full)}${"☆".repeat(5 - full)}`;
+}
+
+function isInWatchlist(id) {
+    return Boolean(appState.watchlist[id]);
+}
+
+function toggleWatchlist(movieId, title) {
+    if (isInWatchlist(movieId)) {
+        delete appState.watchlist[movieId];
+    } else {
+        appState.watchlist[movieId] = {
+            title,
+            addedAt: new Date().toISOString(),
+            addedAtFormatted: new Date().toLocaleDateString("de-DE")
+        };
+    }
+
+    saveJSON(STORAGE_KEYS.watchlist, appState.watchlist);
+    renderStats();
+    renderCatalog();
+    renderContinueWatching();
+}
+
+function getFranchiseStats(franchise) {
+    const progressMap = appState.franchise[franchise.slug];
+    const total = franchise.parts.length;
+    const seenCount = franchise.parts.filter((part) => progressMap[part.id].seen).length;
+    const progress = Math.round((seenCount / total) * 100);
+    return { total, seenCount, progress };
+}
+
+function renderStats() {
+    const statsEl = document.getElementById("quickStats");
+    if (!statsEl) return;
+
+    const allParts = FRANCHISES.flatMap((f) => f.parts.map((p) => ({ franchise: f.slug, id: p.id })));
+    const seen = allParts.filter((part) => appState.franchise[part.franchise][part.id].seen).length;
+    const ratings = Object.values(appState.userRatings).filter((v) => Number(v) > 0);
+    const avgRating = ratings.length ? (ratings.reduce((a, b) => a + Number(b), 0) / ratings.length).toFixed(1) : "0.0";
+    const completedFranchises = FRANCHISES.filter((f) => getFranchiseStats(f).progress === 100).length;
+
+    statsEl.innerHTML = `
+        <div class="quick-stat"><b>${Object.keys(appState.watchlist).length}</b><span>Watchlist Titel</span></div>
+        <div class="quick-stat"><b>${seen}/${allParts.length}</b><span>Franchise Teile gesehen</span></div>
+        <div class="quick-stat"><b>${avgRating}/10</b><span>Dein Schnitt</span></div>
+        <div class="quick-stat"><b>${completedFranchises}</b><span>Achievements freigeschaltet</span></div>
     `;
-    document.head.appendChild(style);
-    
-    console.log('📚 Book-like hover effects activated!');
-});
-
-
-
-
-
-
-
-/* Parallax Cinema Section */
-.parallax-cinema-section {
-    position: relative;
-    height: 100vh;
-    min-height: 600px;
-    overflow: hidden;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 60px 0;
 }
 
-.parallax-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 120%;
-    transform-style: preserve-3d;
-    perspective: 1000px;
-}
+function renderContinueWatching() {
+    const box = document.getElementById("continueWatching");
+    if (!box) return;
 
-.parallax-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.parallax-back {
-    transform: translateZ(-100px) scale(1.1);
-}
-
-.parallax-mid {
-    transform: translateZ(-50px) scale(1.05);
-}
-
-.parallax-front {
-    transform: translateZ(0);
-    z-index: 10;
-}
-
-/* Cinema Screen Background */
-.cinema-screen {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    height: 60%;
-    background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
-    border: 8px solid #333;
-    border-radius: 20px;
-    box-shadow: 
-        0 0 50px rgba(244, 193, 15, 0.3),
-        inset 0 0 100px rgba(0, 0, 0, 0.8);
-    opacity: 0.3;
-}
-
-.cinema-screen::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    height: 90%;
-    background: radial-gradient(ellipse at center, 
-        rgba(244, 193, 15, 0.1) 0%, 
-        transparent 70%);
-    animation: screenGlow 4s ease-in-out infinite alternate;
-}
-
-@keyframes screenGlow {
-    0% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
-    100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.05); }
-}
-
-/* Floating Elements */
-.floating-popcorn, .floating-film, .floating-tickets {
-    position: absolute;
-    font-size: 3rem;
-    opacity: 0.6;
-    animation: float 6s ease-in-out infinite;
-}
-
-.floating-popcorn {
-    top: 20%;
-    left: 15%;
-    animation-delay: 0s;
-}
-
-.floating-film {
-    top: 30%;
-    right: 20%;
-    animation-delay: 2s;
-}
-
-.floating-tickets {
-    bottom: 25%;
-    left: 10%;
-    animation-delay: 4s;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    25% { transform: translateY(-20px) rotate(5deg); }
-    50% { transform: translateY(-10px) rotate(-3deg); }
-    75% { transform: translateY(-15px) rotate(2deg); }
-}
-
-/* Cinema Seats */
-.cinema-seats {
-    position: absolute;
-    bottom: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0.4;
-}
-
-.seat-row {
-    display: flex;
-    gap: 10px;
-    perspective: 500px;
-}
-
-.seat {
-    width: 30px;
-    height: 35px;
-    background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-    border-radius: 8px 8px 15px 15px;
-    position: relative;
-    transform: rotateX(15deg);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-}
-
-.seat.occupied {
-    background: linear-gradient(145deg, #8b0000, #660000);
-    box-shadow: 0 5px 15px rgba(139, 0, 0, 0.3);
-}
-
-.seat::before {
-    content: '';
-    position: absolute;
-    top: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 25px;
-    height: 20px;
-    background: inherit;
-    border-radius: 8px 8px 0 0;
-}
-
-/* Main Content */
-.parallax-content {
-    position: relative;
-    z-index: 20;
-    text-align: center;
-    color: white;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.parallax-title {
-    font-size: clamp(2.5rem, 8vw, 6rem);
-    font-weight: 900;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-}
-
-/* Glitch Text Effect */
-.glitch-text {
-    position: relative;
-    display: inline-block;
-    color: #f4c10f;
-    text-shadow: 
-        0 0 10px rgba(244, 193, 15, 0.8),
-        0 0 20px rgba(244, 193, 15, 0.6),
-        0 0 30px rgba(244, 193, 15, 0.4);
-}
-
-.glitch-text::before,
-.glitch-text::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.glitch-text::before {
-    animation: glitch-1 2s infinite;
-    color: #ff0040;
-    z-index: -1;
-}
-
-.glitch-text::after {
-    animation: glitch-2 2s infinite;
-    color: #00ffff;
-    z-index: -2;
-}
-
-@keyframes glitch-1 {
-    0%, 14%, 15%, 49%, 50%, 99%, 100% {
-        transform: translate(0);
-    }
-    15%, 49% {
-        transform: translate(-2px, 2px);
-    }
-}
-
-@keyframes glitch-2 {
-    0%, 20%, 21%, 62%, 63%, 99%, 100% {
-        transform: translate(0);
-    }
-    21%, 62% {
-        transform: translate(2px, -2px);
-    }
-}
-
-.parallax-subtitle {
-    font-size: 1.5rem;
-    margin-bottom: 40px;
-    opacity: 0.9;
-    color: #da7f09;
-}
-
-/* Statistics */
-.parallax-stats {
-    display: flex;
-    justify-content: center;
-    gap: 60px;
-    margin: 50px 0;
-    flex-wrap: wrap;
-}
-
-.stat-item {
-    text-align: center;
-    min-width: 120px;
-}
-
-.stat-number {
-    display: block;
-    font-size: 3rem;
-    font-weight: 900;
-    color: #f4c10f;
-    text-shadow: 0 0 20px rgba(244, 193, 15, 0.5);
-    margin-bottom: 10px;
-}
-
-.stat-label {
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    opacity: 0.8;
-}
-
-/* Buttons */
-.parallax-buttons {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 40px;
-}
-
-.parallax-btn {
-    padding: 15px 30px;
-    border: none;
-    border-radius: 50px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    min-width: 200px;
-    justify-content: center;
-}
-
-.parallax-btn.primary {
-    background: linear-gradient(135deg, #f4c10f 0%, #da7f09 100%);
-    color: #000;
-    box-shadow: 0 8px 25px rgba(244, 193, 15, 0.3);
-}
-
-.parallax-btn.primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 35px rgba(244, 193, 15, 0.5);
-    background: linear-gradient(135deg, #ffcd1f 0%, #ea8f19 100%);
-}
-
-.parallax-btn.secondary {
-    background: transparent;
-    color: #f4c10f;
-    border: 2px solid #f4c10f;
-    box-shadow: 0 8px 25px rgba(244, 193, 15, 0.1);
-}
-
-.parallax-btn.secondary:hover {
-    background: rgba(244, 193, 15, 0.1);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 35px rgba(244, 193, 15, 0.3);
-}
-
-/* Animated Particles */
-.parallax-particles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 5;
-}
-
-.particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: #f4c10f;
-    border-radius: 50%;
-    opacity: 0.6;
-    animation: particleFloat 8s linear infinite;
-}
-
-.particle:nth-child(1) {
-    left: 10%;
-    animation-delay: 0s;
-    animation-duration: 8s;
-}
-
-.particle:nth-child(2) {
-    left: 30%;
-    animation-delay: 2s;
-    animation-duration: 10s;
-}
-
-.particle:nth-child(3) {
-    left: 50%;
-    animation-delay: 4s;
-    animation-duration: 12s;
-}
-
-.particle:nth-child(4) {
-    left: 70%;
-    animation-delay: 6s;
-    animation-duration: 9s;
-}
-
-.particle:nth-child(5) {
-    left: 90%;
-    animation-delay: 1s;
-    animation-duration: 11s;
-}
-
-@keyframes particleFloat {
-    0% {
-        transform: translateY(100vh) rotate(0deg);
-        opacity: 0;
-    }
-    10% {
-        opacity: 0.6;
-    }
-    90% {
-        opacity: 0.6;
-    }
-    100% {
-        transform: translateY(-100px) rotate(360deg);
-        opacity: 0;
-    }
-}
-
-/* Responsive Design - Fortsetzung */
-@media (max-width: 768px) {
-    .parallax-cinema-section {
-        height: 80vh;
-        min-height: 500px;
-    }
-    
-    .parallax-stats {
-        gap: 30px;
-    }
-    
-    .stat-number {
-        font-size: 2rem;
-    }
-    
-    .parallax-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .parallax-btn {
-        min-width: 250px;
-    }
-    
-    .floating-popcorn, .floating-film, .floating-tickets {
-        font-size: 2rem;
-    }
-    
-    .cinema-screen {
-        width: 90%;
-        height: 50%;
-    }
-    
-    .seat-row {
-        gap: 5px;
-    }
-    
-    .seat {
-        width: 20px;
-        height: 25px;
-    }
-}
-
-@media (max-width: 480px) {
-    .parallax-title {
-        font-size: 2rem;
-    }
-    
-    .parallax-subtitle {
-        font-size: 1.2rem;
-    }
-    
-    .parallax-stats {
-        gap: 20px;
-    }
-    
-    .stat-item {
-        min-width: 80px;
-    }
-    
-    .stat-number {
-        font-size: 1.5rem;
-    }
-    
-    .stat-label {
-        font-size: 0.9rem;
-    }
-}
-
-/* Scroll-triggered animations */
-.parallax-cinema-section.in-view .parallax-title {
-    animation: slideInUp 1s ease-out;
-}
-
-.parallax-cinema-section.in-view .parallax-subtitle {
-    animation: slideInUp 1s ease-out 0.2s both;
-}
-
-.parallax-cinema-section.in-view .parallax-stats {
-    animation: slideInUp 1s ease-out 0.4s both;
-}
-
-.parallax-cinema-section.in-view .parallax-buttons {
-    animation: slideInUp 1s ease-out 0.6s both;
-}
-
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Enhanced Parallax Effect on Scroll */
-.parallax-cinema-section.scrolling .parallax-back {
-    transform: translateZ(-100px) scale(1.1) translateY(var(--scroll-speed-slow));
-}
-
-.parallax-cinema-section.scrolling .parallax-mid {
-    transform: translateZ(-50px) scale(1.05) translateY(var(--scroll-speed-medium));
-}
-
-.parallax-cinema-section.scrolling .parallax-front {
-    transform: translateZ(0) translateY(var(--scroll-speed-fast));
-}
-
-
-
-
-
-
-// Parallax Cinema Section Effects
-document.addEventListener('DOMContentLoaded', function() {
-    const parallaxSection = document.querySelector('.parallax-cinema-section');
-    const parallaxLayers = document.querySelectorAll('.parallax-layer');
-    const statNumbers = document.querySelectorAll('.stat-number');
-    
-    if (!parallaxSection) return;
-    
-    console.log('🎬 Parallax Cinema Section wird initialisiert...');
-    
-    // Intersection Observer für Scroll-Animationen
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
-    };
-    
-    const parallaxObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('in-view');
-                animateStatNumbers();
-            }
-        });
-    }, observerOptions);
-    
-    parallaxObserver.observe(parallaxSection);
-    
-    // Parallax Scroll Effect
-    let ticking = false;
-    
-    function updateParallax() {
-        const scrolled = window.pageYOffset;
-        const rect = parallaxSection.getBoundingClientRect();
-        const speed = scrolled * 0.5;
-        
-        if (rect.bottom >= 0 && rect.top <= window.innerHeight) {
-            parallaxSection.classList.add('scrolling');
-            
-            // Set CSS custom properties for different scroll speeds
-            parallaxSection.style.setProperty('--scroll-speed-slow', `${speed * 0.2}px`);
-            parallaxSection.style.setProperty('--scroll-speed-medium', `${speed * 0.5}px`);
-            parallaxSection.style.setProperty('--scroll-speed-fast', `${speed * 0.8}px`);
-            
-            // Individual layer transforms
-            parallaxLayers.forEach((layer, index) => {
-                const layerSpeed = (index + 1) * 0.3;
-                layer.style.transform = `translateY(${speed * layerSpeed}px)`;
+    const nextUp = [];
+    FRANCHISES.forEach((franchise) => {
+        const progressMap = appState.franchise[franchise.slug];
+        const candidate = franchise.parts.find((part) => !progressMap[part.id].seen);
+        if (candidate) {
+            const stats = getFranchiseStats(franchise);
+            nextUp.push({
+                title: `${franchise.title}: ${candidate.title}`,
+                progress: stats.progress,
+                note: `${stats.seenCount}/${stats.total} gesehen`
             });
-        } else {
-            parallaxSection.classList.remove('scrolling');
         }
-        
-        ticking = false;
-    }
-    
-    function requestTick() {
-        if (!ticking) {
-            requestAnimationFrame(updateParallax);
-            ticking = true;
-        }
-    }
-    
-    window.addEventListener('scroll', requestTick, { passive: true });
-    
-    // Animate Statistics Numbers
-    function animateStatNumbers() {
-        statNumbers.forEach(stat => {
-            const target = parseInt(stat.dataset.count);
-            const duration = 2000;
-            const start = performance.now();
-            
-            function updateNumber(currentTime) {
-                const elapsed = currentTime - start;
-                const progress = Math.min(elapsed / duration, 1);
-                
-                // Easing function for smooth animation
-                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-                const current = Math.floor(target * easeOutQuart);
-                
-                stat.textContent = current.toLocaleString();
-                
-                if (progress < 1) {
-                    requestAnimationFrame(updateNumber);
-                } else {
-                    stat.textContent = target.toLocaleString();
-                }
-            }
-            
-            requestAnimationFrame(updateNumber);
-        });
-    }
-    
-    // Enhanced Glitch Effect
-    function enhanceGlitchEffect() {
-        const glitchText = document.querySelector('.glitch-text');
-        if (!glitchText) return;
-        
-        setInterval(() => {
-            if (Math.random() > 0.95) {
-                glitchText.style.animation = 'none';
-                glitchText.offsetHeight; // Trigger reflow
-                glitchText.style.animation = null;
-            }
-        }, 100);
-    }
-    
-    enhanceGlitchEffect();
-    
-    // Particle System Enhancement
-    function createExtraParticles() {
-        const particleContainer = document.querySelector('.parallax-particles');
-        if (!particleContainer) return;
-        
-        for (let i = 0; i < 10; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle extra-particle';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 8 + 's';
-            particle.style.animationDuration = (8 + Math.random() * 4) + 's';
-            particle.style.opacity = 0.3 + Math.random() * 0.3;
-            
-            // Random colors
-            const colors = ['#f4c10f', '#da7f09', '#ff6b6b', '#4ecdc4', '#45b7d1'];
-            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-            
-            particleContainer.appendChild(particle);
-        }
-    }
-    
-    createExtraParticles();
-    
-    // Mouse Movement Parallax
-    let mouseX = 0;
-    let mouseY = 0;
-    
-    document.addEventListener('mousemove', (e) => {
-        mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-        mouseY = (e.clientY / window.innerHeight) * 2 - 1;
     });
-    
-    function updateMouseParallax() {
-        const floatingElements = document.querySelectorAll('.floating-popcorn, .floating-film, .floating-tickets');
-        
-        floatingElements.forEach((element, index) => {
-            const speed = (index + 1) * 0.02;
-            const x = mouseX * speed * 20;
-            const y = mouseY * speed * 20;
-            
-            element.style.transform = `translate(${x}px, ${y}px)`;
-        });
-        
-        requestAnimationFrame(updateMouseParallax);
-    }
-    
-    updateMouseParallax();
-    
-    // Cinema Screen Interactive Effect
-    const cinemaScreen = document.querySelector('.cinema-screen');
-    if (cinemaScreen) {
-        cinemaScreen.addEventListener('click', function() {
-            this.style.animation = 'screenFlicker 0.5s ease-in-out';
-            setTimeout(() => {
-                this.style.animation = '';
-            }, 500);
-        });
-    }
-    
-    // Add screen flicker animation
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes screenFlicker {
-            0%, 100% { opacity: 0.3; }
-            10% { opacity: 0.8; }
-            20% { opacity: 0.2; }
-            30% { opacity: 0.9; }
-            40% { opacity: 0.1; }
-            50% { opacity: 1; }
-            60% { opacity: 0.3; }
-            70% { opacity: 0.7; }
-            80% { opacity: 0.4; }
-            90% { opacity: 0.8; }
-        }
-        
-        .extra-particle {
-            width: 2px;
-            height: 2px;
-            border-radius: 50%;
-            box-shadow: 0 0 6px currentColor;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    console.log('✅ Parallax Cinema Section erfolgreich initialisiert!');
-});
 
-// Performance optimization for mobile
-if (window.innerWidth <= 768) {
-    // Reduce particle count on mobile
-    const particles = document.querySelectorAll('.extra-particle');
-    particles.forEach((particle, index) => {
-        if (index > 5) particle.remove();
-    });
-    
-    // Disable mouse parallax on mobile
-    document.addEventListener('touchstart', () => {
-        const floatingElements = document.querySelectorAll('.floating-popcorn, .floating-film, .floating-tickets');
-        floatingElements.forEach(element => {
-            element.style.transform = 'none';
-        });
-    });
+    if (!nextUp.length) {
+        box.innerHTML = '<p class="empty-note">Alles durchgeschaut. Zeit fuer neue Reihen.</p>';
+        return;
+    }
+
+    box.innerHTML = nextUp.slice(0, 6).map((item) => `
+        <article class="continue-card">
+            <h3>${item.title}</h3>
+            <p>${item.note}</p>
+            <div class="progress-track"><div class="progress-fill" style="width:${item.progress}%"></div></div>
+        </article>
+    `).join("");
 }
 
+function renderFranchiseGrid() {
+    const grid = document.getElementById("franchiseGrid");
+    if (!grid) return;
 
-    // Enhanced book hover effects with audio feedback
-document.addEventListener('DOMContentLoaded', function() {
-    const movieCards = document.querySelectorAll('.movie-card');
-    
-    // Optional: Add subtle sound effects
-    const createHoverSound = () => {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
-        
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.01, audioContext.currentTime + 0.01);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.1);
-    };
-    
-    movieCards.forEach((card, index) => {
-        // Staggered entrance animation
-        card.style.animationDelay = `${index * 0.1}s`;
-        
-        // Enhanced hover effects
-        card.addEventListener('mouseenter', function() {
-            // Optional sound effect (uncomment if desired)
-            // try { createHoverSound(); } catch(e) {}
-            
-            // Add ripple effect
-            const ripple = document.createElement('div');
-            ripple.className = 'hover-ripple';
-            ripple.style.cssText = `
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 0;
-                height: 0;
-                background: radial-gradient(circle, rgba(244, 193, 15, 0.3) 0%, transparent 70%);
-                border-radius: 50%;
-                transform: translate(-50%, -50%);
-                animation: rippleEffect 0.6s ease-out;
-                pointer-events: none;
-                z-index: 1;
+    grid.innerHTML = FRANCHISES.map((franchise) => {
+        const map = appState.franchise[franchise.slug];
+        const stats = getFranchiseStats(franchise);
+        const unlocked = stats.progress === 100;
+
+        const partsHtml = franchise.parts.map((part) => {
+            const state = map[part.id];
+            return `
+                <div class="part-item" data-franchise="${franchise.slug}" data-part="${part.id}">
+                    <div class="part-head">
+                        <input class="part-check" type="checkbox" ${state.seen ? "checked" : ""}>
+                        <div>
+                            <strong class="part-title">${part.title} (${part.year})</strong>
+                            <div class="part-community">Community ${part.communityRating}/10 · ${formatLikes(part.likes)} Likes</div>
+                        </div>
+                        <span>${makeStars(part.communityRating)}</span>
+                    </div>
+                    <div class="part-controls">
+                        <select class="part-select">
+                            <option value="planned" ${state.status === "planned" ? "selected" : ""}>Geplant</option>
+                            <option value="watching" ${state.status === "watching" ? "selected" : ""}>Schaue ich</option>
+                            <option value="paused" ${state.status === "paused" ? "selected" : ""}>Pausiert</option>
+                            <option value="completed" ${state.status === "completed" ? "selected" : ""}>Abgeschlossen</option>
+                        </select>
+                        <input class="part-rating" type="number" min="0" max="10" step="0.5" value="${state.rating}">
+                        <textarea class="part-comment" placeholder="Kommentar...">${state.comment || ""}</textarea>
+                    </div>
+                </div>
             `;
-            
-            this.appendChild(ripple);
-            
-            setTimeout(() => {
-                if (ripple.parentNode) {
-                    ripple.remove();
-                }
-            }, 600);
-        });
-        
-        // Smooth exit animation
-        card.addEventListener('mouseleave', function() {
-            this.style.transition = 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-        });
+        }).join("");
+
+        return `
+            <article class="franchise-card">
+                <div class="franchise-head">
+                    <h3>${franchise.title}</h3>
+                    <span class="franchise-chip">${franchise.parts.length} Teile</span>
+                </div>
+                <div class="franchise-progress-row">
+                    <div class="progress-track"><div class="progress-fill" style="width:${stats.progress}%"></div></div>
+                    <span>${stats.progress}%</span>
+                </div>
+                ${unlocked ? '<span class="franchise-chip">Achievement: Reihe abgeschlossen</span>' : ""}
+                <div class="parts-list">${partsHtml}</div>
+            </article>
+        `;
+    }).join("");
+}
+
+function renderCatalog() {
+    const grid = document.getElementById("catalogGrid");
+    if (!grid) return;
+
+    grid.innerHTML = CATALOG.map((movie) => {
+        const userRating = Number(appState.userRatings[movie.id] || 0);
+        return `
+            <article class="catalog-card">
+                <img class="catalog-cover" src="${movie.poster}" alt="${movie.title}">
+                <div class="catalog-body">
+                    <h3>${movie.title}</h3>
+                    <div class="meta-line">
+                        <span class="meta-pill">${movie.type === "movie" ? "Film" : "Serie"}</span>
+                        <span class="meta-pill">${movie.genre}</span>
+                    </div>
+                    <div class="rating-line">
+                        <span class="rating-pill"><strong>${makeStars(movie.communityRating)}</strong></span>
+                        <span class="rating-pill">${movie.communityRating}/10</span>
+                        <span class="rating-pill">${movie.communityPercent}%</span>
+                        <span class="rating-pill">${formatLikes(movie.likes)} Likes</span>
+                    </div>
+                    <div class="user-line">
+                        <select data-action="set-user-rating" data-movie-id="${movie.id}">
+                            <option value="0" ${userRating === 0 ? "selected" : ""}>Eigene Bewertung</option>
+                            <option value="6" ${userRating === 6 ? "selected" : ""}>6/10</option>
+                            <option value="7" ${userRating === 7 ? "selected" : ""}>7/10</option>
+                            <option value="8" ${userRating === 8 ? "selected" : ""}>8/10</option>
+                            <option value="9" ${userRating === 9 ? "selected" : ""}>9/10</option>
+                            <option value="10" ${userRating === 10 ? "selected" : ""}>10/10</option>
+                        </select>
+                    </div>
+                    <div class="card-actions">
+                        <button type="button" data-action="open-movie" data-movie-id="${movie.id}">Details</button>
+                        <button type="button" data-action="toggle-watchlist" data-movie-id="${movie.id}" data-title="${movie.title}">
+                            ${isInWatchlist(movie.id) ? "Aus Watchlist" : "Zur Watchlist"}
+                        </button>
+                    </div>
+                </div>
+            </article>
+        `;
+    }).join("");
+}
+
+function getFilteredPool() {
+    const type = document.getElementById("typeFilter")?.value || "all";
+    const genre = document.getElementById("genreFilter")?.value || "all";
+    const watchlistMode = document.getElementById("watchlistFilter")?.value || "all";
+
+    return CATALOG.filter((item) => {
+        if (type !== "all" && item.type !== type) return false;
+        if (genre !== "all" && item.genre !== genre) return false;
+        if (watchlistMode === "watchlist" && !isInWatchlist(item.id)) return false;
+        if (watchlistMode === "not-watchlist" && isInWatchlist(item.id)) return false;
+        return true;
     });
-    
-    // Add ripple animation keyframes
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes rippleEffect {
-            0% {
-                width: 0;
-                height: 0;
-                opacity: 1;
-            }
-            100% {
-                width: 200px;
-                height: 200px;
-                opacity: 0;
-            }
-        }
-        
-        .hover-ripple {
-            animation: rippleEffect 0.6s ease-out;
-        }
+}
+
+function renderRoulettePick(movie) {
+    const box = document.getElementById("randomFilmResult");
+    if (!box) return;
+
+    if (!movie) {
+        box.innerHTML = '<p class="result-placeholder">Keine Treffer mit den aktuellen Filtern.</p>';
+        return;
+    }
+
+    box.innerHTML = `
+        <div class="result-card">
+            <img src="${movie.poster}" alt="${movie.title}">
+            <div class="result-meta">
+                <h4>${movie.title}</h4>
+                <p>${movie.description}</p>
+                <div class="mini-actions">
+                    <button type="button" data-action="roulette-open">Details</button>
+                    <button type="button" data-action="roulette-watchlist">${isInWatchlist(movie.id) ? "Aus Watchlist" : "Zur Watchlist"}</button>
+                </div>
+            </div>
+        </div>
     `;
-    document.head.appendChild(style);
-    
-    console.log('📚 Book-like hover effects activated!');
-});
+}
 
+function runRoulette() {
+    const box = document.getElementById("randomFilmResult");
+    if (!box) return;
 
+    const pool = getFilteredPool();
+    box.classList.add("is-loading");
 
+    setTimeout(() => {
+        box.classList.remove("is-loading");
+        if (!pool.length) {
+            appState.roulettePick = null;
+            renderRoulettePick(null);
+            return;
+        }
 
-// Parallax Cinema Section Effects
-document.addEventListener('DOMContentLoaded', function() {
-    const parallaxSection = document.querySelector('.parallax-cinema-section');
-    const parallaxLayers = document.querySelectorAll('.parallax-layer');
-    const statNumbers = document.querySelectorAll('.stat-number');
-    
-    if (!parallaxSection) return;
-    
-    console.log('🎬 Parallax Cinema Section wird initialisiert...');
-    
-    // Intersection Observer für Scroll-Animationen
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        appState.roulettePick = pick;
+        renderRoulettePick(pick);
+    }, 750);
+}
+
+function findMovieById(movieId) {
+    const direct = CATALOG.find((movie) => movie.id === movieId);
+    if (direct) return direct;
+
+    for (const franchise of FRANCHISES) {
+        const part = franchise.parts.find((item) => item.id === movieId);
+        if (part) {
+            return {
+                id: part.id,
+                title: `${franchise.title}: ${part.title}`,
+                poster: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80",
+                description: `Teil aus ${franchise.title}`,
+                genre: "franchise",
+                type: "movie",
+                communityRating: part.communityRating
+            };
+        }
+    }
+
+    return null;
+}
+
+function openMovie(movieId) {
+    const movie = findMovieById(movieId);
+    if (!movie) return;
+
+    const movieData = {
+        id: movie.id,
+        title: movie.title,
+        cover: movie.poster,
+        description: movie.description,
+        genre: movie.genre,
+        rating: movie.communityRating
     };
-    
-    const parallaxObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('in-view');
-                animateStatNumbers();
-            }
-        });
-    }, observerOptions);
-    
-    parallaxObserver.observe(parallaxSection);
-    
-    // Parallax Scroll Effect
-    let ticking = false;
-    
-    function updateParallax() {
-        const scrolled = window.pageYOffset;
-        const rect = parallaxSection.getBoundingClientRect();
-        const speed = scrolled * 0.5;
-        
-        if (rect.bottom >= 0 && rect.top <= window.innerHeight) {
-            parallaxSection.classList.add('scrolling');
-            
-            // Set CSS custom properties for different scroll speeds
-            parallaxSection.style.setProperty('--scroll-speed-slow', `${speed * 0.2}px`);
-            parallaxSection.style.setProperty('--scroll-speed-medium', `${speed * 0.5}px`);
-            parallaxSection.style.setProperty('--scroll-speed-fast', `${speed * 0.8}px`);
-            
-            // Individual layer transforms
-            parallaxLayers.forEach((layer, index) => {
-                const layerSpeed = (index + 1) * 0.3;
-                layer.style.transform = `translateY(${speed * layerSpeed}px)`;
-            });
-        } else {
-            parallaxSection.classList.remove('scrolling');
-        }
-        
-        ticking = false;
-    }
-    
-    function requestTick() {
-        if (!ticking) {
-            requestAnimationFrame(updateParallax);
-            ticking = true;
-        }
-    }
-    
-    window.addEventListener('scroll', requestTick, { passive: true });
-    
-    // Animate Statistics Numbers
-    function animateStatNumbers() {
-        statNumbers.forEach(stat => {
-            const target = parseInt(stat.dataset.count);
-            const duration = 2000;
-            const start = performance.now();
-            
-            function updateNumber(currentTime) {
-                const elapsed = currentTime - start;
-                const progress = Math.min(elapsed / duration, 1);
-                
-                // Easing function for smooth animation
-                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-                const current = Math.floor(target * easeOutQuart);
-                
-                stat.textContent = current.toLocaleString();
-                
-                if (progress < 1) {
-                    requestAnimationFrame(updateNumber);
-                } else {
-                    stat.textContent = target.toLocaleString();
-                }
-            }
-            
-            requestAnimationFrame(updateNumber);
-        });
-    }
-    
-    // Enhanced Glitch Effect
-    function enhanceGlitchEffect() {
-        const glitchText = document.querySelector('.glitch-text');
-        if (!glitchText) return;
-        
-        setInterval(() => {
-            if (Math.random() > 0.95) {
-                glitchText.style.animation = 'none';
-                glitchText.offsetHeight; // Trigger reflow
-                glitchText.style.animation = null;
-            }
-        }, 100);
-    }
-    
-    enhanceGlitchEffect();
-    
-    // Particle System Enhancement
-    function createExtraParticles() {
-        const particleContainer = document.querySelector('.parallax-particles');
-        if (!particleContainer) return;
-        
-        for (let i = 0; i < 10; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle extra-particle';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 8 + 's';
-            particle.style.animationDuration = (8 + Math.random() * 4) + 's';
-            particle.style.opacity = 0.3 + Math.random() * 0.3;
-            
-            // Random colors
-            const colors = ['#f4c10f', '#da7f09', '#ff6b6b', '#4ecdc4', '#45b7d1'];
-            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-            
-            particleContainer.appendChild(particle);
-        }
-    }
-    
-    createExtraParticles();
-    
-    // Mouse Movement Parallax
-    let mouseX = 0;
-    let mouseY = 0;
-    
-    document.addEventListener('mousemove', (e) => {
-        mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-        mouseY = (e.clientY / window.innerHeight) * 2 - 1;
-    });
-    
-    function updateMouseParallax() {
-        const floatingElements = document.querySelectorAll('.floating-popcorn, .floating-film, .floating-tickets');
-        
-        floatingElements.forEach((element, index) => {
-            const speed = (index + 1) * 0.02;
-            const x = mouseX * speed * 20;
-            const y = mouseY * speed * 20;
-            
-            element.style.transform = `translate(${x}px, ${y}px)`;
-        });
-        
-        requestAnimationFrame(updateMouseParallax);
-    }
-    
-    updateMouseParallax();
-    
-    // Cinema Screen Interactive Effect
-    const cinemaScreen = document.querySelector('.cinema-screen');
-    if (cinemaScreen) {
-        cinemaScreen.addEventListener('click', function() {
-            this.style.animation = 'screenFlicker 0.5s ease-in-out';
-            setTimeout(() => {
-                this.style.animation = '';
-            }, 500);
-        });
-    }
-    
-    // Add screen flicker animation
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes screenFlicker {
-            0%, 100% { opacity: 0.3; }
-            10% { opacity: 0.8; }
-            20% { opacity: 0.2; }
-            30% { opacity: 0.9; }
-            40% { opacity: 0.1; }
-            50% { opacity: 1; }
-            60% { opacity: 0.3; }
-            70% { opacity: 0.7; }
-            80% { opacity: 0.4; }
-            90% { opacity: 0.8; }
-        }
-        
-        .extra-particle {
-            width: 2px;
-            height: 2px;
-            border-radius: 50%;
-            box-shadow: 0 0 6px currentColor;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    console.log('✅ Parallax Cinema Section erfolgreich initialisiert!');
-});
 
-// Performance optimization for mobile
-if (window.innerWidth <= 768) {
-    // Reduce particle count on mobile
-    const particles = document.querySelectorAll('.extra-particle');
-    particles.forEach((particle, index) => {
-        if (index > 5) particle.remove();
+    localStorage.setItem("currentMovie", JSON.stringify(movieData));
+    window.location.href = `movie-detail.html?id=${encodeURIComponent(movie.id)}`;
+}
+
+window.openMovie = openMovie;
+
+function persistFranchiseState() {
+    saveJSON(STORAGE_KEYS.franchiseProgress, appState.franchise);
+}
+
+function attachEvents() {
+    document.getElementById("randomFilmBtn")?.addEventListener("click", runRoulette);
+
+    document.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-action]");
+        if (!button) return;
+
+        const { action, movieId, title } = button.dataset;
+
+        if (action === "toggle-watchlist" && movieId) {
+            toggleWatchlist(movieId, title || movieId);
+        }
+
+        if (action === "open-movie" && movieId) {
+            openMovie(movieId);
+        }
+
+        if (action === "roulette-open" && appState.roulettePick) {
+            openMovie(appState.roulettePick.id);
+        }
+
+        if (action === "roulette-watchlist" && appState.roulettePick) {
+            toggleWatchlist(appState.roulettePick.id, appState.roulettePick.title);
+            renderRoulettePick(appState.roulettePick);
+        }
     });
-    
-    // Disable mouse parallax on mobile
-    document.addEventListener('touchstart', () => {
-        const floatingElements = document.querySelectorAll('.floating-popcorn, .floating-film, .floating-tickets');
-        floatingElements.forEach(element => {
-            element.style.transform = 'none';
+
+    document.addEventListener("change", (event) => {
+        const ratingSelect = event.target.closest('select[data-action="set-user-rating"]');
+        if (ratingSelect) {
+            const value = Number(ratingSelect.value || 0);
+            appState.userRatings[ratingSelect.dataset.movieId] = value;
+            saveJSON(STORAGE_KEYS.userRatings, appState.userRatings);
+            renderStats();
+            return;
+        }
+
+        const partItem = event.target.closest(".part-item");
+        if (!partItem) return;
+
+        const franchiseKey = partItem.dataset.franchise;
+        const partId = partItem.dataset.part;
+        const state = appState.franchise[franchiseKey][partId];
+
+        if (event.target.classList.contains("part-check")) {
+            state.seen = event.target.checked;
+            if (state.seen) state.status = "completed";
+        }
+
+        if (event.target.classList.contains("part-select")) {
+            state.status = event.target.value;
+            if (state.status === "completed") state.seen = true;
+        }
+
+        if (event.target.classList.contains("part-rating")) {
+            const value = Number(event.target.value || 0);
+            state.rating = Math.max(0, Math.min(10, value));
+        }
+
+        persistFranchiseState();
+        renderFranchiseGrid();
+        renderStats();
+        renderContinueWatching();
+    });
+
+    document.addEventListener("blur", (event) => {
+        const partItem = event.target.closest(".part-item");
+        if (!partItem || !event.target.classList.contains("part-comment")) return;
+
+        const franchiseKey = partItem.dataset.franchise;
+        const partId = partItem.dataset.part;
+        appState.franchise[franchiseKey][partId].comment = event.target.value.trim();
+        persistFranchiseState();
+    }, true);
+}
+
+function attachPageTransitions() {
+    document.querySelectorAll('.topnav a[href]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('javascript')) return;
+            e.preventDefault();
+            document.body.classList.remove('page-ready');
+            document.body.classList.add('page-exit');
+            setTimeout(() => { window.location.href = href; }, 380);
         });
     });
 }
+
+function init() {
+    initState();
+    renderStats();
+    renderContinueWatching();
+    renderFranchiseGrid();
+    renderCatalog();
+    attachEvents();
+    attachPageTransitions();
+
+    window.requestAnimationFrame(() => {
+        document.body.classList.add("page-ready");
+    });
+}
+
+document.addEventListener("DOMContentLoaded", init);
