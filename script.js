@@ -43,108 +43,99 @@ async function loadMoviesData() {
             poster: movie.cover || "",
             communityRating: parseMovieRating(movie.rating),
             description: movie.description || "",
-            let _shelfTooltip = null;
-            let _hideTimer = null;
-            let _activeBook = null;
+            streamUrl: movie.streamUrl || ""
+        }));
+    } catch (err) {
+        console.error("Fehler beim Laden von movies-data.json:", err);
+        return [];
+    }
+}
 
-            function _setActiveBook(book) {
-                if (_activeBook && _activeBook !== book) _activeBook.classList.remove("is-active");
-                _activeBook = book || null;
-                if (_activeBook) _activeBook.classList.add("is-active");
-            }
+const FRANCHISES = [
+    {
+        slug: "harry-potter",
+        title: "Harry Potter",
+        parts: [
+            { id: "hp-1", title: "Stein der Weisen", year: 2001, communityRating: 7.6, likes: 21000 },
+            { id: "hp-2", title: "Kammer des Schreckens", year: 2002, communityRating: 7.4, likes: 18600 },
+            { id: "hp-3", title: "Gefangener von Askaban", year: 2004, communityRating: 8.0, likes: 23300 },
+            { id: "hp-4", title: "Feuerkelch", year: 2005, communityRating: 7.7, likes: 19800 }
+        ]
+    },
+    {
+        slug: "fast-furious",
+        title: "Fast & Furious",
+        parts: [
+            { id: "ff-1", title: "The Fast and the Furious", year: 2001, communityRating: 6.8, likes: 14100 },
+            { id: "ff-2", title: "2 Fast 2 Furious", year: 2003, communityRating: 6.0, likes: 9800 },
+            { id: "ff-3", title: "Tokyo Drift", year: 2006, communityRating: 6.3, likes: 12000 },
+            { id: "ff-4", title: "Fast & Furious", year: 2009, communityRating: 6.6, likes: 10200 }
+        ]
+    },
+    {
+        slug: "star-wars",
+        title: "Star Wars",
+        parts: [
+            { id: "sw-4", title: "Episode IV", year: 1977, communityRating: 8.6, likes: 26100 },
+            { id: "sw-5", title: "Episode V", year: 1980, communityRating: 8.8, likes: 29400 },
+            { id: "sw-6", title: "Episode VI", year: 1983, communityRating: 8.3, likes: 20100 },
+            { id: "sw-7", title: "Episode VII", year: 2015, communityRating: 7.8, likes: 18800 }
+        ]
+    },
+    {
+        slug: "marvel",
+        title: "Marvel",
+        parts: [
+            { id: "m-ironman", title: "Iron Man", year: 2008, communityRating: 7.9, likes: 22400 },
+            { id: "m-avengers", title: "The Avengers", year: 2012, communityRating: 8.0, likes: 24100 },
+            { id: "m-infwar", title: "Infinity War", year: 2018, communityRating: 8.4, likes: 27300 },
+            { id: "m-endgame", title: "Endgame", year: 2019, communityRating: 8.3, likes: 28600 }
+        ]
+    },
+    {
+        slug: "shrek",
+        title: "Shrek",
+        parts: [
+            { id: "shrek-1", title: "Shrek", year: 2001, communityRating: 7.9, likes: 17800 },
+            { id: "shrek-2", title: "Shrek 2", year: 2004, communityRating: 7.9, likes: 24100 },
+            { id: "shrek-3", title: "Shrek der Dritte", year: 2007, communityRating: 6.2, likes: 10200 },
+            { id: "shrek-4", title: "Fuer immer Shrek", year: 2010, communityRating: 6.3, likes: 9600 }
+        ]
+    },
+    {
+        slug: "toy-story",
+        title: "Toy Story",
+        parts: [
+            { id: "ts-1", title: "Toy Story", year: 1995, communityRating: 8.3, likes: 21900 },
+            { id: "ts-2", title: "Toy Story 2", year: 1999, communityRating: 7.9, likes: 17300 },
+            { id: "ts-3", title: "Toy Story 3", year: 2010, communityRating: 8.3, likes: 27500 },
+            { id: "ts-4", title: "Toy Story 4", year: 2019, communityRating: 7.7, likes: 16000 }
+        ]
+    }
+];
 
-            function _clearActiveBook() {
-                if (_activeBook) _activeBook.classList.remove("is-active");
-                _activeBook = null;
-            }
+const appState = {
+    watchlist: {},
+    franchise: {},
+    userRatings: {},
+    roulettePick: null
+};
 
-            function _resetShelfPopupState() {
-                clearTimeout(_hideTimer);
-                if (_shelfTooltip) _shelfTooltip.classList.remove("popup-visible");
-                _clearActiveBook();
-            }
+// ── Catalog filter/sort state ──────────────────────────
+let catalogFilterType = "all";
+let catalogFilterGenre = "all";
+let catalogSort = "default";
 
-            function attachShelfPopups() {
-                if (_shelfTooltip) return;
+// ── Franchise groups detected from catalog IDs ────────
+const CATALOG_FRANCHISE_MAP = {
+    "saw":              { label: "SAW Universe",          ids: ["saw-1","saw-2","saw-3","saw-4","saw-5","saw-6","saw-7","jigsaw","saw-spiral","saw-x"] },
+    "final-dest":       { label: "Final Destination",     ids: ["final-destination","final-destination-6"] },
+    "scream":           { label: "Scream Franchise",      ids: ["scream-1","scream-2","scream-3","scream-4","scream-5","scream-6"] },
+    "cloverfield":      { label: "Cloverfield Universe",  ids: ["cloverfield","10-cloverfield-lane","cloverfield-paradox"] },
+    "cube":             { label: "Cube Franchise",        ids: ["cube-zero","cube","cube-2","cube-2021"] },
+};
 
-                _shelfTooltip = document.createElement("div");
-                _shelfTooltip.className = "shelf-popup";
-                _shelfTooltip.setAttribute("role", "tooltip");
-                document.body.appendChild(_shelfTooltip);
-
-                _shelfTooltip.addEventListener("mouseenter", () => {
-                    clearTimeout(_hideTimer);
-                    if (_activeBook) _activeBook.classList.add("is-active");
-                });
-                _shelfTooltip.addEventListener("mouseleave", _scheduleHide);
-
-                window.addEventListener("resize", () => {
-                    if (_shelfTooltip?.classList.contains("popup-visible") && _activeBook) _positionTooltip(_activeBook);
-                });
-                window.addEventListener("scroll", () => {
-                    _resetShelfPopupState();
-                }, { passive: true });
-            }
-
-            function _scheduleHide() {
-                _hideTimer = setTimeout(() => {
-                    _resetShelfPopupState();
-                }, 130);
-            }
-
-            function _showTooltip(book) {
-                if (!_shelfTooltip) return;
-                clearTimeout(_hideTimer);
-                _setActiveBook(book);
-
-                const id = book.dataset.id;
-                const movie = CATALOG.find(m => m.id === id);
-                if (!movie) return;
-
-                _shelfTooltip.innerHTML = buildTooltipHTML(movie);
-                _positionTooltip(book);
-                _shelfTooltip.classList.add("popup-visible");
-            }
-
-            function _positionTooltip(book) {
-                const rect = book.getBoundingClientRect();
-
-                _shelfTooltip.style.visibility = "hidden";
-                _shelfTooltip.style.left = "0px";
-                _shelfTooltip.style.top = "0px";
-                const pw = _shelfTooltip.offsetWidth || 260;
-                const ph = _shelfTooltip.offsetHeight || 280;
-                _shelfTooltip.style.visibility = "";
-
-                // Prefer centered above the cover.
-                let left = rect.left + rect.width / 2 - pw / 2;
-                let top = rect.top - ph - 16;
-
-                // If top space is tight, place tooltip at the side.
-                if (top < 12) {
-                    left = rect.right + 14;
-                    top = Math.max(12, rect.top - 8);
-                }
-
-                // Clamp to viewport.
-                if (left + pw > window.innerWidth - 8) left = rect.left - pw - 14;
-                if (left < 8) left = 8;
-                if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
-                if (top + ph > window.innerHeight - 8) top = window.innerHeight - ph - 8;
-                if (top < 8) top = 8;
-
-                _shelfTooltip.style.left = left + "px";
-                _shelfTooltip.style.top = top + "px";
-            }
-
-            function bindShelfBooks() {
-                document.querySelectorAll(".shelf-book").forEach(book => {
-                    book.addEventListener("mouseenter", () => _showTooltip(book));
-                    book.addEventListener("mouseleave", _scheduleHide);
-                    book.addEventListener("focus", () => _showTooltip(book));
-                    book.addEventListener("blur", _scheduleHide);
-                });
-            }
+function safeGetJSON(key, fallback) {
     try {
         const raw = localStorage.getItem(key);
         if (!raw) return fallback;
@@ -415,6 +406,9 @@ function buildTooltipHTML(movie) {
     const esc = (s) => String(s).replace(/"/g, "&quot;").replace(/</g, "&lt;");
     const stars = makeStars(movie.communityRating || 0);
     return `
+        <div class="shelf-popup-poster-wrap">
+            <img class="shelf-popup-poster" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
+        </div>
         <div class="shelf-popup-body">
             <h4 class="shelf-popup-title">${movie.title}</h4>
             <div class="shelf-popup-meta">
@@ -438,51 +432,25 @@ function buildTooltipHTML(movie) {
             <div class="shelf-popup-actions">
                 <button type="button" data-action="open-movie" data-movie-id="${esc(movie.id)}">Details</button>
                 <button type="button" data-action="toggle-watchlist" data-movie-id="${esc(movie.id)}" data-title="${esc(movie.title)}">
-                let _activeBook = null;
-
-                function _setActiveBook(book) {
-                    if (_activeBook && _activeBook !== book) _activeBook.classList.remove("is-active");
-                    _activeBook = book || null;
-                    if (_activeBook) _activeBook.classList.add("is-active");
-                }
-
-                function _clearActiveBook() {
-                    if (_activeBook) _activeBook.classList.remove("is-active");
-                    _activeBook = null;
-                }
                     ${inWL ? "&#8722; Liste" : "&#43; Liste"}
                 </button>
             </div>
         </div>`;}
 
 /* ── Portal tooltip system ── */
-                    _shelfTooltip.addEventListener("mouseenter", () => {
-                        clearTimeout(_hideTimer);
-                        if (_activeBook) _activeBook.classList.add("is-active");
-                    });
+let _shelfTooltip = null;
 let _hideTimer = null;
-
-                    // Reposition/hide tooltip on viewport changes to avoid drift.
-                    window.addEventListener("resize", () => {
-                        if (_shelfTooltip?.classList.contains("popup-visible") && _activeBook) _positionTooltip(_activeBook);
-                    });
-                    window.addEventListener("scroll", () => {
-                        if (_shelfTooltip) _shelfTooltip.classList.remove("popup-visible");
-                        _clearActiveBook();
-                    }, { passive: true });
 
 function attachShelfPopups() {
     _shelfTooltip = document.createElement("div");
     _shelfTooltip.className = "shelf-popup";
-                        if (_shelfTooltip) _shelfTooltip.classList.remove("popup-visible");
-                        _clearActiveBook();
-                    }, 130);
+    _shelfTooltip.setAttribute("role", "tooltip");
+    document.body.appendChild(_shelfTooltip);
     _shelfTooltip.addEventListener("mouseenter", () => clearTimeout(_hideTimer));
     _shelfTooltip.addEventListener("mouseleave", _scheduleHide);
 }
 
 function _scheduleHide() {
-                    _setActiveBook(book);
     _hideTimer = setTimeout(() => {
         if (_shelfTooltip) _shelfTooltip.classList.remove("popup-visible");
     }, 80);
@@ -501,32 +469,22 @@ function _showTooltip(book) {
 
 function _positionTooltip(book) {
     const rect = book.getBoundingClientRect();
+    const pw = 230;
     // force layout to measure height before showing
     _shelfTooltip.style.visibility = "hidden";
     _shelfTooltip.style.left = "0px";
     _shelfTooltip.style.top = "0px";
-    const pw = _shelfTooltip.offsetWidth || 260;
-    const ph = _shelfTooltip.offsetHeight || 280;
+    const ph = _shelfTooltip.offsetHeight || 340;
     _shelfTooltip.style.visibility = "";
 
-    // Prefer centered above the cover.
+    // center horizontally over book, appear above
     let left = rect.left + rect.width / 2 - pw / 2;
     let top  = rect.top - ph - 16;
 
-    // If top space is tight, place tooltip to the right instead of below to avoid overlap flicker.
-    if (top < 12) {
-        left = rect.right + 14;
-        top = Math.max(12, rect.top - 8);
-    }
-
-    // Clamp to viewport.
-    if (left + pw > window.innerWidth - 8) {
-        left = rect.left - pw - 14;
-    }
+    // clamp to viewport
     if (left < 8) left = 8;
     if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
-    if (top + ph > window.innerHeight - 8) top = window.innerHeight - ph - 8;
-    if (top < 8) top = 8;
+    if (top < 8) top = rect.bottom + 16; // flip below if no space above
 
     _shelfTooltip.style.left = left + "px";
     _shelfTooltip.style.top  = top  + "px";
@@ -544,8 +502,6 @@ function bindShelfBooks() {
 function renderCatalogShelf() {
     const host = document.getElementById("catalogShelf");
     if (!host) return;
-
-    _resetShelfPopupState();
 
     const groups = buildCatalogGroups(CATALOG);
     const visible = applyShelfFilters(groups);
@@ -580,8 +536,6 @@ function renderCatalogShelf() {
 
     bindShelfBooks();
 
-    // Newly rendered groups are not part of the initial observer set.
-    // Make them visible after every filter/sort rerender.
     window.requestAnimationFrame(() => {
         host.querySelectorAll(".shelf-group").forEach((el, idx) => {
             setTimeout(() => el.classList.add("is-visible"), idx * 55);
