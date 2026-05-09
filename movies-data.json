@@ -944,6 +944,83 @@
     "cover": "https://i.ebayimg.com/00/s/MTYwMFgxMTMy/z/VoIAAOSwM-Zkc6TQ/$_57.JPG",
     "description": "geilster teil mMn. ab hier war das fundament der reihe gelegt und ausgereift",
     "streamUrl": ""
+  },
+  "the-wailing": {
+    "title": "The Wailing",
+    "genre": "Horror, Mystery",
+    "year": "2016",
+    "duration": "156 min",
+    "rating": "7.4/10",
+    "type": "movie",
+    "cover": "",
+    "description": "Mystery-Horror aus S\u00fcdkorea um eine r\u00e4tselhafte Krankheitswelle in einem Dorf.",
+    "streamUrl": ""
+  },
+  "the-eyes-of-my-mother": {
+    "title": "The Eyes of My Mother",
+    "genre": "Horror, Drama",
+    "year": "2016",
+    "duration": "76 min",
+    "rating": "6.2/10",
+    "type": "movie",
+    "cover": "",
+    "description": "Atmosph\u00e4rischer Independent-Horror \u00fcber Isolation und Trauma.",
+    "streamUrl": ""
+  },
+  "fallen": {
+    "title": "Fallen",
+    "genre": "Thriller, Supernatural",
+    "year": "1998",
+    "duration": "124 min",
+    "rating": "7.0/10",
+    "type": "movie",
+    "cover": "",
+    "description": "Ein Detective jagt eine b\u00f6se Macht, die K\u00f6rper wechseln kann.",
+    "streamUrl": ""
+  },
+  "terrified": {
+    "title": "Terrified",
+    "genre": "Horror, Supernatural",
+    "year": "2017",
+    "duration": "87 min",
+    "rating": "6.5/10",
+    "type": "movie",
+    "cover": "",
+    "description": "Argentinischer Horrorfilm \u00fcber paranormale Ereignisse in einer Nachbarschaft.",
+    "streamUrl": ""
+  },
+  "bug": {
+    "title": "Bug",
+    "genre": "Psychological Horror, Thriller",
+    "year": "2006",
+    "duration": "102 min",
+    "rating": "6.1/10",
+    "type": "movie",
+    "cover": "",
+    "description": "Kammerspiel-Thriller \u00fcber Paranoia, Verschw\u00f6rung und psychischen Zerfall.",
+    "streamUrl": ""
+  },
+  "session-9": {
+    "title": "Session 9",
+    "genre": "Horror, Mystery",
+    "year": "2001",
+    "duration": "100 min",
+    "rating": "6.4/10",
+    "type": "movie",
+    "cover": "",
+    "description": "Unheimlicher Psychothriller in einer verlassenen Nervenheilanstalt.",
+    "streamUrl": ""
+  },
+  "fallen-angel": {
+    "title": "Fallen Angel",
+    "genre": "Horror, Thriller",
+    "year": "TBA",
+    "duration": "TBA",
+    "rating": "TBA",
+    "type": "movie",
+    "cover": "",
+    "description": "Titel hinzugef\u00fcgt. Details bei Bedarf erg\u00e4nzen.",
+    "streamUrl": ""
   }
 }
 
