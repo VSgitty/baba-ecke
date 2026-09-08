@@ -33,7 +33,7 @@
     .cover-toggle { margin-left: 12px; padding:6px 10px; border-radius:8px; background:rgba(255,255,255,0.04); color:#fff; border:1px solid rgba(255,255,255,0.06); cursor:pointer }
     .cover-toggle.active { background:linear-gradient(90deg,var(--cover-accent-1),var(--cover-accent-2)); color:#0b0b0b; border-color:transparent }
     .catalog-cover-host { margin-top:18px; }
-    .cover-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:14px; align-items:start; grid-auto-rows:4px; grid-auto-flow:dense }
+    .cover-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:12px; align-items:start; grid-auto-rows:10px; grid-auto-flow:dense }
     .cover-card { position:relative; perspective:1200px; border-radius:12px; overflow:hidden; background:var(--cover-card-bg); box-shadow: 0 8px 24px var(--cover-shadow); transform-style:preserve-3d; transition:transform .22s ease, box-shadow .22s ease; grid-row:span var(--span,40) }
     .cover-media { position:absolute; inset:0; background-size:cover; background-position:center; filter:contrast(.95) saturate(1.05); transform-origin:center; transition:transform .35s cubic-bezier(.2,.8,.25,1); background-color:var(--cover-card-bg) }
     .cover-media.lazy { background-image: none; filter: blur(6px) saturate(.8) brightness(.8); }

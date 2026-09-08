@@ -639,7 +639,7 @@ function renderCatalogShelf() {
 function renderCoverCard(movie) {
     const poster = movie.poster || '';
     // default span (will be recalculated after image load)
-    const span = 40;
+    const span = 30;
     return `
         <article class="cover-card" tabindex="0" data-id="${movie.id}" style="--span:${span}">
             <div class="cover-media lazy" data-bg="${poster}"></div>
@@ -723,7 +723,7 @@ function initCoverLazyLoading() {
                         media.classList.add('loaded');
                         // set a reasonable default span
                         const card = media.closest('.cover-card');
-                        if (card) card.style.setProperty('--span', 40);
+                        if (card) card.style.setProperty('--span', 30);
                         return;
                     }
                     const u = urls.shift();
@@ -741,15 +741,20 @@ function initCoverLazyLoading() {
                                     // ensure layout is updated
                                     requestAnimationFrame(() => {
                                         const cardWidth = Math.max(80, card.clientWidth || parseFloat(getComputedStyle(card).width) || 160);
-                                        const rowHeight = parseFloat(getComputedStyle(grid).getPropertyValue('grid-auto-rows')) || 4;
+                                        const rowHeight = parseFloat(getComputedStyle(grid).getPropertyValue('grid-auto-rows')) || 10;
                                         const aspect = (img.naturalHeight && img.naturalWidth) ? (img.naturalHeight / img.naturalWidth) : 1.5;
-                                        const span = Math.max(12, Math.round((aspect * cardWidth) / rowHeight));
+                                        let span = Math.round((aspect * cardWidth) / rowHeight);
+                                        // clamp span to reasonable bounds to avoid huge blanks
+                                        span = Math.max(12, Math.min(80, span));
                                         card.style.setProperty('--span', span);
                                     });
                                 }
                             } catch (e) { /* ignore layout calc errors */ }
                         };
-                    img.onerror = () => loadSequential(urls);
+                    img.onerror = () => {
+                        // on error, try next; if none left, placeholder will be used
+                        loadSequential(urls);
+                    };
                 };
 
                 loadSequential(tryUrls);
