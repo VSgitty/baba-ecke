@@ -690,6 +690,31 @@ function renderCatalogCover() {
     // initialize lazy loading and parallax for these cards
     initCoverLazyLoading();
     initCoverParallax();
+    // small reflow pass to reduce gaps for placeholders
+    requestAnimationFrame(() => rebalanceCoverGrid());
+}
+
+function rebalanceCoverGrid() {
+    const grid = document.getElementById('catalogCoverGrid');
+    if (!grid) return;
+    const rowHeight = parseFloat(getComputedStyle(grid).getPropertyValue('grid-auto-rows')) || 10;
+    document.querySelectorAll('.cover-card').forEach(card => {
+        const media = card.querySelector('.cover-media');
+        if (!media) return;
+        const bg = getComputedStyle(media).backgroundImage || '';
+        if (!bg || bg === 'none' || media.classList.contains('lazy')) {
+            // set a small span for unloaded/placeholder cards
+            card.style.setProperty('--span', 20);
+        } else {
+            // leave span as computed by image onload; if not set, compute a fallback
+            const cur = parseInt(getComputedStyle(card).getPropertyValue('--span')) || 0;
+            if (!cur || cur < 12) {
+                const w = card.clientWidth || 160;
+                const span = Math.max(12, Math.round((1.5 * w) / rowHeight));
+                card.style.setProperty('--span', span);
+            }
+        }
+    });
 }
 
 function initCoverLazyLoading() {
@@ -747,6 +772,8 @@ function initCoverLazyLoading() {
                                         // clamp span to reasonable bounds to avoid huge blanks
                                         span = Math.max(12, Math.min(80, span));
                                         card.style.setProperty('--span', span);
+                                        // trigger a quick rebalance so grid gaps shrink
+                                        setTimeout(() => rebalanceCoverGrid(), 40);
                                     });
                                 }
                             } catch (e) { /* ignore layout calc errors */ }
