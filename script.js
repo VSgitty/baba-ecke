@@ -668,7 +668,7 @@ function renderCatalogCover() {
     // Smart shuffle: spotlight highly-rated + random mix
     const sorted = pool.slice().sort((a,b) => (b.communityRating||0) - (a.communityRating||0));
     const top = sorted.slice(0, 6);
-    const rest = pool.filter(p => !top.includes(p)).sort(() => Math.random() - 0.5).slice(0, 30);
+    const rest = pool.filter(p => !top.includes(p)).sort(() => Math.random() - 0.5);
     const mix = top.concat(rest);
 
     host.innerHTML = mix.map(m => renderCoverCard(m)).join('');
@@ -728,25 +728,27 @@ function initCoverLazyLoading() {
                     }
                     const u = urls.shift();
                     const img = new Image();
-                    img.crossOrigin = 'anonymous';
-                    img.src = u;
-                    img.onload = () => {
-                        media.style.backgroundImage = `url('${u}')`;
-                        media.classList.remove('lazy');
-                        media.classList.add('loaded');
-                        // calculate a masonry span based on natural aspect ratio
-                        try {
-                            const card = media.closest('.cover-card');
-                            const grid = document.getElementById('catalogCoverGrid');
-                            if (card && grid) {
-                                const cardWidth = Math.max(80, card.getBoundingClientRect().width || parseFloat(getComputedStyle(card).width));
-                                const rowHeight = parseFloat(getComputedStyle(grid).getPropertyValue('grid-auto-rows')) || 8;
-                                const aspect = (img.naturalHeight && img.naturalWidth) ? (img.naturalHeight / img.naturalWidth) : 1.5;
-                                const span = Math.max(20, Math.round((aspect * cardWidth) / rowHeight));
-                                card.style.setProperty('--span', span);
-                            }
-                        } catch (e) { /* ignore layout calc errors */ }
-                    };
+                        img.src = u;
+                        img.onload = () => {
+                            media.style.backgroundImage = `url('${u}')`;
+                            media.classList.remove('lazy');
+                            media.classList.add('loaded');
+                            // calculate a masonry span based on natural aspect ratio
+                            try {
+                                const card = media.closest('.cover-card');
+                                const grid = document.getElementById('catalogCoverGrid');
+                                if (card && grid) {
+                                    // ensure layout is updated
+                                    requestAnimationFrame(() => {
+                                        const cardWidth = Math.max(80, card.clientWidth || parseFloat(getComputedStyle(card).width) || 160);
+                                        const rowHeight = parseFloat(getComputedStyle(grid).getPropertyValue('grid-auto-rows')) || 4;
+                                        const aspect = (img.naturalHeight && img.naturalWidth) ? (img.naturalHeight / img.naturalWidth) : 1.5;
+                                        const span = Math.max(12, Math.round((aspect * cardWidth) / rowHeight));
+                                        card.style.setProperty('--span', span);
+                                    });
+                                }
+                            } catch (e) { /* ignore layout calc errors */ }
+                        };
                     img.onerror = () => loadSequential(urls);
                 };
 
