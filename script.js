@@ -638,9 +638,8 @@ function renderCatalogShelf() {
 // --- Cover View Renderer (modern, interactive cover grid) ---
 function renderCoverCard(movie) {
     const poster = movie.poster || '';
-    // assign a row-span for masonry-like layout
-    const spanOptions = [40, 48, 32];
-    const span = spanOptions[Math.floor(Math.random() * spanOptions.length)];
+    // default span (will be recalculated after image load)
+    const span = 40;
     return `
         <article class="cover-card" tabindex="0" data-id="${movie.id}" style="--span:${span}">
             <div class="cover-media lazy" data-bg="${poster}"></div>
@@ -715,8 +714,18 @@ function initCoverLazyLoading() {
                 tryUrls.push(src);
 
                 // preload sequentially until one succeeds
+                const placeholder = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='900'><rect width='100%' height='100%' fill='%230b0b0b'/><text x='50%' y='50%' fill='%23666' font-size='24' dominant-baseline='middle' text-anchor='middle'>Kein Bild</text></svg>";
+
                 const loadSequential = (urls) => {
-                    if (!urls.length) { media.classList.remove('lazy'); media.classList.add('loaded'); return; }
+                    if (!urls.length) {
+                        media.style.backgroundImage = `url('${placeholder}')`;
+                        media.classList.remove('lazy');
+                        media.classList.add('loaded');
+                        // set a reasonable default span
+                        const card = media.closest('.cover-card');
+                        if (card) card.style.setProperty('--span', 40);
+                        return;
+                    }
                     const u = urls.shift();
                     const img = new Image();
                     img.crossOrigin = 'anonymous';
@@ -725,6 +734,18 @@ function initCoverLazyLoading() {
                         media.style.backgroundImage = `url('${u}')`;
                         media.classList.remove('lazy');
                         media.classList.add('loaded');
+                        // calculate a masonry span based on natural aspect ratio
+                        try {
+                            const card = media.closest('.cover-card');
+                            const grid = document.getElementById('catalogCoverGrid');
+                            if (card && grid) {
+                                const cardWidth = Math.max(80, card.getBoundingClientRect().width || parseFloat(getComputedStyle(card).width));
+                                const rowHeight = parseFloat(getComputedStyle(grid).getPropertyValue('grid-auto-rows')) || 8;
+                                const aspect = (img.naturalHeight && img.naturalWidth) ? (img.naturalHeight / img.naturalWidth) : 1.5;
+                                const span = Math.max(20, Math.round((aspect * cardWidth) / rowHeight));
+                                card.style.setProperty('--span', span);
+                            }
+                        } catch (e) { /* ignore layout calc errors */ }
                     };
                     img.onerror = () => loadSequential(urls);
                 };
