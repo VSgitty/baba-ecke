@@ -635,6 +635,182 @@ function renderCatalogShelf() {
     });
 }
 
+// --- Cover View Renderer (modern, interactive cover grid) ---
+function renderCoverCard(movie) {
+    const poster = movie.poster || '';
+    // assign a row-span for masonry-like layout
+    const spanOptions = [40, 48, 32];
+    const span = spanOptions[Math.floor(Math.random() * spanOptions.length)];
+    return `
+        <article class="cover-card" tabindex="0" data-id="${movie.id}" style="--span:${span}">
+            <div class="cover-media lazy" data-bg="${poster}"></div>
+            <div class="cover-gloss"></div>
+            <div class="cover-info">
+                <div class="cover-title">${movie.title}</div>
+                <div class="cover-meta"><span class="cover-badge">${movie.year || ''}</span><span>${movie.communityRating ? movie.communityRating + '/10' : ''}</span></div>
+                <div class="cover-actions">
+                    <button class="cover-cta" data-action="open">OPEN</button>
+                    <button class="cover-cta" data-action="watchlist">${isInWatchlist(movie.id) ? 'In WL' : '+WL'}</button>
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+function renderCatalogCover() {
+    const host = document.getElementById('catalogCoverGrid');
+    if (!host) return;
+    const pool = getFilteredPool();
+    if (!pool.length) {
+        host.innerHTML = '<p class="empty-note">Keine Treffer für die Cover‑Ansicht.</p>';
+        return;
+    }
+
+    // Smart shuffle: spotlight highly-rated + random mix
+    const sorted = pool.slice().sort((a,b) => (b.communityRating||0) - (a.communityRating||0));
+    const top = sorted.slice(0, 6);
+    const rest = pool.filter(p => !top.includes(p)).sort(() => Math.random() - 0.5).slice(0, 30);
+    const mix = top.concat(rest);
+
+    host.innerHTML = mix.map(m => renderCoverCard(m)).join('');
+
+    // attach interactions
+    host.querySelectorAll('.cover-card').forEach(card => {
+        const id = card.dataset.id;
+        card.addEventListener('click', (e) => {
+            const action = e.target.closest('[data-action]')?.dataset.action;
+            if (action === 'open') return openMovie(id);
+            if (action === 'watchlist') return toggleWatchlist(id, findMovieById(id)?.title || '');
+            // default click opens
+            if (!action) openMovie(id);
+        });
+        // keyboard support
+        card.addEventListener('keydown', (e) => { if (e.key === 'Enter') openMovie(id); });
+    });
+
+    // initialize lazy loading and parallax for these cards
+    initCoverLazyLoading();
+    initCoverParallax();
+}
+
+function initCoverLazyLoading() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const media = entry.target;
+            const src = media.dataset.bg;
+            if (src) {
+                // attempt WebP variant first if supported, then fallback to original
+                const tryUrls = [];
+                const supportsWebP = (function(){
+                    try {
+                        const c = document.createElement('canvas');
+                        return !!(c.getContext && c.getContext('2d') && c.toDataURL('image/webp').indexOf('data:image/webp') === 0);
+                    } catch { return false }
+                })();
+
+                if (supportsWebP && /\.(jpe?g|png)([\?#].*)?$/i.test(src)) {
+                    tryUrls.push(src.replace(/\.(jpe?g|png)([\?#].*)?$/i, '.webp$2'));
+                }
+                tryUrls.push(src);
+
+                // preload sequentially until one succeeds
+                const loadSequential = (urls) => {
+                    if (!urls.length) { media.classList.remove('lazy'); media.classList.add('loaded'); return; }
+                    const u = urls.shift();
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.src = u;
+                    img.onload = () => {
+                        media.style.backgroundImage = `url('${u}')`;
+                        media.classList.remove('lazy');
+                        media.classList.add('loaded');
+                    };
+                    img.onerror = () => loadSequential(urls);
+                };
+
+                loadSequential(tryUrls);
+            }
+            observer.unobserve(media);
+        });
+    }, { root: null, rootMargin: '200px', threshold: 0.05 });
+
+    document.querySelectorAll('.cover-media[data-bg]').forEach(el => observer.observe(el));
+}
+
+function initCoverParallax() {
+    // disable on touch / coarse pointers for usability
+    const isCoarse = ('ontouchstart' in window) || window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+    if (isCoarse) return;
+
+    document.querySelectorAll('.cover-card').forEach(card => {
+        const media = card.querySelector('.cover-media');
+        if (!media) return;
+        card.addEventListener('mousemove', (e) => {
+            const r = card.getBoundingClientRect();
+            const px = (e.clientX - r.left) / r.width - 0.5; // -0.5 .. 0.5
+            const py = (e.clientY - r.top) / r.height - 0.5;
+            const rotY = px * 10; // deg
+            const rotX = -py * 8;
+            card.style.transform = `translateY(-6px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+            media.style.transform = `scale(1.06) translateZ(20px) translateX(${px * 8}px) translateY(${py * 6}px)`;
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+            media.style.transform = '';
+        });
+    });
+}
+
+function attachThemeToggle() {
+    const btn = document.getElementById('themeToggleBtn');
+    if (!btn) return;
+    const KEY = 'baba_theme';
+    // initialize from storage
+    const stored = localStorage.getItem(KEY);
+    const isOnInit = stored === 'cinematic';
+    btn.classList.toggle('active', isOnInit);
+    btn.setAttribute('aria-pressed', String(isOnInit));
+    if (isOnInit) document.body.setAttribute('data-theme', 'cinematic');
+
+    btn.addEventListener('click', () => {
+        const isOn = btn.classList.toggle('active');
+        btn.setAttribute('aria-pressed', String(isOn));
+        if (isOn) {
+            document.body.setAttribute('data-theme', 'cinematic');
+            localStorage.setItem(KEY, 'cinematic');
+        } else {
+            document.body.removeAttribute('data-theme');
+            localStorage.removeItem(KEY);
+        }
+    });
+}
+
+function attachCoverToggle() {
+    const btn = document.getElementById('coverToggleBtn');
+    const coverHost = document.getElementById('catalogCover');
+    const shelfHost = document.getElementById('catalogShelf');
+    if (!btn || !coverHost || !shelfHost) return;
+    // respect initial active state (button may be pre-set active in DOM)
+    const setState = (isActive) => {
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-pressed', String(isActive));
+        if (isActive) {
+            coverHost.classList.remove('hidden');
+            shelfHost.classList.add('hidden');
+            renderCatalogCover();
+        } else {
+            coverHost.classList.add('hidden');
+            shelfHost.classList.remove('hidden');
+        }
+    };
+
+    // initialize view based on DOM class
+    setState(btn.classList.contains('active'));
+
+    btn.addEventListener('click', () => setState(!btn.classList.contains('active')));
+}
+
 // legacy alias kept for backward compatibility
 function renderCatalog() { renderCatalogShelf(); }
 
@@ -944,9 +1120,12 @@ async function init() {
     renderContinueWatching();
     renderFranchiseGrid();
     renderCatalog();
+    renderCatalogCover();
     attachDVDCase();
+    attachThemeToggle();
     attachEvents();
     attachAccordions();
+    attachCoverToggle();
     attachParallaxHero();
     attachCatalogFilters();
     attachPageTransitions();
