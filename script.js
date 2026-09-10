@@ -22,20 +22,60 @@ function createFallbackCover(movie) {
     return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-async function searchInternetCover(movie) {
-    const query = `${movie.title} movie cover`;
-    if (coverSearchCache.has(query)) return coverSearchCache.get(query);
+function normalizeTitle(title) {
+    return String(title || "")
+        .toLowerCase()
+        .replace(/\([^)]*\)|\[[^\]]*\]/g, "")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+}
 
-    const request = fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrnamespace=0&prop=pageimages&piprop=thumbnail&pithumbsize=800&format=json&origin=*`)
+function isUsableImdbResult(item) {
+    return Boolean(item?.i?.imageUrl && ["movie", "tvSeries", "tvMiniSeries", "tvMovie"].includes(item.qid));
+}
+
+async function searchImdbCover(movie) {
+    const key = `imdb:${movie.title}:${movie.year || ""}`;
+    if (coverSearchCache.has(key)) return coverSearchCache.get(key);
+
+    const request = fetch(`https://v3.sg.media-imdb.com/suggestion/x/${encodeURIComponent(movie.title)}.json`)
         .then((response) => response.ok ? response.json() : null)
         .then((data) => {
-            const pages = Object.values(data?.query?.pages || {});
-            return pages.find((page) => page.thumbnail?.source)?.thumbnail.source || "";
+            const wanted = normalizeTitle(movie.title);
+            const candidates = (data?.d || []).filter(isUsableImdbResult);
+            const exact = candidates.filter((item) => normalizeTitle(item.l) === wanted);
+            const yearMatch = exact.find((item) => String(item.y || "") === String(movie.year || ""));
+            return (yearMatch || exact[0] || (movie.year ? candidates.find((item) => String(item.y || "") === String(movie.year)) : null))?.i?.imageUrl || "";
         })
         .catch(() => "");
 
-    coverSearchCache.set(query, request);
+    coverSearchCache.set(key, request);
     return request;
+}
+
+async function searchTvMazeCover(movie) {
+    const key = `tvmaze:${movie.title}`;
+    if (coverSearchCache.has(key)) return coverSearchCache.get(key);
+
+    const request = fetch(`https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(movie.title)}`)
+        .then((response) => response.ok ? response.json() : null)
+        .then((show) => show?.image?.original || show?.image?.medium || "")
+        .catch(() => "");
+
+    coverSearchCache.set(key, request);
+    return request;
+}
+
+async function searchInternetCover(movie) {
+    const imdbCover = await searchImdbCover(movie);
+    if (imdbCover) return imdbCover;
+    if (movie.type === "series") return searchTvMazeCover(movie);
+    return "";
+}
+
+async function resolveCover(movie, existingUrl) {
+    const officialCover = await searchInternetCover(movie);
+    return officialCover || existingUrl || createFallbackCover(movie);
 }
 
 function normalizeGenre(genreStr) {
@@ -506,17 +546,18 @@ function renderShelfBook(movie) {
         <div class="shelf-book${inWL ? " in-watchlist" : ""}"
              data-id="${esc(movie.id)}"
              tabindex="0" role="button" aria-label="${esc(movie.title)}">
-            <img class="shelf-book-cover" src="${esc(movie.poster || createFallbackCover(movie))}" data-cover-title="${esc(movie.title)}" alt="${esc(movie.title)}" loading="lazy">
+            <img class="shelf-book-cover" src="${esc(movie.poster || createFallbackCover(movie))}" data-cover-title="${esc(movie.title)}" data-cover-year="${esc(movie.year)}" data-cover-type="${esc(movie.type)}" alt="${esc(movie.title)}" loading="lazy">
         </div>`;}
 
 function attachImageCoverFallbacks(root = document) {
     root.querySelectorAll("img[data-cover-title]").forEach((image) => {
         if (image.dataset.coverFallbackBound) return;
         image.dataset.coverFallbackBound = "true";
+        const movie = { title: image.dataset.coverTitle, year: image.dataset.coverYear, type: image.dataset.coverType };
+        resolveCover(movie, image.src).then((cover) => { image.src = cover; });
         image.addEventListener("error", async () => {
             if (image.dataset.coverFallbackUsed) return;
             image.dataset.coverFallbackUsed = "true";
-            const movie = { title: image.dataset.coverTitle };
             const found = await searchInternetCover(movie);
             image.src = found || createFallbackCover(movie);
             image.onerror = () => { image.src = createFallbackCover(movie); };
@@ -763,16 +804,10 @@ function initCoverLazyLoading() {
                 // preload sequentially until one succeeds
                 const loadSequential = (urls) => {
                     if (!urls.length) {
-                        searchInternetCover(movie).then((found) => {
-                            if (found) {
-                                media.style.backgroundImage = `url("${found}")`;
-                                media.classList.remove('lazy', 'failed');
-                                media.classList.add('loaded');
-                            } else {
-                                media.style.backgroundImage = `url("${createFallbackCover(movie)}")`;
-                                media.classList.remove('lazy');
-                                media.classList.add('failed');
-                            }
+                        resolveCover(movie, "").then((cover) => {
+                            media.style.backgroundImage = `url("${cover}")`;
+                            media.classList.remove('lazy', 'failed');
+                            media.classList.add('loaded');
                         });
                         return;
                     }
@@ -780,9 +815,11 @@ function initCoverLazyLoading() {
                     const img = new Image();
                         img.src = u;
                         img.onload = () => {
-                            media.style.backgroundImage = `url('${u}')`;
-                            media.classList.remove('lazy');
-                            media.classList.add('loaded');
+                            resolveCover(movie, u).then((cover) => {
+                                media.style.backgroundImage = `url("${cover}")`;
+                                media.classList.remove('lazy', 'failed');
+                                media.classList.add('loaded');
+                            });
                         };
                     img.onerror = () => {
                         loadSequential(urls);
@@ -791,10 +828,10 @@ function initCoverLazyLoading() {
 
                 loadSequential(tryUrls);
             } else {
-                searchInternetCover(movie).then((found) => {
-                    media.style.backgroundImage = `url("${found || createFallbackCover(movie)}")`;
+                resolveCover(movie, "").then((cover) => {
+                    media.style.backgroundImage = `url("${cover}")`;
                     media.classList.remove('lazy');
-                    media.classList.add(found ? 'loaded' : 'failed');
+                    media.classList.add('loaded');
                 });
             }
             observer.unobserve(media);
