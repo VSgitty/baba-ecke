@@ -638,10 +638,8 @@ function renderCatalogShelf() {
 // --- Cover View Renderer (modern, interactive cover grid) ---
 function renderCoverCard(movie) {
     const poster = movie.poster || '';
-    // default span (will be recalculated after image load)
-    const span = 30;
     return `
-        <article class="cover-card" tabindex="0" data-id="${movie.id}" style="--span:${span}">
+        <article class="cover-card" tabindex="0" data-id="${movie.id}">
             <div class="cover-media lazy" data-bg="${poster}"></div>
             <div class="cover-gloss"></div>
             <div class="cover-info">
@@ -690,31 +688,6 @@ function renderCatalogCover() {
     // initialize lazy loading and parallax for these cards
     initCoverLazyLoading();
     initCoverParallax();
-    // small reflow pass to reduce gaps for placeholders
-    requestAnimationFrame(() => rebalanceCoverGrid());
-}
-
-function rebalanceCoverGrid() {
-    const grid = document.getElementById('catalogCoverGrid');
-    if (!grid) return;
-    const rowHeight = parseFloat(getComputedStyle(grid).getPropertyValue('grid-auto-rows')) || 10;
-    document.querySelectorAll('.cover-card').forEach(card => {
-        const media = card.querySelector('.cover-media');
-        if (!media) return;
-        const bg = getComputedStyle(media).backgroundImage || '';
-        if (!bg || bg === 'none' || media.classList.contains('lazy')) {
-            // set a small span for unloaded/placeholder cards
-            card.style.setProperty('--span', 20);
-        } else {
-            // leave span as computed by image onload; if not set, compute a fallback
-            const cur = parseInt(getComputedStyle(card).getPropertyValue('--span')) || 0;
-            if (!cur || cur < 12) {
-                const w = card.clientWidth || 160;
-                const span = Math.max(12, Math.round((1.5 * w) / rowHeight));
-                card.style.setProperty('--span', span);
-            }
-        }
-    });
 }
 
 function initCoverLazyLoading() {
@@ -739,16 +712,10 @@ function initCoverLazyLoading() {
                 tryUrls.push(src);
 
                 // preload sequentially until one succeeds
-                const placeholder = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='900'><rect width='100%' height='100%' fill='%230b0b0b'/><text x='50%' y='50%' fill='%23666' font-size='24' dominant-baseline='middle' text-anchor='middle'>Kein Bild</text></svg>";
-
                 const loadSequential = (urls) => {
                     if (!urls.length) {
-                        media.style.backgroundImage = `url('${placeholder}')`;
                         media.classList.remove('lazy');
-                        media.classList.add('loaded');
-                        // set a reasonable default span
-                        const card = media.closest('.cover-card');
-                        if (card) card.style.setProperty('--span', 30);
+                        media.classList.add('failed');
                         return;
                     }
                     const u = urls.shift();
@@ -758,25 +725,6 @@ function initCoverLazyLoading() {
                             media.style.backgroundImage = `url('${u}')`;
                             media.classList.remove('lazy');
                             media.classList.add('loaded');
-                            // calculate a masonry span based on natural aspect ratio
-                            try {
-                                const card = media.closest('.cover-card');
-                                const grid = document.getElementById('catalogCoverGrid');
-                                if (card && grid) {
-                                    // ensure layout is updated
-                                    requestAnimationFrame(() => {
-                                        const cardWidth = Math.max(80, card.clientWidth || parseFloat(getComputedStyle(card).width) || 160);
-                                        const rowHeight = parseFloat(getComputedStyle(grid).getPropertyValue('grid-auto-rows')) || 10;
-                                        const aspect = (img.naturalHeight && img.naturalWidth) ? (img.naturalHeight / img.naturalWidth) : 1.5;
-                                        let span = Math.round((aspect * cardWidth) / rowHeight);
-                                        // clamp span to reasonable bounds to avoid huge blanks
-                                        span = Math.max(12, Math.min(80, span));
-                                        card.style.setProperty('--span', span);
-                                        // trigger a quick rebalance so grid gaps shrink
-                                        setTimeout(() => rebalanceCoverGrid(), 40);
-                                    });
-                                }
-                            } catch (e) { /* ignore layout calc errors */ }
                         };
                     img.onerror = () => {
                         // on error, try next; if none left, placeholder will be used

@@ -22,7 +22,9 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
-    let filePath = path.join(__dirname, req.url === '/' ? 'index (2).html' : req.url);
+    const requestPath = decodeURIComponent(new URL(req.url, `http://${req.headers.host || 'localhost'}`).pathname);
+    const relativePath = requestPath === '/' ? 'index.html' : requestPath.replace(/^\/+/, '');
+    let filePath = path.join(__dirname, relativePath);
 
     fs.readFile(filePath, (err, content) => {
         if (err) {

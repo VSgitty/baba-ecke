@@ -33,11 +33,13 @@
     .cover-toggle { margin-left: 12px; padding:6px 10px; border-radius:8px; background:rgba(255,255,255,0.04); color:#fff; border:1px solid rgba(255,255,255,0.06); cursor:pointer }
     .cover-toggle.active { background:linear-gradient(90deg,var(--cover-accent-1),var(--cover-accent-2)); color:#0b0b0b; border-color:transparent }
     .catalog-cover-host { margin-top:18px; }
-    .cover-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:12px; align-items:start; grid-auto-rows:10px; grid-auto-flow:dense }
-    .cover-card { position:relative; perspective:1200px; border-radius:12px; overflow:hidden; background:var(--cover-card-bg); box-shadow: 0 8px 24px var(--cover-shadow); transform-style:preserve-3d; transition:transform .22s ease, box-shadow .22s ease; grid-row:span var(--span,40) }
+    .cover-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)); gap:18px; align-items:stretch; }
+    .cover-card { position:relative; aspect-ratio:2 / 3; min-width:0; perspective:1200px; border-radius:12px; overflow:hidden; background:var(--cover-card-bg); box-shadow: 0 8px 24px var(--cover-shadow); transform-style:preserve-3d; transition:transform .22s ease, box-shadow .22s ease; }
     .cover-media { position:absolute; inset:0; background-size:cover; background-position:center; filter:contrast(.95) saturate(1.05); transform-origin:center; transition:transform .35s cubic-bezier(.2,.8,.25,1); background-color:var(--cover-card-bg) }
     .cover-media.lazy { background-image: none; filter: blur(6px) saturate(.8) brightness(.8); }
     .cover-media.loaded { filter: none; transition:filter .4s ease, transform .35s cubic-bezier(.2,.8,.25,1) }
+    .cover-media.failed { background: radial-gradient(circle at 30% 20%, rgba(255,186,45,.18), transparent 34%), linear-gradient(145deg, #20283a, #080b13 72%); filter: none; }
+    .cover-media.failed::after { content: 'COVER UNAVAILABLE'; position: absolute; inset: auto 12px 78px; color: rgba(255,255,255,.42); font-size: .62rem; font-weight: 700; letter-spacing: .12em; }
     .cover-gloss { position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0)); mix-blend-mode:overlay }
     .cover-info { position:absolute; left:0; right:0; bottom:0; padding:10px; color:#fff; backdrop-filter: blur(6px) saturate(1.2); background:linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.6)); transform:translateZ(30px); }
     .cover-title { font-weight:700; font-size:0.95rem; letter-spacing:0.2px }
@@ -47,7 +49,8 @@
     .cover-card:focus-within .cover-media, .cover-card:hover .cover-media { transform:scale(1.04) translateZ(20px) }
     .cover-actions { margin-top:8px; display:flex; gap:8px }
     .cover-cta { background:linear-gradient(90deg,var(--cover-cta-bg1),var(--cover-cta-bg2)); color:#0b0b0b; border-radius:8px; padding:6px 8px; font-weight:700; cursor:pointer }
-    @media (min-width:1100px) { .cover-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } .cover-card{height:320px} }
+    @media (min-width:1100px) { .cover-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); } }
+    @media (max-width:600px) { .cover-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap:12px; } .cover-card { border-radius:10px; } }
     .hidden { display:none !important }
     </style>
 </head>
