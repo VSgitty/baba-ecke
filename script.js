@@ -74,8 +74,9 @@ async function searchInternetCover(movie) {
 }
 
 async function resolveCover(movie, existingUrl) {
+    if (existingUrl) return existingUrl;
     const officialCover = await searchInternetCover(movie);
-    return officialCover || existingUrl || createFallbackCover(movie);
+    return officialCover || createFallbackCover(movie);
 }
 
 function normalizeGenre(genreStr) {
@@ -546,7 +547,7 @@ function renderShelfBook(movie) {
         <div class="shelf-book${inWL ? " in-watchlist" : ""}"
              data-id="${esc(movie.id)}"
              tabindex="0" role="button" aria-label="${esc(movie.title)}">
-            <img class="shelf-book-cover" src="${esc(movie.poster || createFallbackCover(movie))}" data-cover-title="${esc(movie.title)}" data-cover-year="${esc(movie.year)}" data-cover-type="${esc(movie.type)}" alt="${esc(movie.title)}" loading="lazy">
+            <img class="shelf-book-cover" src="${esc(movie.poster || createFallbackCover(movie))}" data-cover-title="${esc(movie.title)}" data-cover-year="${esc(movie.year)}" data-cover-type="${esc(movie.type)}" data-cover-source="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
         </div>`;}
 
 function attachImageCoverFallbacks(root = document) {
@@ -554,7 +555,9 @@ function attachImageCoverFallbacks(root = document) {
         if (image.dataset.coverFallbackBound) return;
         image.dataset.coverFallbackBound = "true";
         const movie = { title: image.dataset.coverTitle, year: image.dataset.coverYear, type: image.dataset.coverType };
-        resolveCover(movie, image.src).then((cover) => { image.src = cover; });
+        if (!image.dataset.coverSource) {
+            resolveCover(movie, "").then((cover) => { image.src = cover; });
+        }
         image.addEventListener("error", async () => {
             if (image.dataset.coverFallbackUsed) return;
             image.dataset.coverFallbackUsed = "true";
@@ -815,11 +818,9 @@ function initCoverLazyLoading() {
                     const img = new Image();
                         img.src = u;
                         img.onload = () => {
-                            resolveCover(movie, u).then((cover) => {
-                                media.style.backgroundImage = `url("${cover}")`;
-                                media.classList.remove('lazy', 'failed');
-                                media.classList.add('loaded');
-                            });
+                            media.style.backgroundImage = `url("${u}")`;
+                            media.classList.remove('lazy', 'failed');
+                            media.classList.add('loaded');
                         };
                     img.onerror = () => {
                         loadSequential(urls);
