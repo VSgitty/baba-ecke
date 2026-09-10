@@ -1037,7 +1037,26 @@ function attachParallaxHero() {
     const bg = document.getElementById("heroLayerBg");
     const mid = document.getElementById("heroLayerMid");
     if (!hero || !bg) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reels = hero.querySelectorAll(".hero-film-reel");
+
+    if (!reduceMotion && reels.length) {
+        let scrollRaf = 0;
+        const updateReels = () => {
+            const scrollY = window.scrollY || window.pageYOffset;
+            reels.forEach((reel, index) => {
+                const direction = index % 2 === 0 ? 1 : -1;
+                reel.style.setProperty("--film-scroll", `${(scrollY * 0.42 * direction) % 96}px`);
+            });
+            scrollRaf = 0;
+        };
+        window.addEventListener("scroll", () => {
+            if (!scrollRaf) scrollRaf = window.requestAnimationFrame(updateReels);
+        }, { passive: true });
+        updateReels();
+    }
+
+    if (reduceMotion) return;
 
     let rafId = 0;
     let pointerX = 0;
