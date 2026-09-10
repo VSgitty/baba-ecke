@@ -5,6 +5,38 @@ const STORAGE_KEYS = {
 };
 
 let CATALOG = [];
+const coverSearchCache = new Map();
+
+function escapeSvgText(value) {
+    return String(value || "Unbekannter Titel")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+function createFallbackCover(movie) {
+    const title = escapeSvgText(movie.title);
+    const year = escapeSvgText(movie.year || "BABA ECKE");
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#27354a"/><stop offset="1" stop-color="#080b12"/></linearGradient></defs><rect width="600" height="900" fill="url(#g)"/><path d="M0 680L600 430V900H0Z" fill="#05070b" opacity=".7"/><text x="48" y="112" fill="#ffba2d" font-family="Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="5">BABA ECKE</text><text x="48" y="660" fill="#fff" font-family="Arial,sans-serif" font-size="42" font-weight="700">${title}</text><text x="48" y="710" fill="#a8b3cf" font-family="Arial,sans-serif" font-size="24">${year}  /  COVER SEARCH</text></svg>`;
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+async function searchInternetCover(movie) {
+    const query = `${movie.title} movie cover`;
+    if (coverSearchCache.has(query)) return coverSearchCache.get(query);
+
+    const request = fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrnamespace=0&prop=pageimages&piprop=thumbnail&pithumbsize=800&format=json&origin=*`)
+        .then((response) => response.ok ? response.json() : null)
+        .then((data) => {
+            const pages = Object.values(data?.query?.pages || {});
+            return pages.find((page) => page.thumbnail?.source)?.thumbnail.source || "";
+        })
+        .catch(() => "");
+
+    coverSearchCache.set(query, request);
+    return request;
+}
 
 function normalizeGenre(genreStr) {
     if (!genreStr) return "other";
@@ -474,8 +506,23 @@ function renderShelfBook(movie) {
         <div class="shelf-book${inWL ? " in-watchlist" : ""}"
              data-id="${esc(movie.id)}"
              tabindex="0" role="button" aria-label="${esc(movie.title)}">
-            <img class="shelf-book-cover" src="${esc(movie.poster)}" alt="${esc(movie.title)}" loading="lazy">
+            <img class="shelf-book-cover" src="${esc(movie.poster || createFallbackCover(movie))}" data-cover-title="${esc(movie.title)}" alt="${esc(movie.title)}" loading="lazy">
         </div>`;}
+
+function attachImageCoverFallbacks(root = document) {
+    root.querySelectorAll("img[data-cover-title]").forEach((image) => {
+        if (image.dataset.coverFallbackBound) return;
+        image.dataset.coverFallbackBound = "true";
+        image.addEventListener("error", async () => {
+            if (image.dataset.coverFallbackUsed) return;
+            image.dataset.coverFallbackUsed = "true";
+            const movie = { title: image.dataset.coverTitle };
+            const found = await searchInternetCover(movie);
+            image.src = found || createFallbackCover(movie);
+            image.onerror = () => { image.src = createFallbackCover(movie); };
+        }, { once: true });
+    });
+}
 
 /* ── Build DVD Case content HTML ── */
 function buildDVDCaseHTML(movie) {
@@ -627,6 +674,7 @@ function renderCatalogShelf() {
     `).join("");
 
     bindShelfBooks();
+    attachImageCoverFallbacks(host);
 
     window.requestAnimationFrame(() => {
         host.querySelectorAll(".shelf-group").forEach((el, idx) => {
@@ -695,6 +743,7 @@ function initCoverLazyLoading() {
         entries.forEach(entry => {
             if (!entry.isIntersecting) return;
             const media = entry.target;
+            const movie = findMovieById(media.closest(".cover-card")?.dataset.id) || { title: "Film" };
             const src = media.dataset.bg;
             if (src) {
                 // attempt WebP variant first if supported, then fallback to original
@@ -714,8 +763,17 @@ function initCoverLazyLoading() {
                 // preload sequentially until one succeeds
                 const loadSequential = (urls) => {
                     if (!urls.length) {
-                        media.classList.remove('lazy');
-                        media.classList.add('failed');
+                        searchInternetCover(movie).then((found) => {
+                            if (found) {
+                                media.style.backgroundImage = `url("${found}")`;
+                                media.classList.remove('lazy', 'failed');
+                                media.classList.add('loaded');
+                            } else {
+                                media.style.backgroundImage = `url("${createFallbackCover(movie)}")`;
+                                media.classList.remove('lazy');
+                                media.classList.add('failed');
+                            }
+                        });
                         return;
                     }
                     const u = urls.shift();
@@ -727,12 +785,17 @@ function initCoverLazyLoading() {
                             media.classList.add('loaded');
                         };
                     img.onerror = () => {
-                        // on error, try next; if none left, placeholder will be used
                         loadSequential(urls);
                     };
                 };
 
                 loadSequential(tryUrls);
+            } else {
+                searchInternetCover(movie).then((found) => {
+                    media.style.backgroundImage = `url("${found || createFallbackCover(movie)}")`;
+                    media.classList.remove('lazy');
+                    media.classList.add(found ? 'loaded' : 'failed');
+                });
             }
             observer.unobserve(media);
         });
